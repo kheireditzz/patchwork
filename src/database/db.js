@@ -8,23 +8,17 @@ import { createClient } from '@supabase/supabase-js';
 
 dotenv.config();
 
+import os from 'os';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// On Vercel, the project dir is read-only. Copy DB to /tmp on cold start.
+// On Vercel, the project dir is read-only.
 const projectDbPath = path.join(__dirname, '../../patchwork.db');
 const isVercel = !!process.env.VERCEL;
-const tmpDbPath = '/tmp/patchwork.db';
+const tmpDbPath = path.join(os.tmpdir(), 'patchwork.db');
 
-let dbFilePath;
-if (isVercel) {
-  if (!fs.existsSync(tmpDbPath) && fs.existsSync(projectDbPath)) {
-    fs.copyFileSync(projectDbPath, tmpDbPath);
-  }
-  dbFilePath = tmpDbPath;
-} else {
-  dbFilePath = projectDbPath;
-}
+let dbFilePath = isVercel ? tmpDbPath : projectDbPath;
 
 export const SUPABASE_URL = process.env.SUPABASE_URL || '';
 export const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';

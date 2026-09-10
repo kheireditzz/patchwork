@@ -10,17 +10,20 @@ import { authenticateToken, authorizeRole, JWT_SECRET } from '../middlewares/aut
 
 const router = express.Router();
 
+import os from 'os';
+
 // Setup Multer Storage for file uploads (Banner, Thumbnail, Gallery)
 const isVercelEnv = !!process.env.VERCEL;
-const uploadDir = isVercelEnv ? '/tmp/uploads' : path.join(process.cwd(), 'public/uploads');
-const excelUploadDir = isVercelEnv ? '/tmp/temp_excel' : path.join(process.cwd(), 'public/uploads/temp_excel');
+const baseTemp = os.tmpdir();
+const uploadDir = isVercelEnv ? path.join(baseTemp, 'uploads') : path.join(process.cwd(), 'public/uploads');
+const excelUploadDir = isVercelEnv ? path.join(baseTemp, 'temp_excel') : path.join(process.cwd(), 'public/uploads/temp_excel');
 
 try {
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
 } catch (e) {
-  console.warn('Could not create uploadDir:', e.message);
+  // Ignore
 }
 
 try {
@@ -28,17 +31,20 @@ try {
     fs.mkdirSync(excelUploadDir, { recursive: true });
   }
 } catch (e) {
-  console.warn('Could not create excelUploadDir:', e.message);
+  // Ignore
 }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const base = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
-    cb(null, `${Date.now()}-${base}${ext}`);
-  }
-});
+// In serverless, memoryStorage or fallback to tempDir avoids EROFS errors
+const storage = isVercelEnv
+  ? multer.memoryStorage()
+  : multer.diskStorage({
+      destination: (req, file, cb) => cb(null, uploadDir),
+      filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        const base = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
+        cb(null, `${Date.now()}-${base}${ext}`);
+      }
+    });
 
 const upload = multer({
   storage,
@@ -53,7 +59,7 @@ const upload = multer({
 });
 
 const excelUpload = multer({
-  dest: excelUploadDir
+  storage: multer.memoryStorage()
 });
 
 // Helper: Slugify
@@ -122,22 +128,25 @@ router.post('/upload', authenticateToken, upload.single('file'), async (req, res
       return res.status(400).json({ error: 'Tidak ada file yang diunggah.' });
     }
 
-    const relativeUrl = `/uploads/${req.file.filename}`;
+    const filename = req.file.filename || `${Date.now()}-${(req.file.originalname || 'file').replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+    const relativeUrl = `/uploads/${filename}`;
 
     // If Supabase is connected, optionally upload to Supabase Storage as well
     if (supabase) {
       try {
-        const fileData = fs.readFileSync(req.file.path);
-        const { error: sbErr } = await supabase.storage
-          .from('patchwork')
-          .upload(`uploads/${req.file.filename}`, fileData, {
-            contentType: req.file.mimetype,
-            upsert: true
-          });
-        if (!sbErr) {
-          const { data: publicData } = supabase.storage.from('patchwork').getPublicUrl(`uploads/${req.file.filename}`);
-          if (publicData?.publicUrl) {
-            return res.json({ url: publicData.publicUrl, localUrl: relativeUrl });
+        const fileData = req.file.buffer || (req.file.path ? fs.readFileSync(req.file.path) : null);
+        if (fileData) {
+          const { error: sbErr } = await supabase.storage
+            .from('patchwork')
+            .upload(`uploads/${filename}`, fileData, {
+              contentType: req.file.mimetype,
+              upsert: true
+            });
+          if (!sbErr) {
+            const { data: publicData } = supabase.storage.from('patchwork').getPublicUrl(`uploads/${filename}`);
+            if (publicData?.publicUrl) {
+              return res.json({ url: publicData.publicUrl, localUrl: relativeUrl });
+            }
           }
         }
       } catch (err) {
