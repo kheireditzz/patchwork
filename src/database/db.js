@@ -97,7 +97,15 @@ function saveDbToFile() {
 }
 
 export async function initDatabase() {
-  const SQL = await initSqlJs();
+  const wasmPath = path.join(process.cwd(), 'node_modules/sql.js/dist/sql-wasm.wasm');
+  const SQL = await initSqlJs({
+    locateFile: file => {
+      if (file.endsWith('.wasm')) {
+        if (fs.existsSync(wasmPath)) return wasmPath;
+      }
+      return file;
+    }
+  });
   if (fs.existsSync(dbFilePath)) {
     const filebuffer = fs.readFileSync(dbFilePath);
     rawDb = new SQL.Database(filebuffer);

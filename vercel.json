@@ -5,7 +5,11 @@
       "src": "api/index.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["src/**", "public/**"]
+        "includeFiles": [
+          "src/**",
+          "public/**",
+          "node_modules/sql.js/dist/sql-wasm.wasm"
+        ]
       }
     }
   ],
