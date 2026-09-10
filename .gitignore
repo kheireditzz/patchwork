@@ -1,0 +1,7 @@
+node_modules/
+.env
+patchwork.db
+public/uploads/temp_excel/
+*.log
+.DS_Store
+.vercel

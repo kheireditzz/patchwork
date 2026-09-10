@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - PATCHWORK Affiliate</title>
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+    .admin-card {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .admin-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.1);
+    }
+    .dark .admin-card:hover {
+      box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.5);
+    }
+    .top-nav-slider {
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .top-nav-slider::-webkit-scrollbar { display: none; }
+    .tab-pill {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
+    }
+    .tab-pill.active {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: #ffffff !important;
+      box-shadow: 0 6px 20px -4px rgba(79, 70, 229, 0.5);
+      transform: scale(1.03);
+      border-color: transparent !important;
+    }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeOutUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-12px); } }
+    .fade-in-up { animation: fadeInUp 0.4s ease-out; }
+  </style>
+</head>
+<body class="bg-slate-50/80 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- ================= AUTH CONTAINER (LOGIN) ================= -->
+  <div id="login-container" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-tr from-slate-950 via-brand-950 to-purple-950 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+      <div class="absolute -right-20 -top-20 w-96 h-96 bg-brand-500 rounded-full blur-3xl"></div>
+      <div class="absolute -left-20 -bottom-20 w-96 h-96 bg-purple-500 rounded-full blur-3xl"></div>
+    </div>
+    <div class="max-w-md w-full bg-white rounded-3xl p-8 border border-slate-200 shadow-2xl relative z-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 to-purple-500 flex items-center justify-center text-white mx-auto shadow-xl shadow-brand-500/30 mb-5">
+          <i data-lucide="layers" class="w-8 h-8"></i>
+        </div>
+        <h1 class="text-2xl font-extrabold tracking-tight">Admin PATCHWORK</h1>
+        <p class="text-xs text-slate-500 mt-1">Masuk untuk mengelola link affiliate, banner & statistik</p>
+      </div>
+
+      <form id="login-form" class="space-y-4">
+        <div id="login-error" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold"></div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Email</label>
+          <div class="relative">
+            <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input type="email" id="login-email" placeholder="Masukkan email admin" required class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-brand-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Password</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input type="password" id="login-password" placeholder="Masukkan password" required class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-brand-500">
+          </div>
+        </div>
+
+        <button type="submit" id="btn-login-submit" class="w-full py-3.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-lg shadow-brand-500/25 transition duration-200 flex items-center justify-center space-x-2">
+          <span>Masuk ke Dashboard</span>
+          <i data-lucide="log-in" class="w-4 h-4"></i>
+        </button>
+
+        <div class="text-center pt-2">
+          <a href="/" class="text-xs text-slate-500 hover:text-brand-500 transition">← Kembali ke Halaman Publik</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= DASHBOARD APP CONTAINER ================= -->
+  <div id="dashboard-container" class="hidden flex-1 flex flex-col h-screen overflow-hidden">
+    
+    <!-- TOP HEADER -->
+    <header class="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-sm z-20">
+      <!-- Left: Brand Logo & Title -->
+      <div class="flex items-center space-x-3">
+        <a href="/" class="flex items-center group py-1" title="Ke Beranda Publik">
+          <img 
+            src="/images/logo.png" 
+            onerror="this.onerror=null; this.src='https://i.ibb.co.com/mwpHfGn/263941-removebg-preview.png';" 
+            alt="Logo" 
+            class="h-10 w-auto max-w-[130px] object-contain drop-shadow transition-transform duration-200 group-hover:scale-105"
+          >
+        </a>
+        <span class="text-slate-300">/</span>
+        <h2 class="text-xs sm:text-sm font-bold text-slate-700 truncate max-w-[120px] sm:max-w-none" id="section-title">
+          Ringkasan & Analytics
+        </h2>
+      </div>
+
+      <!-- Right: Actions & User Info -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <a href="/" target="_blank" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold hover:bg-slate-100 flex items-center space-x-1.5 transition shadow-sm" title="Lihat Web Publik">
+          <i data-lucide="external-link" class="w-3.5 h-3.5 text-brand-500"></i>
+          <span class="hidden md:inline">Web Publik</span>
+        </a>
+
+
+
+
+        <!-- User Profile Pill -->
+        <div class="flex items-center space-x-2 pl-2 border-l border-slate-200">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-brand-600 to-indigo-500 text-white flex items-center justify-center font-bold text-xs shadow-sm" id="user-avatar">
+            SA
+          </div>
+          <div class="hidden sm:block text-left">
+            <div class="text-xs font-bold truncate max-w-[100px]" id="user-display-name">Super Admin</div>
+            <div class="text-[9px] text-slate-400 font-semibold uppercase tracking-wider" id="user-display-role">Admin</div>
+          </div>
+          <button onclick="logout()" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition" title="Keluar">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- HORIZONTAL SCROLLING FEATURE NAVIGATION (FITUR ATAS MODEL GESER) -->
+    <div class="bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-2 sm:px-6 py-2 shrink-0 flex items-center gap-1 sm:gap-2 z-10 shadow-sm">
+      <button onclick="slideAdminNav('prev')" class="w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:text-slate-900 shadow-sm shrink-0 active:scale-90 transition hover:border-brand-500" title="Geser Kiri">
+        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+      </button>
+
+      <div id="admin-nav-slider" class="flex-1 flex items-center gap-2 overflow-x-auto top-nav-slider py-1 px-1">
+        <button onclick="navigateTab('overview')" id="nav-overview" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Ringkasan & Analytics</span>
+        </button>
+
+        <button onclick="navigateTab('products')" id="nav-products" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
+          <i data-lucide="package" class="w-4 h-4"></i>
+          <span>Manajemen Produk</span>
+        </button>
+
+        <button onclick="navigateTab('categories')" id="nav-categories" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
+          <i data-lucide="tag" class="w-4 h-4"></i>
+          <span>Manajemen Kategori</span>
+        </button>
+
+        <button onclick="navigateTab('banners')" id="nav-banners" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
+          <i data-lucide="image" class="w-4 h-4"></i>
+          <span>Manajemen Banner</span>
+        </button>
+
+        <button onclick="navigateTab('users')" id="nav-users" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span>Manajemen Pengguna</span>
+        </button>
+
+        <button onclick="navigateTab('seo')" id="nav-seo" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
+          <i data-lucide="globe" class="w-4 h-4"></i>
+          <span>SEO & Pengaturan</span>
+        </button>
+
+        <button onclick="navigateTab('tools')" id="nav-tools" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
+          <i data-lucide="database" class="w-4 h-4"></i>
+          <span>Import, Export & Backup</span>
+        </button>
+
+        <button onclick="navigateTab('logs')" id="nav-logs" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
+          <i data-lucide="history" class="w-4 h-4"></i>
+          <span>Audit Log Aktivitas</span>
+        </button>
+      </div>
+
+      <button onclick="slideAdminNav('next')" class="w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:text-slate-900 shadow-sm shrink-0 active:scale-90 transition hover:border-brand-500" title="Geser Kanan">
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- MAIN BODY CONTENT (FULL WIDTH) -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <!-- Dynamic Tab Views -->
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 custom-scrollbar bg-slate-50/70">
+
+        <!-- 1. OVERVIEW & ANALYTICS TAB -->
+        <div id="tab-overview" class="space-y-6">
+          <!-- Metric KPI Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm admin-card relative overflow-hidden">
+              <div class="flex items-center justify-between text-slate-500 mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Produk</span>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-brand-600/10 text-indigo-600 flex items-center justify-center">
+                  <i data-lucide="package" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div class="text-3xl font-extrabold tracking-tight" id="kpi-products">0</div>
+              <span class="text-[11px] text-emerald-600 font-semibold inline-flex items-center mt-1" id="kpi-products-sub">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                0 tayang publik
+              </span>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm admin-card relative overflow-hidden">
+              <div class="flex items-center justify-between text-slate-500 mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Klik Affiliate</span>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500/20 to-pink-600/10 text-pink-600 flex items-center justify-center">
+                  <i data-lucide="mouse-pointer-click" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div class="text-3xl font-extrabold tracking-tight text-pink-600" id="kpi-clicks">0</div>
+              <span class="text-[11px] text-slate-400 font-medium inline-block mt-1">Akumulasi seluruh link affiliate</span>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm admin-card relative overflow-hidden">
+              <div class="flex items-center justify-between text-slate-500 mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Shopee vs TikTok</span>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 text-orange-600 flex items-center justify-center">
+                  <i data-lucide="pie-chart" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div class="text-2xl font-black flex items-center space-x-2 mt-1">
+                <span class="text-orange-600" id="kpi-shopee">0</span>
+                <span class="text-slate-300">/</span>
+                <span class="text-pink-600" id="kpi-tiktok">0</span>
+              </div>
+              <span class="text-[11px] text-slate-400 font-medium inline-block mt-1">Perbandingan performa link</span>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm admin-card relative overflow-hidden">
+              <div class="flex items-center justify-between text-slate-500 mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Pengunjung</span>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 text-blue-600 flex items-center justify-center">
+                  <i data-lucide="eye" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div class="text-3xl font-extrabold tracking-tight text-blue-600" id="kpi-visitors">0</div>
+              <span class="text-[11px] text-slate-400 font-medium inline-block mt-1">Pengunjung halaman tercatat</span>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Daily Click Chart -->
+            <div class="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm">
+              <h3 class="text-sm font-bold mb-4 flex items-center justify-between">
+                <span>Grafik Klik 7 Hari Terakhir</span>
+                <i data-lucide="trending-up" class="w-4 h-4 text-brand-500"></i>
+              </h3>
+              <div class="h-64">
+                <canvas id="dailyClicksChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Top Products Table -->
+            <div class="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm flex flex-col">
+              <h3 class="text-sm font-bold mb-4 flex items-center justify-between">
+                <span>Produk Paling Populer (Klik Terbanyak)</span>
+                <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
+              </h3>
+              <div class="flex-1 overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="text-slate-400 border-b border-slate-100">
+                    <tr>
+                      <th class="pb-2">Produk</th>
+                      <th class="pb-2">Market</th>
+                      <th class="pb-2 text-right">Total Klik</th>
+                    </tr>
+                  </thead>
+                  <tbody id="top-products-tbody" class="divide-y divide-slate-100">
+                    <!-- Top products injected here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. PRODUCT MANAGEMENT TAB -->
+        <div id="tab-products" class="hidden space-y-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="relative flex-1 max-w-sm w-full">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="admin-product-search" placeholder="Cari nama produk..." oninput="loadAdminProducts()" class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs">
+            </div>
+            <button onclick="openProductModal()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md shadow-brand-500/20 flex items-center space-x-2">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Tambah Produk Baru</span>
+            </button>
+          </div>
+
+          <!-- Product Table -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="p-3.5">Produk</th>
+                    <th class="p-3.5">Kategori</th>
+                    <th class="p-3.5">Harga</th>
+                    <th class="p-3.5">Komisi</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5">Klik</th>
+                    <th class="p-3.5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-products-table" class="divide-y divide-slate-100">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. CATEGORY MANAGEMENT TAB -->
+        <div id="tab-categories" class="hidden space-y-6">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-slate-500">Kelola kategori untuk mengelompokkan produk affiliate.</p>
+            <button onclick="openCategoryModal()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md flex items-center space-x-1.5">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Tambah Kategori</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="categories-list">
+            <!-- Categories cards injected -->
+          </div>
+        </div>
+
+        <!-- 4. BANNER MANAGEMENT TAB -->
+        <div id="tab-banners" class="hidden space-y-6">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-slate-500">Atur hero banner dan promo slider yang tampil di halaman beranda.</p>
+            <button onclick="openBannerModal()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md flex items-center space-x-1.5">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Tambah Banner</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="banners-list">
+            <!-- Banner cards injected -->
+          </div>
+        </div>
+
+        <!-- 5. USERS MANAGEMENT TAB -->
+        <div id="tab-users" class="hidden space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold">Hak Akses & Pengguna</h3>
+              <p class="text-xs text-slate-500">Super Admin dapat membuat akun Admin dan Editor.</p>
+            </div>
+            <button onclick="openUserModal()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md flex items-center space-x-1.5">
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              <span>Tambah User</span>
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                <tr>
+                  <th class="p-3.5">Nama</th>
+                  <th class="p-3.5">Email</th>
+                  <th class="p-3.5">Peran (Role)</th>
+                  <th class="p-3.5">Dibuat</th>
+                  <th class="p-3.5 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body" class="divide-y divide-slate-100">
+                <!-- User rows injected -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 6. SEO & SETTINGS TAB -->
+        <div id="tab-seo" class="hidden space-y-6">
+          <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm max-w-2xl">
+            <h3 class="text-base font-bold mb-4">Pengaturan Global & SEO</h3>
+            <form id="settings-form" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold mb-1">Nama Situs / Platform</label>
+                <input type="text" id="setting-site_name" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold mb-1">Meta Title (Google Search)</label>
+                <input type="text" id="setting-meta_title" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold mb-1">Meta Description</label>
+                <textarea id="setting-meta_description" rows="3" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold mb-1">Open Graph (OG) Image URL</label>
+                <input type="text" id="setting-og_image" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold mb-1">Robots.txt Content</label>
+                <textarea id="setting-robots_txt" rows="3" class="w-full p-2.5 rounded-xl font-mono text-[11px] border border-slate-200 bg-slate-50"></textarea>
+              </div>
+
+              <div class="pt-2">
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md">
+                  Simpan Pengaturan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- 7. TOOLS (IMPORT / EXPORT / BACKUP) TAB -->
+        <div id="tab-tools" class="hidden space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Export Excel -->
+            <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-3">
+                  <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-bold text-sm mb-1">Export Data ke Excel</h4>
+                <p class="text-xs text-slate-500 mb-4">Unduh seluruh produk, link affiliate, dan jumlah klik dalam file spreadsheet .xlsx</p>
+              </div>
+              <button onclick="exportExcel()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center space-x-2">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                <span>Download File Excel</span>
+              </button>
+            </div>
+
+            <!-- Import Excel -->
+            <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center mb-3">
+                  <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-bold text-sm mb-1">Import Data dari Excel</h4>
+                <p class="text-xs text-slate-500 mb-4">Upload massal produk affiliate melalui template tabel Excel.</p>
+              </div>
+              <div>
+                <input type="file" id="excel-file-input" accept=".xlsx, .xls" class="hidden" onchange="handleExcelImport(event)">
+                <button onclick="document.getElementById('excel-file-input').click()" class="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center space-x-2">
+                  <i data-lucide="upload" class="w-4 h-4"></i>
+                  <span>Pilih File Excel</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Backup Database -->
+            <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center mb-3">
+                  <i data-lucide="hard-drive" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-bold text-sm mb-1">Backup Database Utama</h4>
+                <p class="text-xs text-slate-500 mb-4">Download file salinan cadangan snapshot database SQLite (.db).</p>
+              </div>
+              <button onclick="backupDatabase()" class="w-full py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center justify-center space-x-2">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                <span>Download Backup</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. ACTIVITY LOGS TAB -->
+        <div id="tab-logs" class="hidden space-y-6">
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                <tr>
+                  <th class="p-3.5">Waktu</th>
+                  <th class="p-3.5">User</th>
+                  <th class="p-3.5">Aksi</th>
+                  <th class="p-3.5">Rincian</th>
+                  <th class="p-3.5">IP</th>
+                </tr>
+              </thead>
+              <tbody id="activity-logs-body" class="divide-y divide-slate-100">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- PRODUCT MODAL (Add / Edit) -->
+  <div id="product-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <div class="flex items-center justify-between mb-4 border-b pb-3">
+        <h3 class="text-base font-bold" id="product-modal-title">Tambah Produk Affiliate</h3>
+        <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <form id="product-form" class="space-y-4">
+        <input type="hidden" id="prod-id">
+
+        <div>
+          <label class="block text-xs font-bold mb-1">Nama Produk *</label>
+          <input type="text" id="prod-name" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold mb-1">Kategori</label>
+            <select id="prod-category" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Marketplace Utama</label>
+            <select id="prod-marketplace" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+              <option value="Shopee">Shopee</option>
+              <option value="TikTok Shop">TikTok Shop</option>
+              <option value="Tokopedia">Tokopedia</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold mb-1">Harga (Rp)</label>
+            <input type="number" id="prod-price" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs" placeholder="150000">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Estimasi Komisi</label>
+            <input type="text" id="prod-commission" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs" placeholder="Contoh: 10% atau Rp 15.000">
+          </div>
+        </div>
+
+        <!-- SINGLE ACTIVE AFFILIATE LINK TOGGLE (HANYA SALAH SATU YANG BISA AKTIF) -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <label class="block text-xs font-bold text-slate-800">Pilihan Link Affiliate Aktif (Pilih Salah Satu)</label>
+              <p class="text-[11px] text-slate-500">Pilih link mana yang ingin diaktifkan untuk produk ini (Shopee ATAU TikTok Shop)</p>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-500/10 text-brand-600">Single Active</span>
+          </div>
+
+          <!-- Radio Selector -->
+          <div class="grid grid-cols-2 gap-3 pt-1">
+            <label class="cursor-pointer border-2 rounded-xl p-3 flex items-center space-x-3 transition has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/50 border-slate-200">
+              <input type="radio" name="active_affiliate_channel" id="channel-shopee" value="Shopee" checked onchange="toggleAffiliateChannel('Shopee')" class="w-4 h-4 text-orange-600 focus:ring-orange-500">
+              <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5 text-orange-600" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.5 7.05h-2.73c-.28-2.67-2.1-4.8-4.77-4.8s-4.49 2.13-4.77 4.8H4.5c-.83 0-1.5.67-1.5 1.5l1.2 11.4c.08.77.73 1.35 1.5 1.35h12.6c.77 0 1.42-.58 1.5-1.35l1.2-11.4c0-.83-.67-1.5-1.5-1.5zm-7.5-3.3c1.83 0 3.32 1.49 3.47 3.3H8.53c.15-1.81 1.64-3.3 3.47-3.3zm5.7 15.75H6.3L5.25 8.55h13.5l-1.05 10.95z"/>
+                </svg>
+                <span class="text-xs font-bold text-slate-800">Shopee Aktif</span>
+              </div>
+            </label>
+
+            <label class="cursor-pointer border-2 rounded-xl p-3 flex items-center space-x-3 transition has-[:checked]:border-pink-500 has-[:checked]:bg-pink-50/50 border-slate-200">
+              <input type="radio" name="active_affiliate_channel" id="channel-tiktok" value="TikTok Shop" onchange="toggleAffiliateChannel('TikTok Shop')" class="w-4 h-4 text-pink-600 focus:ring-pink-500">
+              <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5 text-pink-600" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298 0 .592.046.87.136V9.4a6.33 6.33 0 0 0-.87-.06A6.34 6.34 0 0 0 3.14 15.7a6.34 6.34 0 0 0 9.15 5.62v-9.15a8.16 8.16 0 0 0 4.87 1.6v-3.47a4.85 4.85 0 0 1-2.57-1.61z"/>
+                </svg>
+                <span class="text-xs font-bold text-slate-800">TikTok Shop Aktif</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Shopee Input Container -->
+          <div id="shopee-input-block" class="pt-2">
+            <label class="block text-xs font-bold mb-1 text-orange-600 flex items-center space-x-1.5">
+              <span>Link Shopee Affiliate (ON)</span>
+            </label>
+            <input type="url" id="prod-url-shopee" class="w-full p-2.5 rounded-xl border border-orange-300 bg-white text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="https://s.shopee.co.id/... atau https://shope.ee/...">
+          </div>
+
+          <!-- TikTok Input Container -->
+          <div id="tiktok-input-block" class="pt-2 hidden">
+            <label class="block text-xs font-bold mb-1 text-pink-600 flex items-center space-x-1.5">
+              <span>Link TikTok Shop Affiliate (ON)</span>
+            </label>
+            <input type="url" id="prod-url-tiktok" class="w-full p-2.5 rounded-xl border border-pink-300 bg-white text-xs focus:ring-2 focus:ring-pink-500 focus:outline-none" placeholder="https://vt.tiktok.com/... atau https://shop.tiktok.com/...">
+          </div>
+
+          <input type="hidden" id="prod-url-tokopedia" value="">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold mb-1">Thumbnail Gambar (URL atau Upload)</label>
+          <div class="flex gap-2">
+            <input type="text" id="prod-thumbnail" class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs" placeholder="https://... atau upload file">
+            <label class="px-3 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-xs font-bold cursor-pointer shrink-0">
+              <i data-lucide="upload" class="w-4 h-4 inline-block"></i>
+              <input type="file" class="hidden" accept="image/*" onchange="uploadImageFile(this, 'prod-thumbnail')">
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold mb-1">Deskripsi Produk</label>
+          <textarea id="prod-description" rows="3" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold mb-1">Status Publikasi</label>
+            <select id="prod-status" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+              <option value="Published">Published (Tayang)</option>
+              <option value="Draft">Draft (Disembunyikan)</option>
+            </select>
+          </div>
+          <div class="flex items-center pt-5">
+            <label class="flex items-center space-x-2 text-xs font-bold cursor-pointer">
+              <input type="checkbox" id="prod-featured" class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+              <span>Produk Unggulan (Featured / Trending)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t flex justify-end space-x-2">
+          <button type="button" onclick="closeProductModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold">Batal</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md">Simpan Produk</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CATEGORY MODAL -->
+  <div id="category-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 border border-slate-200 shadow-2xl">
+      <div class="flex items-center justify-between mb-4 border-b pb-3">
+        <h3 class="text-base font-bold" id="category-modal-title">Tambah Kategori</h3>
+        <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="category-form" class="space-y-4">
+        <input type="hidden" id="cat-id">
+        <div>
+          <label class="block text-xs font-bold mb-1">Nama Kategori *</label>
+          <input type="text" id="cat-name" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Deskripsi</label>
+          <input type="text" id="cat-desc" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+        </div>
+        <div class="pt-3 border-t flex justify-end space-x-2">
+          <button type="button" onclick="closeCategoryModal()" class="px-4 py-2 rounded-xl border text-xs font-bold">Batal</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs">Simpan Kategori</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- BANNER MODAL -->
+  <div id="banner-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 border border-slate-200 shadow-2xl">
+      <div class="flex items-center justify-between mb-4 border-b pb-3">
+        <h3 class="text-base font-bold">Tambah / Edit Banner</h3>
+        <button onclick="closeBannerModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="banner-form" class="space-y-4">
+        <input type="hidden" id="banner-id">
+        <div>
+          <label class="block text-xs font-bold mb-1">Judul Banner *</label>
+          <input type="text" id="banner-title-input" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Sub Judul</label>
+          <input type="text" id="banner-subtitle-input" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Gambar Banner (URL / Upload)</label>
+          <div class="flex gap-2">
+            <input type="text" id="banner-image-input" required class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+            <label class="px-3 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-xs font-bold cursor-pointer shrink-0">
+              <i data-lucide="upload" class="w-4 h-4 inline-block"></i>
+              <input type="file" class="hidden" accept="image/*" onchange="uploadImageFile(this, 'banner-image-input')">
+            </label>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Link Tujuan Banner</label>
+          <input type="text" id="banner-target-input" value="#products" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Status</label>
+          <select id="banner-status-input" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+            <option value="Published">Published</option>
+            <option value="Draft">Draft</option>
+          </select>
+        </div>
+        <div class="pt-3 border-t flex justify-end space-x-2">
+          <button type="button" onclick="closeBannerModal()" class="px-4 py-2 rounded-xl border text-xs font-bold">Batal</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs">Simpan Banner</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- USER MODAL -->
+  <div id="user-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 border border-slate-200 shadow-2xl">
+      <div class="flex items-center justify-between mb-4 border-b pb-3">
+        <h3 class="text-base font-bold">Tambah Pengguna Baru</h3>
+        <button onclick="closeUserModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="user-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold mb-1">Nama Lengkap</label>
+          <input type="text" id="new-user-name" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Email</label>
+          <input type="email" id="new-user-email" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Password</label>
+          <input type="password" id="new-user-pass" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Role / Peran</label>
+          <select id="new-user-role" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+            <option value="Admin">Admin</option>
+            <option value="Editor">Editor</option>
+            <option value="Super Admin">Super Admin</option>
+          </select>
+        </div>
+        <div class="pt-3 border-t flex justify-end space-x-2">
+          <button type="button" onclick="closeUserModal()" class="px-4 py-2 rounded-xl border text-xs font-bold">Batal</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs">Simpan Pengguna</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CUSTOM TOAST & CONFIRM MODAL -->
+  <div id="toast-container" class="fixed top-5 right-5 z-[999] flex flex-col gap-3 pointer-events-none" style="max-width:380px;"></div>
+
+  <div id="confirm-modal" class="fixed inset-0 z-[998] hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="confirm-overlay"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 relative" id="confirm-box" style="animation: fadeInUp 0.25s ease-out;">
+        <div class="flex items-center space-x-3 mb-4">
+          <div class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0" id="confirm-icon-bg">
+            <i id="confirm-icon" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-900" id="confirm-title">Konfirmasi</h3>
+            <p class="text-xs text-slate-500 mt-0.5" id="confirm-message">Apakah Anda yakin?</p>
+          </div>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button id="confirm-cancel-btn" class="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition active:scale-95">
+            Batal
+          </button>
+          <button id="confirm-ok-btn" class="px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-lg transition active:scale-95">
+            Ya, Lanjutkan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let token = localStorage.getItem('patchwork_token') || '';
+    let currentUser = null;
+    let dailyChart = null;
+
+    // =================== CUSTOM TOAST ===================
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const colors = {
+        success: { bg: 'bg-emerald-50 border-emerald-200', text: 'text-emerald-800', icon: 'check-circle', iconColor: 'text-emerald-500' },
+        error:   { bg: 'bg-red-50 border-red-200', text: 'text-red-800', icon: 'x-circle', iconColor: 'text-red-500' },
+        warning: { bg: 'bg-amber-50 border-amber-200', text: 'text-amber-800', icon: 'alert-triangle', iconColor: 'text-amber-500' },
+        info:    { bg: 'bg-blue-50 border-blue-200', text: 'text-blue-800', icon: 'info', iconColor: 'text-blue-500' },
+      };
+      const c = colors[type] || colors.info;
+
+      toast.className = `pointer-events-auto flex items-start gap-3 px-4 py-3.5 rounded-2xl border shadow-xl ${c.bg} ${c.text}`;
+      toast.style.cssText = 'animation: fadeInUp 0.3s ease-out; min-width: 280px;';
+      toast.innerHTML = `
+        <i data-lucide="${c.icon}" class="w-5 h-5 ${c.iconColor} shrink-0 mt-0.5"></i>
+        <div class="flex-1">
+          <p class="text-xs font-semibold leading-relaxed">${message}</p>
+        </div>
+        <button onclick="this.closest('div[class*=pointer-events-auto]').remove()" class="shrink-0 p-0.5 rounded-lg hover:bg-black/5 transition">
+          <i data-lucide="x" class="w-3.5 h-3.5 opacity-50"></i>
+        </button>
+      `;
+
+      container.appendChild(toast);
+      lucide.createIcons({ nodes: [toast] });
+
+      setTimeout(() => {
+        toast.style.animation = 'fadeOutUp 0.3s ease-in forwards';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // =================== CUSTOM CONFIRM ===================
+    function showConfirm({ title, message, type = 'danger', confirmText = 'Ya, Lanjutkan', cancelText = 'Batal' }) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('confirm-modal');
+        const titleEl = document.getElementById('confirm-title');
+        const msgEl = document.getElementById('confirm-message');
+        const okBtn = document.getElementById('confirm-ok-btn');
+        const cancelBtn = document.getElementById('confirm-cancel-btn');
+        const iconBg = document.getElementById('confirm-icon-bg');
+        const iconEl = document.getElementById('confirm-icon');
+        const overlay = document.getElementById('confirm-overlay');
+
+        const styles = {
+          danger:  { bg: 'bg-red-100', iconColor: 'text-red-600', btn: 'bg-red-600 hover:bg-red-700 shadow-red-500/25', iconName: 'trash-2' },
+          warning: { bg: 'bg-amber-100', iconColor: 'text-amber-600', btn: 'bg-amber-600 hover:bg-amber-700 shadow-amber-500/25', iconName: 'alert-triangle' },
+          info:    { bg: 'bg-blue-100', iconColor: 'text-blue-600', btn: 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/25', iconName: 'help-circle' },
+        };
+        const s = styles[type] || styles.danger;
+
+        titleEl.innerText = title || 'Konfirmasi';
+        msgEl.innerText = message || 'Apakah Anda yakin?';
+        okBtn.innerText = confirmText;
+        cancelBtn.innerText = cancelText;
+        okBtn.className = `px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-lg transition active:scale-95 ${s.btn}`;
+        iconBg.className = `w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${s.bg}`;
+        iconEl.className = `w-5 h-5 ${s.iconColor}`;
+        iconEl.setAttribute('data-lucide', s.iconName);
+        
+        modal.classList.remove('hidden');
+        lucide.createIcons({ nodes: [modal] });
+
+        function cleanup() {
+          modal.classList.add('hidden');
+          okBtn.removeEventListener('click', onOk);
+          cancelBtn.removeEventListener('click', onCancel);
+          overlay.removeEventListener('click', onCancel);
+        }
+        function onOk() { cleanup(); resolve(true); }
+        function onCancel() { cleanup(); resolve(false); }
+
+        okBtn.addEventListener('click', onOk);
+        cancelBtn.addEventListener('click', onCancel);
+        overlay.addEventListener('click', onCancel);
+      });
+    }
+
+
+    // Check Auth State on load
+    async function checkAuth() {
+      if (!token) {
+        showLogin();
+        return;
+      }
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const json = await res.json();
+          currentUser = json.user;
+          showDashboard();
+        } else {
+          token = '';
+          localStorage.removeItem('patchwork_token');
+          currentUser = null;
+          showLogin();
+        }
+      } catch (err) {
+        showLogin();
+      }
+    }
+
+    function showLogin() {
+      document.getElementById('login-container').classList.remove('hidden');
+      document.getElementById('dashboard-container').classList.add('hidden');
+      document.getElementById('dashboard-container').style.display = '';
+      lucide.createIcons();
+    }
+
+    function showDashboard() {
+      document.getElementById('login-container').style.display = 'none';
+      document.getElementById('login-container').classList.add('hidden');
+      document.getElementById('dashboard-container').classList.remove('hidden');
+      document.getElementById('dashboard-container').style.display = 'flex';
+      
+      if (currentUser) {
+        document.getElementById('user-display-name').innerText = currentUser.name || 'Admin';
+        document.getElementById('user-display-role').innerText = currentUser.role || 'Admin';
+        document.getElementById('user-avatar').innerText = (currentUser.name || 'A').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      }
+
+      navigateTab('overview');
+      lucide.createIcons();
+    }
+
+    function logout() {
+      localStorage.removeItem('patchwork_token');
+      token = '';
+      currentUser = null;
+      showLogin();
+    }
+
+    // Login Form Submit
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errEl = document.getElementById('login-error');
+      const btnSubmit = document.getElementById('btn-login-submit');
+
+      // Disable button saat proses
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<span>Memproses...</span>';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.token) {
+          // Simpan token dan user data
+          localStorage.setItem('patchwork_token', data.token);
+          token = data.token;
+          currentUser = data.user;
+          errEl.classList.add('hidden');
+          
+          // Langsung tampilkan dashboard tanpa memanggil checkAuth lagi
+          showDashboard();
+        } else {
+          errEl.innerText = data.error || 'Email atau password salah!';
+          errEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        errEl.innerText = 'Koneksi ke server gagal. Pastikan server berjalan.';
+        errEl.classList.remove('hidden');
+      } finally {
+        // Re-enable button
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = '<span>Masuk ke Dashboard</span><i data-lucide="log-in" class="w-4 h-4"></i>';
+        lucide.createIcons();
+      }
+    });
+
+    // Navigation Tab Switching
+    const tabs = ['overview', 'products', 'categories', 'banners', 'users', 'seo', 'tools', 'logs'];
+    function navigateTab(tabName) {
+      tabs.forEach(t => {
+        const tabEl = document.getElementById(`tab-${t}`);
+        const navEl = document.getElementById(`nav-${t}`);
+        const sideNavEl = document.getElementById(`sidebar-nav-${t}`);
+        
+        if (t === tabName) {
+          if (tabEl) tabEl.classList.remove('hidden');
+          if (navEl) {
+            navEl.classList.add('active');
+            navEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          }
+          if (sideNavEl) sideNavEl.classList.add('bg-brand-50', 'text-brand-600', 'dark:bg-brand-950/40', 'dark:text-brand-400');
+        } else {
+          if (tabEl) tabEl.classList.add('hidden');
+          if (navEl) navEl.classList.remove('active');
+          if (sideNavEl) sideNavEl.classList.remove('bg-brand-50', 'text-brand-600', 'dark:bg-brand-950/40', 'dark:text-brand-400');
+        }
+      });
+
+      const titleMap = {
+        overview: 'Ringkasan & Analytics',
+        products: 'Manajemen Produk Affiliate',
+        categories: 'Manajemen Kategori',
+        banners: 'Manajemen Banner Promo',
+        users: 'Manajemen Hak Akses Pengguna',
+        seo: 'SEO & Pengaturan Sistem',
+        tools: 'Import / Export & Database Backup',
+        logs: 'Audit Log Aktivitas Admin'
+      };
+      document.getElementById('section-title').innerText = titleMap[tabName] || 'Dashboard';
+
+      // Trigger data loaders based on tab
+      try {
+        if (tabName === 'overview') loadOverviewData();
+        if (tabName === 'products') { loadAdminCategoriesDropdown(); loadAdminProducts(); }
+        if (tabName === 'categories') loadCategoriesList();
+        if (tabName === 'banners') loadBannersList();
+        if (tabName === 'users') loadUsersList();
+        if (tabName === 'seo') loadSettings();
+        if (tabName === 'logs') loadActivityLogs();
+      } catch (err) {
+        console.error('Error loading tab data:', err);
+      }
+
+      lucide.createIcons();
+    }
+
+    function slideAdminNav(direction) {
+      const slider = document.getElementById('admin-nav-slider');
+      if (!slider) return;
+      const scrollAmount = 180;
+      if (direction === 'next') {
+        slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      } else {
+        slider.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      }
+    }
+
+    // ----------------- OVERVIEW TAB -----------------
+    async function loadOverviewData() {
+      try {
+        const res = await fetch('/api/analytics', { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!res.ok) return;
+        const data = await res.json();
+
+        document.getElementById('kpi-products').innerText = data.summary.totalProducts || 0;
+        document.getElementById('kpi-products-sub').innerText = `${data.summary.totalPublished || 0} produk published`;
+        document.getElementById('kpi-clicks').innerText = Number(data.summary.totalClicks || 0).toLocaleString();
+        document.getElementById('kpi-shopee').innerText = `${data.summary.shopeeClicks || 0} Shopee`;
+        document.getElementById('kpi-tiktok').innerText = `${data.summary.tiktokClicks || 0} TikTok`;
+        document.getElementById('kpi-visitors').innerText = Number(data.summary.totalVisitors || 0).toLocaleString();
+
+        // Top Products table
+        const topTable = document.getElementById('top-products-tbody');
+        if (data.topProducts && data.topProducts.length > 0) {
+          topTable.innerHTML = data.topProducts.map(p => `
+            <tr class="hover:bg-slate-50">
+              <td class="py-2.5 flex items-center space-x-2">
+                <img src="${p.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80'}" class="w-8 h-8 rounded-lg object-cover">
+                <span class="font-medium truncate max-w-xs">${p.name}</span>
+              </td>
+              <td class="py-2.5 font-semibold text-slate-500">${p.marketplace}</td>
+              <td class="py-2.5 text-right font-bold text-brand-600">${p.total_clicks || 0}</td>
+            </tr>
+          `).join('');
+        } else {
+          topTable.innerHTML = '<tr><td colspan="3" class="py-4 text-center text-slate-400 text-xs">Belum ada data produk</td></tr>';
+        }
+
+        // Render Daily Chart
+        const chartCtx = document.getElementById('dailyClicksChart').getContext('2d');
+        const labels = (data.dailyClicks || []).map(d => d.date);
+        const counts = (data.dailyClicks || []).map(d => d.count);
+
+        if (dailyChart) dailyChart.destroy();
+        dailyChart = new Chart(chartCtx, {
+          type: 'line',
+          data: {
+            labels: labels.length > 0 ? labels : ['Hari ini'],
+            datasets: [{
+              label: 'Klik Harian',
+              data: counts.length > 0 ? counts : [0],
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99, 102, 241, 0.1)',
+              tension: 0.3,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: 'rgba(150, 150, 150, 0.1)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      } catch (err) {
+        console.error('Error loading overview:', err);
+      }
+    }
+
+    // ----------------- PRODUCTS TAB -----------------
+    async function loadAdminCategoriesDropdown() {
+      try {
+        const res = await fetch('/api/categories');
+        const json = await res.json();
+        const select = document.getElementById('prod-category');
+        select.innerHTML = (json.data || []).map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      } catch (err) {
+        console.error('Error loading categories dropdown:', err);
+      }
+    }
+
+    async function loadAdminProducts() {
+      try {
+        const search = document.getElementById('admin-product-search').value;
+        const res = await fetch(`/api/products?limit=50&search=${encodeURIComponent(search)}`);
+        const json = await res.json();
+        const tbody = document.getElementById('admin-products-table');
+
+        tbody.innerHTML = (json.data || []).map(p => `
+          <tr class="hover:bg-slate-50/80 transition group">
+            <td class="p-3.5 flex items-center space-x-3.5">
+              <div class="relative w-11 h-11 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200/60 shadow-sm">
+                <img src="${p.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80'}" class="w-full h-full object-cover">
+                ${p.is_featured ? '<span class="absolute top-1 left-1 w-2 h-2 rounded-full bg-pink-500 shadow-sm ring-2 ring-white" title="Trending/Featured"></span>' : ''}
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="font-bold text-slate-800 truncate max-w-xs group-hover:text-brand-600 transition">${p.name}</div>
+                <div class="text-[10px] text-slate-400 flex items-center space-x-2 mt-0.5">
+                  <span class="px-1.5 py-0.5 rounded bg-slate-100 font-medium text-slate-600">${p.marketplace || 'Affiliate'}</span>
+                  <span class="truncate">/product/${p.slug}</span>
+                </div>
+              </div>
+            </td>
+            <td class="p-3.5">
+              <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-600">
+                ${p.category_name || 'Umum'}
+              </span>
+            </td>
+            <td class="p-3.5 font-bold text-slate-900">Rp ${Number(p.price).toLocaleString('id-ID')}</td>
+            <td class="p-3.5">
+              <span class="font-semibold text-emerald-600">${p.commission_rate || '-'}</span>
+            </td>
+            <td class="p-3.5">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center space-x-1 ${p.status === 'Published' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'}">
+                <span class="w-1.5 h-1.5 rounded-full ${p.status === 'Published' ? 'bg-emerald-500' : 'bg-amber-500'}"></span>
+                <span>${p.status}</span>
+              </span>
+            </td>
+            <td class="p-3.5">
+              <div class="flex items-center space-x-1 font-bold text-slate-700">
+                <i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span>${p.total_clicks || 0}</span>
+              </div>
+            </td>
+            <td class="p-3.5 text-right space-x-1">
+              <button onclick="editProduct('${p.id}')" class="p-2 text-slate-500 hover:text-brand-600 rounded-xl hover:bg-brand-50 transition" title="Edit Produk">
+                <i data-lucide="edit-3" class="w-4 h-4"></i>
+              </button>
+              <button onclick="deleteProduct('${p.id}')" class="p-2 text-slate-500 hover:text-red-600 rounded-xl hover:bg-red-50 transition" title="Hapus Produk">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+
+        lucide.createIcons();
+      } catch (err) {
+        console.error('Error loading products:', err);
+      }
+    }
+
+    function toggleAffiliateChannel(channel) {
+      const shopeeBlock = document.getElementById('shopee-input-block');
+      const tiktokBlock = document.getElementById('tiktok-input-block');
+      const prodMarket = document.getElementById('prod-marketplace');
+      
+      if (channel === 'Shopee') {
+        shopeeBlock.classList.remove('hidden');
+        tiktokBlock.classList.add('hidden');
+        document.getElementById('channel-shopee').checked = true;
+        if (prodMarket) prodMarket.value = 'Shopee';
+      } else {
+        shopeeBlock.classList.add('hidden');
+        tiktokBlock.classList.remove('hidden');
+        document.getElementById('channel-tiktok').checked = true;
+        if (prodMarket) prodMarket.value = 'TikTok Shop';
+      }
+    }
+
+    function openProductModal() {
+      document.getElementById('product-modal-title').innerText = 'Tambah Produk Affiliate';
+      document.getElementById('product-form').reset();
+      document.getElementById('prod-id').value = '';
+      toggleAffiliateChannel('Shopee');
+      document.getElementById('product-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeProductModal() {
+      document.getElementById('product-modal').classList.add('hidden');
+    }
+
+    async function editProduct(id) {
+      try {
+        const res = await fetch(`/api/products/${id}`);
+        const json = await res.json();
+        const p = json.data;
+
+        document.getElementById('product-modal-title').innerText = 'Edit Produk Affiliate';
+        document.getElementById('prod-id').value = p.id;
+        document.getElementById('prod-name').value = p.name;
+        document.getElementById('prod-category').value = p.category_id;
+        document.getElementById('prod-marketplace').value = p.marketplace;
+        document.getElementById('prod-price').value = p.price;
+        document.getElementById('prod-commission').value = p.commission_rate || '';
+        document.getElementById('prod-url-shopee').value = p.url_shopee || '';
+        document.getElementById('prod-url-tiktok').value = p.url_tiktok || '';
+        document.getElementById('prod-url-tokopedia').value = p.url_tokopedia || '';
+        document.getElementById('prod-thumbnail').value = p.thumbnail || '';
+        document.getElementById('prod-description').value = p.description || '';
+        document.getElementById('prod-status').value = p.status;
+        document.getElementById('prod-featured').checked = p.is_featured === 1;
+
+        // Determine active exclusive channel
+        if (p.url_tiktok && !p.url_shopee) {
+          toggleAffiliateChannel('TikTok Shop');
+        } else {
+          toggleAffiliateChannel('Shopee');
+        }
+
+        document.getElementById('product-modal').classList.remove('hidden');
+        lucide.createIcons();
+      } catch (err) {
+        showToast('Gagal memuat data produk', 'error');
+      }
+    }
+
+    document.getElementById('product-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('prod-id').value;
+      const activeChannel = document.querySelector('input[name="active_affiliate_channel"]:checked')?.value || 'Shopee';
+
+      let shopeeUrl = '';
+      let tiktokUrl = '';
+      let chosenMarket = activeChannel;
+
+      if (activeChannel === 'Shopee') {
+        shopeeUrl = document.getElementById('prod-url-shopee').value.trim();
+        tiktokUrl = '';
+      } else {
+        tiktokUrl = document.getElementById('prod-url-tiktok').value.trim();
+        shopeeUrl = '';
+      }
+
+      const payload = {
+        name: document.getElementById('prod-name').value,
+        category_id: document.getElementById('prod-category').value,
+        marketplace: chosenMarket,
+        price: parseFloat(document.getElementById('prod-price').value || 0),
+        commission_rate: document.getElementById('prod-commission').value,
+        url_shopee: shopeeUrl,
+        url_tiktok: tiktokUrl,
+        url_tokopedia: '',
+        thumbnail: document.getElementById('prod-thumbnail').value,
+        description: document.getElementById('prod-description').value,
+        status: document.getElementById('prod-status').value,
+        is_featured: document.getElementById('prod-featured').checked ? 1 : 0
+      };
+
+      const url = id ? `/api/products/${id}` : '/api/products';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          closeProductModal();
+          showToast('Produk berhasil disimpan!', 'success');
+          loadAdminProducts();
+        } else {
+          const err = await res.json();
+          showToast('Gagal menyimpan: ' + (err.error || ''), 'error');
+        }
+      } catch (err) {
+        showToast('Gagal menyimpan produk. Periksa koneksi.', 'error');
+      }
+    });
+
+    async function deleteProduct(id) {
+      const ok = await showConfirm({ title: 'Hapus Produk', message: 'Produk ini akan dihapus secara permanen. Lanjutkan?', confirmText: 'Ya, Hapus', type: 'danger' });
+      if (!ok) return;
+      try {
+        const res = await fetch(`/api/products/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) { showToast('Produk berhasil dihapus', 'success'); loadAdminProducts(); }
+        else showToast('Gagal menghapus produk', 'error');
+      } catch (err) {
+        showToast('Gagal menghapus produk', 'error');
+      }
+    }
+
+    // ----------------- CATEGORIES TAB -----------------
+    async function loadCategoriesList() {
+      try {
+        const res = await fetch('/api/categories');
+        const json = await res.json();
+        const container = document.getElementById('categories-list');
+
+        container.innerHTML = (json.data || []).map(c => `
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-600 flex items-center justify-center font-bold">
+                <i data-lucide="tag" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-sm">${c.name}</h4>
+                <span class="text-xs text-slate-400">${c.product_count || 0} Produk terhubung</span>
+              </div>
+            </div>
+            <button onclick="deleteCategory('${c.id}')" class="text-slate-400 hover:text-red-500 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </div>
+        `).join('');
+        lucide.createIcons();
+      } catch (err) {
+        console.error('Error loading categories:', err);
+      }
+    }
+
+    function openCategoryModal() {
+      document.getElementById('category-form').reset();
+      document.getElementById('category-modal').classList.remove('hidden');
+    }
+    function closeCategoryModal() { document.getElementById('category-modal').classList.add('hidden'); }
+
+    document.getElementById('category-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('cat-name').value;
+      const description = document.getElementById('cat-desc').value;
+
+      try {
+        const res = await fetch('/api/categories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ name, description })
+        });
+        if (res.ok) {
+          closeCategoryModal();
+          showToast('Kategori berhasil disimpan!', 'success');
+          loadCategoriesList();
+        }
+      } catch (err) {
+        showToast('Gagal menyimpan kategori', 'error');
+      }
+    });
+
+    async function deleteCategory(id) {
+      const ok = await showConfirm({ title: 'Hapus Kategori', message: 'Kategori ini akan dihapus. Data produk terkait tidak terpengaruh.', confirmText: 'Ya, Hapus', type: 'danger' });
+      if (!ok) return;
+      await fetch(`/api/categories/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      showToast('Kategori berhasil dihapus', 'success');
+      loadCategoriesList();
+    }
+
+    // ----------------- BANNERS TAB -----------------
+    async function loadBannersList() {
+      try {
+        const res = await fetch('/api/banners');
+        const json = await res.json();
+        const container = document.getElementById('banners-list');
+
+        container.innerHTML = (json.data || []).map(b => `
+          <div class="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+            <div class="h-40 bg-cover bg-center" style="background-image: url('${b.image}')"></div>
+            <div class="p-4 flex-1 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold ${b.status === 'Published' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-500/10 text-slate-500'}">${b.status}</span>
+                  <span class="text-xs text-slate-400">Order: ${b.display_order || 0}</span>
+                </div>
+                <h4 class="font-bold text-sm">${b.title}</h4>
+                <p class="text-xs text-slate-500 mt-1">${b.subtitle || ''}</p>
+              </div>
+              <div class="pt-3 border-t mt-3 flex justify-end">
+                <button onclick="deleteBanner('${b.id}')" class="text-xs text-red-600 hover:text-red-700 font-semibold flex items-center space-x-1">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  <span>Hapus</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+        lucide.createIcons();
+      } catch (err) {
+        console.error('Error loading banners:', err);
+      }
+    }
+
+    function openBannerModal() {
+      document.getElementById('banner-form').reset();
+      document.getElementById('banner-modal').classList.remove('hidden');
+    }
+    function closeBannerModal() { document.getElementById('banner-modal').classList.add('hidden'); }
+
+    document.getElementById('banner-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        title: document.getElementById('banner-title-input').value,
+        subtitle: document.getElementById('banner-subtitle-input').value,
+        image: document.getElementById('banner-image-input').value,
+        target_url: document.getElementById('banner-target-input').value,
+        status: document.getElementById('banner-status-input').value
+      };
+
+      try {
+        const res = await fetch('/api/banners', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          closeBannerModal();
+          showToast('Banner berhasil disimpan!', 'success');
+          loadBannersList();
+        }
+      } catch (err) {
+        showToast('Gagal menyimpan banner', 'error');
+      }
+    });
+
+    async function deleteBanner(id) {
+      const ok = await showConfirm({ title: 'Hapus Banner', message: 'Banner ini akan dihapus dari halaman beranda.', confirmText: 'Ya, Hapus', type: 'danger' });
+      if (!ok) return;
+      await fetch(`/api/banners/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      showToast('Banner berhasil dihapus', 'success');
+      loadBannersList();
+    }
+
+    // ----------------- USERS TAB -----------------
+    async function loadUsersList() {
+      try {
+        const res = await fetch('/api/users', { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!res.ok) return;
+        const json = await res.json();
+        const tbody = document.getElementById('users-table-body');
+
+        tbody.innerHTML = (json.data || []).map(u => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3.5 font-bold">${u.name}</td>
+            <td class="p-3.5 text-slate-500">${u.email}</td>
+            <td class="p-3.5">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${u.role === 'Super Admin' ? 'bg-purple-500/10 text-purple-600' : (u.role === 'Admin' ? 'bg-brand-500/10 text-brand-600' : 'bg-slate-500/10 text-slate-500')}">
+                ${u.role}
+              </span>
+            </td>
+            <td class="p-3.5 text-slate-400">${new Date(u.created_at).toLocaleDateString('id-ID')}</td>
+            <td class="p-3.5 text-right">
+              ${currentUser && u.id !== currentUser.id ? `
+                <button onclick="deleteUser('${u.id}')" class="text-slate-400 hover:text-red-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              ` : '<span class="text-slate-400 text-[10px] italic">Akun Anda</span>'}
+            </td>
+          </tr>
+        `).join('');
+        lucide.createIcons();
+      } catch (err) {
+        console.error('Error loading users:', err);
+      }
+    }
+
+    function openUserModal() {
+      document.getElementById('user-form').reset();
+      document.getElementById('user-modal').classList.remove('hidden');
+    }
+    function closeUserModal() { document.getElementById('user-modal').classList.add('hidden'); }
+
+    document.getElementById('user-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById('new-user-name').value,
+        email: document.getElementById('new-user-email').value,
+        password: document.getElementById('new-user-pass').value,
+        role: document.getElementById('new-user-role').value
+      };
+
+      try {
+        const res = await fetch('/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          closeUserModal();
+          showToast('Pengguna berhasil ditambahkan!', 'success');
+          loadUsersList();
+        } else {
+          const err = await res.json();
+          showToast('Gagal menambah user: ' + (err.error || ''), 'error');
+        }
+      } catch (err) {
+        showToast('Gagal menambah user', 'error');
+      }
+    });
+
+    async function deleteUser(id) {
+      const ok = await showConfirm({ title: 'Hapus Pengguna', message: 'Akun pengguna ini akan dihapus secara permanen.', confirmText: 'Ya, Hapus', type: 'danger' });
+      if (!ok) return;
+      await fetch(`/api/users/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      showToast('Pengguna berhasil dihapus', 'success');
+      loadUsersList();
+    }
+
+    // ----------------- SEO & SETTINGS TAB -----------------
+    async function loadSettings() {
+      try {
+        const res = await fetch('/api/settings');
+        const json = await res.json();
+        const d = json.data || {};
+
+        if (d.site_name) document.getElementById('setting-site_name').value = d.site_name;
+        if (d.meta_title) document.getElementById('setting-meta_title').value = d.meta_title;
+        if (d.meta_description) document.getElementById('setting-meta_description').value = d.meta_description;
+        if (d.og_image) document.getElementById('setting-og_image').value = d.og_image;
+        if (d.robots_txt) document.getElementById('setting-robots_txt').value = d.robots_txt;
+      } catch (err) {
+        console.error('Error loading settings:', err);
+      }
+    }
+
+    document.getElementById('settings-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        site_name: document.getElementById('setting-site_name').value,
+        meta_title: document.getElementById('setting-meta_title').value,
+        meta_description: document.getElementById('setting-meta_description').value,
+        og_image: document.getElementById('setting-og_image').value,
+        robots_txt: document.getElementById('setting-robots_txt').value
+      };
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) showToast('Pengaturan SEO berhasil diperbarui!', 'success');
+      } catch (err) {
+        showToast('Gagal menyimpan pengaturan', 'error');
+      }
+    });
+
+    // ----------------- ACTIVITY LOGS TAB -----------------
+    async function loadActivityLogs() {
+      try {
+        const res = await fetch('/api/activity-logs', { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!res.ok) return;
+        const json = await res.json();
+        const tbody = document.getElementById('activity-logs-body');
+
+        tbody.innerHTML = (json.data || []).map(l => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3.5 text-slate-400">${new Date(l.created_at).toLocaleString('id-ID')}</td>
+            <td class="p-3.5 font-bold">${l.user_name || 'System'}</td>
+            <td class="p-3.5 font-semibold text-brand-600">${l.action}</td>
+            <td class="p-3.5 text-slate-600">${l.details || '-'}</td>
+            <td class="p-3.5 font-mono text-[10px] text-slate-400">${l.ip_address || '-'}</td>
+          </tr>
+        `).join('');
+        lucide.createIcons();
+      } catch (err) {
+        console.error('Error loading activity logs:', err);
+      }
+    }
+
+    // ----------------- TOOLS / IMPORT / EXPORT -----------------
+    function exportExcel() {
+      window.location.href = `/api/export/products?token=${token}`;
+    }
+
+    function backupDatabase() {
+      window.location.href = `/api/backup/download?token=${token}`;
+    }
+
+    async function handleExcelImport(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch('/api/import/products', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+        const json = await res.json();
+        if (res.ok) {
+          showToast(json.message || 'Import berhasil!', 'success');
+          e.target.value = '';
+        } else {
+          showToast('Gagal import: ' + json.error, 'error');
+        }
+      } catch (err) {
+        showToast('Gagal import file', 'error');
+      }
+    }
+
+    // Universal Upload Helper
+    async function uploadImageFile(inputEl, targetInputId) {
+      const file = inputEl.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok && data.url) {
+          document.getElementById(targetInputId).value = data.url;
+          showToast('Upload berhasil!', 'success');
+        } else {
+          showToast('Upload gagal: ' + (data.error || ''), 'error');
+        }
+      } catch (err) {
+        showToast('Upload gagal.', 'error');
+      }
+    }
+
+    // Run Auth check on page load
+    checkAuth();
+  </script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Detail Produk - PATCHWORK Affiliate</title>
+  <meta name="description" id="page-desc" content="Detail spesifikasi produk dan link affiliate marketplace.">
+  <meta property="og:title" id="og-title" content="Detail Produk - PATCHWORK">
+  <meta property="og:description" id="og-desc" content="Rekomendasi link affiliate termurah dan terpercaya.">
+  <meta property="og:image" id="og-img" content="">
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
+            shopee: '#ee4d2d', tiktok: '#fe2c55', tokopedia: '#03ac0e'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glassmorphism { background: rgba(255,255,255,0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+    .dark .glassmorphism { background: rgba(15,23,42,0.8); }
+    .social-btn { transition: all 0.3s cubic-bezier(0.16,1,0.3,1); }
+    .social-btn:hover { transform: translateY(-3px) scale(1.1); }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .float-anim { animation: float 3s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white transition-colors duration-200">
+
+  <!-- NAVBAR -->
+  <nav class="sticky top-0 z-50 glassmorphism border-b border-slate-200/60 dark:border-slate-800/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="/" class="flex items-center group py-1" title="Kembali ke Beranda">
+          <img src="/images/logo.png" onerror="this.onerror=null; this.src='https://i.ibb.co.com/mwpHfGn/263941-removebg-preview.png';" alt="Logo" class="h-11 w-auto max-w-[140px] sm:max-w-[170px] object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-105">
+        </a>
+        <div class="flex items-center space-x-3">
+          <button id="theme-toggle" class="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-all">
+            <i data-lucide="moon" id="theme-icon" class="w-5 h-5"></i>
+          </button>
+          <a href="/" class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            <span>Kembali ke Katalog</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PRODUCT DETAIL -->
+  <main class="flex-1 py-10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center space-x-2 text-xs text-slate-500 mb-8">
+        <a href="/" class="hover:text-brand-600 transition">Beranda</a>
+        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+        <span id="breadcrumb-category">Kategori</span>
+        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+        <span id="breadcrumb-title" class="truncate max-w-xs font-semibold text-slate-900 dark:text-slate-100">Detail Produk</span>
+      </nav>
+
+      <!-- Loading -->
+      <div id="loading-state" class="animate-pulse grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div class="aspect-square bg-slate-200 dark:bg-slate-800 rounded-3xl"></div>
+        <div class="space-y-5">
+          <div class="h-8 bg-slate-200 dark:bg-slate-800 rounded-xl w-3/4"></div>
+          <div class="h-6 bg-slate-200 dark:bg-slate-800 rounded-xl w-1/3"></div>
+          <div class="h-40 bg-slate-200 dark:bg-slate-800 rounded-2xl w-full"></div>
+          <div class="h-14 bg-slate-200 dark:bg-slate-800 rounded-2xl w-full"></div>
+        </div>
+      </div>
+
+      <!-- Product Content -->
+      <div id="product-content" class="hidden grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
+        <!-- Gallery -->
+        <div class="md:col-span-6 space-y-4">
+          <div class="relative aspect-square rounded-3xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl group">
+            <img id="main-image" src="" alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+            <span id="marketplace-badge" class="absolute top-4 left-4 px-3 py-1.5 rounded-xl text-xs font-extrabold uppercase tracking-wider backdrop-blur-md shadow-lg"></span>
+            <button onclick="openQRModal()" class="absolute bottom-4 right-4 p-3 rounded-2xl bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 backdrop-blur-md shadow-lg hover:scale-110 transition-all" title="Generate QR Code">
+              <i data-lucide="qr-code" class="w-5 h-5"></i>
+            </button>
+          </div>
+          <div id="gallery-thumbs" class="flex gap-3 overflow-x-auto pb-2"></div>
+        </div>
+
+        <!-- Info -->
+        <div class="md:col-span-6 flex flex-col">
+          <div class="flex items-center justify-between gap-2 mb-4">
+            <span id="cat-badge" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300 border border-brand-200 dark:border-brand-800">Kategori</span>
+            <div class="flex items-center space-x-3 text-xs text-slate-500">
+              <span class="flex items-center space-x-1"><i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i><span id="stat-total-clicks">0 total klik</span></span>
+              <span id="commission-info" class="hidden font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800">Komisi: --</span>
+            </div>
+          </div>
+
+          <h1 id="product-name" class="text-2xl md:text-3xl font-extrabold tracking-tight mb-4 text-slate-900 dark:text-white leading-tight">--</h1>
+
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-brand-50 to-slate-50 dark:from-slate-900 dark:to-slate-900/50 border border-slate-200/80 dark:border-slate-800 mb-6">
+            <div class="text-xs text-slate-500 dark:text-slate-400 mb-1 font-medium">Estimasi Harga Promo:</div>
+            <div id="product-price" class="text-3xl font-extrabold text-brand-600 dark:text-brand-400">Rp 0</div>
+          </div>
+
+          <div class="mb-8">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Deskripsi Produk</h3>
+            <div id="product-desc" class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed whitespace-pre-line bg-white dark:bg-slate-900/60 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/80">--</div>
+          </div>
+
+          <!-- CTA Buttons -->
+          <div class="space-y-3 mt-auto">
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Beli Langsung:</div>
+
+            <a id="btn-shopee" href="#" target="_blank" class="hidden w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#ee4d2d] to-[#f76c3f] hover:from-[#d43d1f] hover:to-[#e55a2a] text-white font-bold text-sm shadow-lg shadow-orange-500/25 flex items-center justify-between transition-all hover:-translate-y-0.5">
+              <div class="flex items-center space-x-3">
+                <svg class="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24"><path d="M19.5 7.05h-2.73c-.28-2.67-2.1-4.8-4.77-4.8s-4.49 2.13-4.77 4.8H4.5c-.83 0-1.5.67-1.5 1.5l1.2 11.4c.08.77.73 1.35 1.5 1.35h12.6c.77 0 1.42-.58 1.5-1.35l1.2-11.4c0-.83-.67-1.5-1.5-1.5zm-7.5-3.3c1.83 0 3.32 1.49 3.47 3.3H8.53c.15-1.81 1.64-3.3 3.47-3.3zm5.7 15.75H6.3L5.25 8.55h13.5l-1.05 10.95z"/></svg>
+                <span>Beli di Shopee</span>
+              </div>
+              <span class="text-xs bg-white/20 px-3 py-1.5 rounded-lg font-bold">Cek Diskon</span>
+            </a>
+
+            <a id="btn-tiktok" href="#" target="_blank" class="hidden w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white font-bold text-sm shadow-lg shadow-pink-500/20 flex items-center justify-between transition-all hover:-translate-y-0.5">
+              <div class="flex items-center space-x-3">
+                <svg class="w-5 h-5 fill-current text-[#fe2c55] shrink-0" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298 0 .592.046.87.136V9.4a6.33 6.33 0 0 0-.87-.06A6.34 6.34 0 0 0 3.14 15.7a6.34 6.34 0 0 0 9.15 5.62v-9.15a8.16 8.16 0 0 0 4.87 1.6v-3.47a4.85 4.85 0 0 1-2.57-1.61z"/></svg>
+                <span>Lihat di TikTok Shop</span>
+              </div>
+              <span class="text-xs bg-[#fe2c55]/20 text-[#fe2c55] font-extrabold px-3 py-1.5 rounded-lg">Live Promo</span>
+            </a>
+
+            <a id="btn-tokopedia" href="#" target="_blank" class="hidden w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#03ac0e] to-[#05c711] hover:from-[#02930c] hover:to-[#04b00f] text-white font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center justify-between transition-all hover:-translate-y-0.5">
+              <div class="flex items-center space-x-3">
+                <svg class="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                <span>Beli di Tokopedia</span>
+              </div>
+              <span class="text-xs bg-white/20 px-3 py-1.5 rounded-lg font-bold">Bebas Ongkir</span>
+            </a>
+
+            <div class="grid grid-cols-2 gap-3 pt-3">
+              <button onclick="copyAffiliateLink()" class="py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs flex items-center justify-center space-x-2 transition">
+                <i data-lucide="copy" class="w-4 h-4"></i>
+                <span id="copy-btn-label">Salin Link</span>
+              </button>
+              <button onclick="shareWhatsApp()" class="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center space-x-2 transition">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                <span>Bagikan WhatsApp</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- QR MODAL -->
+  <div id="qr-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-xs w-full p-7 shadow-2xl border border-slate-200 dark:border-slate-800 text-center relative">
+      <button onclick="closeQRModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="font-bold text-lg mb-1">Scan QR Code</h3>
+      <p class="text-xs text-slate-500 mb-5">Arahkan kamera smartphone untuk membuka langsung.</p>
+      <div class="p-4 bg-white rounded-2xl border border-slate-200 flex justify-center mb-5 shadow-inner">
+        <div id="qrcode-container"></div>
+      </div>
+      <button onclick="closeQRModal()" class="w-full py-2.5 bg-slate-100 dark:bg-slate-800 text-sm font-bold rounded-xl transition hover:bg-slate-200">Tutup</button>
+    </div>
+  </div>
+
+  <!-- FLOATING WA -->
+  <a href="https://wa.me/62895321154498" target="_blank" class="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center shadow-xl shadow-emerald-500/30 transition-all hover:scale-110 float-anim" title="Chat WhatsApp">
+    <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+
+  <!-- FOOTER -->
+  <footer class="bg-gradient-to-b from-slate-900 to-slate-950 text-white pt-12 pb-6 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-pink-500 flex items-center justify-center text-white shadow-lg">
+            <i data-lucide="layers" class="w-4 h-4"></i>
+          </div>
+          <span class="text-base font-extrabold">PATCHWORK</span>
+        </div>
+        <div class="flex items-center space-x-3">
+          <a href="https://www.tiktok.com/@patchwork.biz.id" target="_blank" class="social-btn w-10 h-10 rounded-xl bg-slate-800 hover:bg-black flex items-center justify-center" title="TikTok">
+            <svg class="w-4 h-4 fill-current text-slate-400 hover:text-white" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298 0 .592.046.87.136V9.4a6.33 6.33 0 0 0-.87-.06A6.34 6.34 0 0 0 3.14 15.7a6.34 6.34 0 0 0 9.15 5.62v-9.15a8.16 8.16 0 0 0 4.87 1.6v-3.47a4.85 4.85 0 0 1-2.57-1.61z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/patchwork.biz.id" target="_blank" class="social-btn w-10 h-10 rounded-xl bg-slate-800 hover:bg-gradient-to-br hover:from-purple-600 hover:via-pink-500 hover:to-orange-400 flex items-center justify-center" title="Instagram">
+            <svg class="w-4 h-4 fill-current text-slate-400" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a href="https://www.threads.com/@patchwork.biz.id" target="_blank" class="social-btn w-10 h-10 rounded-xl bg-slate-800 hover:bg-black flex items-center justify-center" title="Threads">
+            <svg class="w-4 h-4 fill-current text-slate-400" viewBox="0 0 24 24"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.59 12c.025 3.086.718 5.496 2.057 7.164 1.432 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.96-.065-1.186.408-2.228 1.33-2.934.812-.622 1.903-.977 3.07-1.003.87-.019 1.684.092 2.42.33-.07-.6-.244-1.074-.521-1.424-.396-.501-1.03-.764-1.883-.782-.784.015-1.46.205-1.975.467l-.876-1.72c.75-.38 1.724-.63 2.85-.66 1.396.03 2.49.455 3.245 1.262.643.686.984 1.602 1.074 2.735.474.196.905.435 1.29.718 1.092.802 1.835 1.87 2.15 3.088.406 1.564.285 3.836-1.634 5.756C18.04 22.838 15.592 23.979 12.186 24z"/></svg>
+          </a>
+          <a href="https://pin.it/cNvqFFJGH" target="_blank" class="social-btn w-10 h-10 rounded-xl bg-slate-800 hover:bg-[#E60023] flex items-center justify-center" title="Pinterest">
+            <svg class="w-4 h-4 fill-current text-slate-400" viewBox="0 0 24 24"><path d="M12 0a12 12 0 0 0-4.373 23.178c-.07-.633-.133-1.604.028-2.295.145-.624.938-3.977.938-3.977s-.239-.479-.239-1.187c0-1.113.645-1.943 1.448-1.943.683 0 1.012.512 1.012 1.127 0 .687-.437 1.714-.663 2.668-.189.796.399 1.446 1.185 1.446 1.42 0 2.514-1.498 2.514-3.662 0-1.915-1.377-3.254-3.342-3.254-2.276 0-3.612 1.707-3.612 3.471 0 .688.265 1.425.595 1.826a.24.24 0 0 1 .056.23c-.061.252-.196.796-.222.907-.035.146-.116.177-.268.107-1-.465-1.624-1.926-1.624-3.1 0-2.523 1.834-4.84 5.286-4.84 2.775 0 4.932 1.977 4.932 4.62 0 2.757-1.739 4.976-4.151 4.976-.811 0-1.573-.421-1.834-.919l-.498 1.902c-.181.695-.669 1.566-.995 2.097A12 12 0 1 0 12 0z"/></svg>
+          </a>
+          <a href="https://id.shp.ee/x8z7g8i9?fromSource=copy_link&smtt=0.0.9" target="_blank" class="social-btn w-10 h-10 rounded-xl bg-slate-800 hover:bg-[#ee4d2d] flex items-center justify-center" title="Shopee">
+            <svg class="w-4 h-4 fill-current text-slate-400" viewBox="0 0 24 24"><path d="M19.5 7.05h-2.73c-.28-2.67-2.1-4.8-4.77-4.8s-4.49 2.13-4.77 4.8H4.5c-.83 0-1.5.67-1.5 1.5l1.2 11.4c.08.77.73 1.35 1.5 1.35h12.6c.77 0 1.42-.58 1.5-1.35l1.2-11.4c0-.83-.67-1.5-1.5-1.5zm-7.5-3.3c1.83 0 3.32 1.49 3.47 3.3H8.53c.15-1.81 1.64-3.3 3.47-3.3zm5.7 15.75H6.3L5.25 8.55h13.5l-1.05 10.95z"/></svg>
+          </a>
+          <a href="https://wa.me/62895321154498" target="_blank" class="social-btn w-10 h-10 rounded-xl bg-slate-800 hover:bg-emerald-600 flex items-center justify-center" title="WhatsApp">
+            <svg class="w-4 h-4 fill-current text-slate-400" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="pt-6 border-t border-slate-800 text-center">
+        <p class="text-xs text-slate-500">&copy; 2026 PATCHWORK. Dikembangkan untuk kreator affiliate TikTok Shop & Shopee.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    let currentProduct = null;
+
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      document.getElementById('theme-icon').setAttribute('data-lucide', 'sun');
+    }
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+      const icon = document.getElementById('theme-icon');
+      icon.setAttribute('data-lucide', document.documentElement.classList.contains('dark') ? 'sun' : 'moon');
+      lucide.createIcons();
+    });
+
+    function formatRupiah(amount) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
+    }
+
+    async function loadProductDetail() {
+      const slug = window.location.pathname.split('/').filter(Boolean).pop();
+      try {
+        const res = await fetch(`/api/products/${slug}`);
+        if (!res.ok) { window.location.href = '/'; return; }
+        const json = await res.json();
+        const p = json.data;
+        currentProduct = p;
+
+        document.getElementById('page-title').innerText = `${p.name} - PATCHWORK`;
+        document.getElementById('breadcrumb-title').innerText = p.name;
+        document.getElementById('breadcrumb-category').innerText = p.category_name || 'Katalog';
+        document.getElementById('product-name').innerText = p.name;
+        document.getElementById('product-desc').innerText = p.description || 'Tidak ada deskripsi rinci.';
+        document.getElementById('product-price').innerText = formatRupiah(p.price);
+        document.getElementById('stat-total-clicks').innerText = `${p.total_clicks || 0} total klik`;
+
+        if (p.commission_rate) {
+          const commEl = document.getElementById('commission-info');
+          commEl.innerText = `Komisi: ${p.commission_rate}`;
+          commEl.classList.remove('hidden');
+        }
+
+        const badge = document.getElementById('marketplace-badge');
+        badge.innerText = p.marketplace;
+        if (p.marketplace === 'Shopee') badge.className = 'absolute top-4 left-4 px-4 py-1.5 rounded-xl text-xs font-extrabold uppercase bg-[#ee4d2d] text-white shadow-lg';
+        else if (p.marketplace.toLowerCase().includes('tiktok')) badge.className = 'absolute top-4 left-4 px-4 py-1.5 rounded-xl text-xs font-extrabold uppercase bg-slate-900 text-white shadow-lg';
+        else badge.className = 'absolute top-4 left-4 px-4 py-1.5 rounded-xl text-xs font-extrabold uppercase bg-emerald-500 text-white shadow-lg';
+
+        document.getElementById('main-image').src = p.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80';
+        document.getElementById('cat-badge').innerText = p.category_name || 'Kategori';
+
+        const gallery = [p.thumbnail, ...(p.gallery || [])].filter(Boolean);
+        const uniqueGallery = [...new Set(gallery)];
+        if (uniqueGallery.length > 1) {
+          document.getElementById('gallery-thumbs').innerHTML = uniqueGallery.map(img => `
+            <img src="${img}" onclick="setMainImage('${img}')" class="w-16 h-16 rounded-xl object-cover border-2 border-transparent hover:border-brand-500 cursor-pointer transition-all shadow-sm hover:scale-105">
+          `).join('');
+        }
+
+        if (p.url_shopee) { const btn = document.getElementById('btn-shopee'); btn.href = p.url_shopee; btn.classList.remove('hidden'); btn.addEventListener('click', () => trackClick(p.id, 'Shopee')); }
+        if (p.url_tiktok) { const btn = document.getElementById('btn-tiktok'); btn.href = p.url_tiktok; btn.classList.remove('hidden'); btn.addEventListener('click', () => trackClick(p.id, 'TikTok Shop')); }
+        if (p.url_tokopedia) { const btn = document.getElementById('btn-tokopedia'); btn.href = p.url_tokopedia; btn.classList.remove('hidden'); btn.addEventListener('click', () => trackClick(p.id, 'Tokopedia')); }
+
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('product-content').classList.remove('hidden');
+        lucide.createIcons();
+      } catch (err) { console.error('Error fetching product', err); }
+    }
+
+    function setMainImage(url) { document.getElementById('main-image').src = url; }
+
+    async function trackClick(productId, marketplace) {
+      try { await fetch('/api/clicks/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: productId, marketplace }) }); } catch (err) { console.warn(err); }
+    }
+
+    function copyAffiliateLink() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        const lbl = document.getElementById('copy-btn-label');
+        lbl.innerText = 'Tersalin! ✅';
+        setTimeout(() => { lbl.innerText = 'Salin Link'; }, 2000);
+      });
+    }
+
+    function shareWhatsApp() {
+      const text = `Cek produk rekomendasi ${currentProduct?.name || ''} di sini:\n${window.location.href}`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function openQRModal() {
+      const qrEl = document.getElementById('qrcode-container');
+      qrEl.innerHTML = '';
+      new QRCode(qrEl, { text: window.location.href, width: 160, height: 160, colorDark: "#0f172a", colorLight: "#ffffff" });
+      document.getElementById('qr-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeQRModal() { document.getElementById('qr-modal').classList.add('hidden'); }
+
+    loadProductDetail();
+    lucide.createIcons();
+  </script>
+</body>
+</html>
