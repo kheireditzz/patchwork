@@ -11,11 +11,24 @@ import { authenticateToken, authorizeRole, JWT_SECRET } from '../middlewares/aut
 const router = express.Router();
 
 // Setup Multer Storage for file uploads (Banner, Thumbnail, Gallery)
-const uploadDir = process.env.VERCEL
-  ? '/tmp/uploads'
-  : path.join(process.cwd(), 'public/uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+const isVercelEnv = !!process.env.VERCEL;
+const uploadDir = isVercelEnv ? '/tmp/uploads' : path.join(process.cwd(), 'public/uploads');
+const excelUploadDir = isVercelEnv ? '/tmp/temp_excel' : path.join(process.cwd(), 'public/uploads/temp_excel');
+
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (e) {
+  console.warn('Could not create uploadDir:', e.message);
+}
+
+try {
+  if (!fs.existsSync(excelUploadDir)) {
+    fs.mkdirSync(excelUploadDir, { recursive: true });
+  }
+} catch (e) {
+  console.warn('Could not create excelUploadDir:', e.message);
 }
 
 const storage = multer.diskStorage({
@@ -40,7 +53,7 @@ const upload = multer({
 });
 
 const excelUpload = multer({
-  dest: path.join(process.cwd(), 'public/uploads/temp_excel')
+  dest: excelUploadDir
 });
 
 // Helper: Slugify
