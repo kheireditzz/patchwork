@@ -662,7 +662,24 @@
       } else { document.querySelectorAll('.reveal').forEach(el => el.classList.add('active')); }
     }
 
-    initTheme();
+    async function loadSettings() {
+      try {
+        const res = await fetch('/api/settings');
+        const json = await res.json();
+        const d = json.data || {};
+        if (d.meta_title) {
+          document.title = d.meta_title;
+          const metaTitle = document.getElementById('meta-title');
+          if (metaTitle) metaTitle.innerText = d.meta_title;
+        }
+        if (d.meta_description) {
+          const metaDesc = document.getElementById('meta-desc');
+          if (metaDesc) metaDesc.setAttribute('content', d.meta_description);
+        }
+      } catch (err) { console.warn('Failed to load settings', err); }
+    }
+
+    loadSettings();
     loadPublicStats();
     loadBanners();
     loadCategories();

@@ -32,20 +32,18 @@
     }
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
+    body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; letter-spacing: -0.01em; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
     .admin-card {
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .admin-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.1);
-    }
-    .dark .admin-card:hover {
-      box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 35px -12px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(99, 102, 241, 0.08);
     }
     .top-nav-slider {
       scroll-behavior: smooth;
@@ -54,20 +52,32 @@
       scrollbar-width: none;
     }
     .top-nav-slider::-webkit-scrollbar { display: none; }
+    
     .tab-pill {
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
       white-space: nowrap;
+      position: relative;
+    }
+    .tab-pill:hover:not(.active) {
+      background: #f8fafc;
+      color: #0f172a;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
     }
     .tab-pill.active {
-      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #7c3aed 100%);
       color: #ffffff !important;
-      box-shadow: 0 6px 20px -4px rgba(79, 70, 229, 0.5);
-      transform: scale(1.03);
+      box-shadow: 0 8px 24px -4px rgba(79, 70, 229, 0.45);
+      transform: translateY(-1px) scale(1.02);
       border-color: transparent !important;
     }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeOutUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-12px); } }
-    .fade-in-up { animation: fadeInUp 0.4s ease-out; }
+    .metric-badge {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+    }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeOutUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-10px); } }
+    .fade-in-up { animation: fadeInUp 0.35s ease-out; }
   </style>
 </head>
 <body class="bg-slate-50/80 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
@@ -626,13 +636,25 @@
         </div>
 
         <div>
-          <label class="block text-xs font-bold mb-1">Thumbnail Gambar (URL atau Upload)</label>
+          <label class="block text-xs font-bold mb-1">Thumbnail Gambar (URL atau Upload dari HP)</label>
           <div class="flex gap-2">
-            <input type="text" id="prod-thumbnail" class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs" placeholder="https://... atau upload file">
-            <label class="px-3 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-xs font-bold cursor-pointer shrink-0">
-              <i data-lucide="upload" class="w-4 h-4 inline-block"></i>
+            <input type="text" id="prod-thumbnail" oninput="updateThumbnailPreview(this.value)" class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs" placeholder="https://... atau pilih foto dari HP">
+            <label class="px-3.5 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 text-xs font-bold cursor-pointer shrink-0 flex items-center space-x-1.5 transition active:scale-95 shadow-sm" title="Upload foto dari HP/Galeri">
+              <i data-lucide="upload" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Pilih Foto</span>
               <input type="file" class="hidden" accept="image/*" onchange="uploadImageFile(this, 'prod-thumbnail')">
             </label>
+          </div>
+          <!-- Live Preview Thumbnail -->
+          <div id="prod-thumb-preview-wrapper" class="mt-2.5 hidden items-center space-x-3 p-2 rounded-xl bg-slate-50 border border-slate-200/80">
+            <img id="prod-thumb-preview-img" src="" class="w-12 h-12 rounded-lg object-cover border border-slate-200 shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80'">
+            <div class="flex-1 min-w-0">
+              <span class="text-[11px] font-bold text-slate-700 block truncate">Preview Gambar Thumbnail</span>
+              <span class="text-[10px] text-emerald-600 font-semibold inline-flex items-center"><i data-lucide="check-circle" class="w-3 h-3 mr-1"></i>Gambar siap ditampilkan</span>
+            </div>
+            <button type="button" onclick="clearThumbnailInput('prod-thumbnail')" class="p-1.5 text-slate-400 hover:text-red-500 rounded-lg transition" title="Hapus Gambar">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
           </div>
         </div>
 
@@ -708,13 +730,25 @@
           <input type="text" id="banner-subtitle-input" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
         </div>
         <div>
-          <label class="block text-xs font-bold mb-1">Gambar Banner (URL / Upload)</label>
+          <label class="block text-xs font-bold mb-1">Gambar Banner (URL atau Upload dari HP)</label>
           <div class="flex gap-2">
-            <input type="text" id="banner-image-input" required class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
-            <label class="px-3 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-xs font-bold cursor-pointer shrink-0">
-              <i data-lucide="upload" class="w-4 h-4 inline-block"></i>
+            <input type="text" id="banner-image-input" oninput="updateBannerPreview(this.value)" required class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs" placeholder="https://... atau pilih dari HP">
+            <label class="px-3.5 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 text-xs font-bold cursor-pointer shrink-0 flex items-center space-x-1.5 transition active:scale-95 shadow-sm" title="Upload dari HP/Galeri">
+              <i data-lucide="upload" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Pilih Foto</span>
               <input type="file" class="hidden" accept="image/*" onchange="uploadImageFile(this, 'banner-image-input')">
             </label>
+          </div>
+          <!-- Live Preview Banner -->
+          <div id="banner-preview-wrapper" class="mt-2.5 hidden items-center space-x-3 p-2 rounded-xl bg-slate-50 border border-slate-200/80">
+            <img id="banner-preview-img" src="" class="w-16 h-10 rounded-lg object-cover border border-slate-200 shadow-sm">
+            <div class="flex-1 min-w-0">
+              <span class="text-[11px] font-bold text-slate-700 block truncate">Preview Banner</span>
+              <span class="text-[10px] text-emerald-600 font-semibold inline-flex items-center"><i data-lucide="check-circle" class="w-3 h-3 mr-1"></i>Foto berhasil dimuat</span>
+            </div>
+            <button type="button" onclick="clearThumbnailInput('banner-image-input')" class="p-1.5 text-slate-400 hover:text-red-500 rounded-lg transition">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
           </div>
         </div>
         <div>
@@ -1078,10 +1112,14 @@
           topTable.innerHTML = '<tr><td colspan="3" class="py-4 text-center text-slate-400 text-xs">Belum ada data produk</td></tr>';
         }
 
-        // Render Daily Chart
+        // Render Daily Chart with refined gradient
         const chartCtx = document.getElementById('dailyClicksChart').getContext('2d');
         const labels = (data.dailyClicks || []).map(d => d.date);
         const counts = (data.dailyClicks || []).map(d => d.count);
+
+        const gradient = chartCtx.createLinearGradient(0, 0, 0, 240);
+        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.28)');
+        gradient.addColorStop(1, 'rgba(99, 102, 241, 0.00)');
 
         if (dailyChart) dailyChart.destroy();
         dailyChart = new Chart(chartCtx, {
@@ -1091,19 +1129,41 @@
             datasets: [{
               label: 'Klik Harian',
               data: counts.length > 0 ? counts : [0],
-              borderColor: '#6366f1',
-              backgroundColor: 'rgba(99, 102, 241, 0.1)',
-              tension: 0.3,
+              borderColor: '#4f46e5',
+              borderWidth: 2.5,
+              pointBackgroundColor: '#4f46e5',
+              pointHoverRadius: 6,
+              pointRadius: 3,
+              backgroundColor: gradient,
+              tension: 0.38,
               fill: true
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0f172a',
+                titleFont: { size: 11, family: 'Plus Jakarta Sans', weight: 'bold' },
+                bodyFont: { size: 12, family: 'Plus Jakarta Sans' },
+                padding: 10,
+                cornerRadius: 10,
+                displayColors: false
+              }
+            },
             scales: {
-              y: { beginAtZero: true, grid: { color: 'rgba(150, 150, 150, 0.1)' } },
-              x: { grid: { display: false } }
+              y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(226, 232, 240, 0.7)' },
+                ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, color: '#94a3b8' }
+              },
+              x: {
+                grid: { display: false },
+                ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, color: '#94a3b8' }
+              }
             }
           }
         });
@@ -1131,12 +1191,17 @@
         const json = await res.json();
         const tbody = document.getElementById('admin-products-table');
 
+        if (!json.data || json.data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400 text-xs font-medium">Belum ada produk affiliate. Silakan klik tombol "Tambah Produk Baru".</td></tr>';
+          return;
+        }
+
         tbody.innerHTML = (json.data || []).map(p => `
-          <tr class="hover:bg-slate-50/80 transition group">
+          <tr class="hover:bg-slate-50/80 transition group border-b border-slate-100 last:border-b-0">
             <td class="p-3.5 flex items-center space-x-3.5">
               <div class="relative w-11 h-11 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200/60 shadow-sm">
                 <img src="${p.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80'}" class="w-full h-full object-cover">
-                ${p.is_featured ? '<span class="absolute top-1 left-1 w-2 h-2 rounded-full bg-pink-500 shadow-sm ring-2 ring-white" title="Trending/Featured"></span>' : ''}
+                ${p.is_featured ? '<span class="absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-pink-500 shadow-sm ring-2 ring-white" title="Trending / Unggulan"></span>' : ''}
               </div>
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-slate-800 truncate max-w-xs group-hover:text-brand-600 transition">${p.name}</div>
@@ -1147,7 +1212,7 @@
               </div>
             </td>
             <td class="p-3.5">
-              <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-600">
+              <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-600 border border-indigo-100">
                 ${p.category_name || 'Umum'}
               </span>
             </td>
@@ -1156,13 +1221,13 @@
               <span class="font-semibold text-emerald-600">${p.commission_rate || '-'}</span>
             </td>
             <td class="p-3.5">
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center space-x-1 ${p.status === 'Published' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'}">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center space-x-1 ${p.status === 'Published' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}">
                 <span class="w-1.5 h-1.5 rounded-full ${p.status === 'Published' ? 'bg-emerald-500' : 'bg-amber-500'}"></span>
                 <span>${p.status}</span>
               </span>
             </td>
             <td class="p-3.5">
-              <div class="flex items-center space-x-1 font-bold text-slate-700">
+              <div class="flex items-center space-x-1.5 font-bold text-slate-700">
                 <i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5 text-slate-400"></i>
                 <span>${p.total_clicks || 0}</span>
               </div>
@@ -1206,6 +1271,7 @@
       document.getElementById('product-modal-title').innerText = 'Tambah Produk Affiliate';
       document.getElementById('product-form').reset();
       document.getElementById('prod-id').value = '';
+      updateThumbnailPreview('');
       toggleAffiliateChannel('Shopee');
       document.getElementById('product-modal').classList.remove('hidden');
       lucide.createIcons();
@@ -1232,6 +1298,7 @@
         document.getElementById('prod-url-tiktok').value = p.url_tiktok || '';
         document.getElementById('prod-url-tokopedia').value = p.url_tokopedia || '';
         document.getElementById('prod-thumbnail').value = p.thumbnail || '';
+        updateThumbnailPreview(p.thumbnail || '');
         document.getElementById('prod-description').value = p.description || '';
         document.getElementById('prod-status').value = p.status;
         document.getElementById('prod-featured').checked = p.is_featured === 1;
@@ -1395,20 +1462,32 @@
         const json = await res.json();
         const container = document.getElementById('banners-list');
 
+        if (!json.data || json.data.length === 0) {
+          container.innerHTML = '<div class="col-span-full py-12 text-center text-slate-400 text-xs">Belum ada banner promo.</div>';
+          return;
+        }
+
         container.innerHTML = (json.data || []).map(b => `
-          <div class="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-            <div class="h-40 bg-cover bg-center" style="background-image: url('${b.image}')"></div>
-            <div class="p-4 flex-1 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between mb-1">
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold ${b.status === 'Published' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-500/10 text-slate-500'}">${b.status}</span>
-                  <span class="text-xs text-slate-400">Order: ${b.display_order || 0}</span>
-                </div>
-                <h4 class="font-bold text-sm">${b.title}</h4>
-                <p class="text-xs text-slate-500 mt-1">${b.subtitle || ''}</p>
+          <div class="rounded-2xl bg-white border border-slate-200/80 shadow-sm overflow-hidden flex flex-col admin-card">
+            <div class="h-44 bg-cover bg-center relative" style="background-image: url('${b.image}')">
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent"></div>
+              <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${b.status === 'Published' ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-200'}">${b.status}</span>
+                <span class="text-[11px] font-medium bg-black/40 px-2 py-0.5 rounded-lg backdrop-blur-sm">Order: ${b.display_order || 0}</span>
               </div>
-              <div class="pt-3 border-t mt-3 flex justify-end">
-                <button onclick="deleteBanner('${b.id}')" class="text-xs text-red-600 hover:text-red-700 font-semibold flex items-center space-x-1">
+            </div>
+            <div class="p-5 flex-1 flex flex-col justify-between">
+              <div>
+                <h4 class="font-bold text-sm text-slate-900">${b.title}</h4>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">${b.subtitle || '-'}</p>
+                <div class="mt-2 text-[11px] text-slate-400 font-mono truncate">Target: ${b.target_url || '#'}</div>
+              </div>
+              <div class="pt-4 border-t border-slate-100 mt-4 flex justify-end space-x-2">
+                <button onclick="editBanner('${b.id}')" class="px-3 py-1.5 text-xs text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-xl font-semibold flex items-center space-x-1 transition">
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                  <span>Edit</span>
+                </button>
+                <button onclick="deleteBanner('${b.id}')" class="px-3 py-1.5 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl font-semibold flex items-center space-x-1 transition">
                   <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                   <span>Hapus</span>
                 </button>
@@ -1422,14 +1501,40 @@
       }
     }
 
+    let bannersCache = [];
+    async function editBanner(id) {
+      try {
+        const res = await fetch('/api/banners');
+        const json = await res.json();
+        const b = (json.data || []).find(item => item.id === id);
+        if (!b) return;
+
+        document.getElementById('banner-id').value = b.id;
+        document.getElementById('banner-title-input').value = b.title;
+        document.getElementById('banner-subtitle-input').value = b.subtitle || '';
+        document.getElementById('banner-image-input').value = b.image || '';
+        updateBannerPreview(b.image || '');
+        document.getElementById('banner-target-input').value = b.target_url || '#products';
+        document.getElementById('banner-status-input').value = b.status || 'Published';
+
+        document.getElementById('banner-modal').classList.remove('hidden');
+        lucide.createIcons();
+      } catch (err) {
+        showToast('Gagal memuat data banner', 'error');
+      }
+    }
+
     function openBannerModal() {
       document.getElementById('banner-form').reset();
+      document.getElementById('banner-id').value = '';
+      updateBannerPreview('');
       document.getElementById('banner-modal').classList.remove('hidden');
     }
     function closeBannerModal() { document.getElementById('banner-modal').classList.add('hidden'); }
 
     document.getElementById('banner-form').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const id = document.getElementById('banner-id').value;
       const payload = {
         title: document.getElementById('banner-title-input').value,
         subtitle: document.getElementById('banner-subtitle-input').value,
@@ -1438,9 +1543,12 @@
         status: document.getElementById('banner-status-input').value
       };
 
+      const url = id ? `/api/banners/${id}` : '/api/banners';
+      const method = id ? 'PUT' : 'POST';
+
       try {
-        const res = await fetch('/api/banners', {
-          method: 'POST',
+        const res = await fetch(url, {
+          method,
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify(payload)
         });
@@ -1448,6 +1556,9 @@
           closeBannerModal();
           showToast('Banner berhasil disimpan!', 'success');
           loadBannersList();
+        } else {
+          const json = await res.json();
+          showToast('Gagal menyimpan banner: ' + (json.error || ''), 'error');
         }
       } catch (err) {
         showToast('Gagal menyimpan banner', 'error');
@@ -1637,13 +1748,50 @@
       }
     }
 
-    // Universal Upload Helper
+    // Preview & Upload Helpers
+    function updateThumbnailPreview(url) {
+      const wrap = document.getElementById('prod-thumb-preview-wrapper');
+      const img = document.getElementById('prod-thumb-preview-img');
+      if (url && url.trim()) {
+        img.src = url.trim();
+        wrap.classList.remove('hidden');
+        wrap.classList.add('flex');
+      } else {
+        wrap.classList.add('hidden');
+        wrap.classList.remove('flex');
+      }
+      lucide.createIcons();
+    }
+
+    function updateBannerPreview(url) {
+      const wrap = document.getElementById('banner-preview-wrapper');
+      const img = document.getElementById('banner-preview-img');
+      if (url && url.trim()) {
+        img.src = url.trim();
+        wrap.classList.remove('hidden');
+        wrap.classList.add('flex');
+      } else {
+        wrap.classList.add('hidden');
+        wrap.classList.remove('flex');
+      }
+      lucide.createIcons();
+    }
+
+    function clearThumbnailInput(inputId) {
+      document.getElementById(inputId).value = '';
+      if (inputId === 'prod-thumbnail') updateThumbnailPreview('');
+      if (inputId === 'banner-image-input') updateBannerPreview('');
+    }
+
+    // Universal Upload Helper (mendukung file dari kamera & galeri HP)
     async function uploadImageFile(inputEl, targetInputId) {
       const file = inputEl.files[0];
       if (!file) return;
 
       const formData = new FormData();
       formData.append('file', file);
+
+      showToast('Mengunggah gambar...', 'info');
 
       try {
         const res = await fetch('/api/upload', {
@@ -1653,13 +1801,18 @@
         });
         const data = await res.json();
         if (res.ok && data.url) {
-          document.getElementById(targetInputId).value = data.url;
-          showToast('Upload berhasil!', 'success');
+          const targetEl = document.getElementById(targetInputId);
+          targetEl.value = data.url;
+          if (targetInputId === 'prod-thumbnail') updateThumbnailPreview(data.url);
+          if (targetInputId === 'banner-image-input') updateBannerPreview(data.url);
+          showToast('Gambar berhasil diunggah!', 'success');
         } else {
           showToast('Upload gagal: ' + (data.error || ''), 'error');
         }
       } catch (err) {
-        showToast('Upload gagal.', 'error');
+        showToast('Upload gagal. Periksa koneksi.', 'error');
+      } finally {
+        inputEl.value = '';
       }
     }
 

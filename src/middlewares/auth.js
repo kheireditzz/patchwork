@@ -17,7 +17,14 @@ export function authenticateToken(req, res, next) {
     }
     
     // Fetch user details from DB to ensure fresh status and role
-    const user = sqlite.prepare('SELECT id, name, email, role FROM users WHERE id = ?').get(decoded.id);
+    let user = sqlite.prepare('SELECT id, name, email, role FROM users WHERE id = ?').get(decoded.id);
+    if (!user && decoded.email) {
+      user = sqlite.prepare('SELECT id, name, email, role FROM users WHERE email = ?').get(decoded.email);
+    }
+    if (!user && decoded.role) {
+      // If user was created in previous container instance, allow valid decoded token payload
+      user = { id: decoded.id, name: decoded.name, email: decoded.email, role: decoded.role };
+    }
     if (!user) {
       return res.status(403).json({ error: 'Pengguna tidak ditemukan.' });
     }

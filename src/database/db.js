@@ -209,10 +209,10 @@ export async function initDatabase() {
   `);
 
   // Default super admin
-  const existingUser = sqlite.prepare('SELECT id FROM users LIMIT 1').get();
+  const existingUser = sqlite.prepare('SELECT id FROM users WHERE email = ?').get('admin@patchwork.com');
   if (!existingUser) {
     const passwordHash = bcrypt.hashSync('admin123', 10);
-    const userId = 'usr_' + Date.now();
+    const userId = 'usr_superadmin';
     sqlite.prepare(`
       INSERT INTO users (id, name, email, password, role)
       VALUES (?, ?, ?, ?, ?)
