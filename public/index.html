@@ -32,28 +32,100 @@
   </script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .glassmorphism { background: rgba(255,255,255,0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
-    .reveal { opacity: 0; transform: translateY(30px) scale(0.98); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); will-change: opacity, transform; }
-    .reveal.active { opacity: 1; transform: translateY(0) scale(1); }
+    
+    /* Premium Glassmorphism */
+    .glassmorphism { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    
+    /* Scroll Reveal Animation Classes */
+    .reveal { 
+      opacity: 0; 
+      transform: translateY(32px) scale(0.97); 
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease; 
+      filter: blur(4px);
+      will-change: opacity, transform, filter; 
+    }
+    .reveal.active { 
+      opacity: 1; 
+      transform: translateY(0) scale(1); 
+      filter: blur(0);
+    }
+    
+    /* Staggered transition delays for grid cards */
+    .reveal:nth-child(1) { transition-delay: 50ms; }
+    .reveal:nth-child(2) { transition-delay: 100ms; }
+    .reveal:nth-child(3) { transition-delay: 150ms; }
+    .reveal:nth-child(4) { transition-delay: 200ms; }
+    
     .slider-container { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .trending-card { transform: scale(0.92); opacity: 0.7; filter: blur(0.5px); transition: transform 0.5s cubic-bezier(0.2,0.8,0.2,1), opacity 0.5s, filter 0.5s, box-shadow 0.5s; will-change: transform, opacity; }
-    .trending-card.is-active { transform: scale(1.04); opacity: 1; filter: blur(0); box-shadow: 0 20px 40px -12px rgba(99,102,241,0.3); z-index: 10; }
-    .trending-card:hover { opacity: 1; filter: blur(0); transform: scale(1.06) translateY(-4px); }
-    .product-card { transition: all 0.35s cubic-bezier(0.16,1,0.3,1); }
-    .product-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
-    .dark .product-card:hover { box-shadow: 0 20px 40px -12px rgba(0,0,0,0.5); }
-    .product-card:hover .product-img { transform: scale(1.08); }
-    .product-img { transition: transform 0.6s cubic-bezier(0.16,1,0.3,1); }
-    @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
-    .float-anim { animation: float 3s ease-in-out infinite; }
-    @keyframes gradient-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    .gradient-animated { background-size: 200% 200%; animation: gradient-shift 8s ease infinite; }
-    .social-btn { transition: all 0.3s cubic-bezier(0.16,1,0.3,1); }
-    .social-btn:hover { transform: translateY(-3px) scale(1.1); }
+    
+    /* Trending Cards with Smooth Magnify */
+    .trending-card { 
+      transform: scale(0.92); 
+      opacity: 0.75; 
+      transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s, box-shadow 0.5s, border-color 0.5s; 
+      will-change: transform, opacity; 
+    }
+    .trending-card.is-active { 
+      transform: scale(1.03); 
+      opacity: 1; 
+      box-shadow: 0 25px 50px -12px rgba(79, 70, 229, 0.28); 
+      z-index: 10; 
+    }
+    .trending-card:hover { 
+      opacity: 1; 
+      transform: scale(1.05) translateY(-4px); 
+      box-shadow: 0 28px 55px -12px rgba(79, 70, 229, 0.32);
+    }
+    
+    /* Product Card Interactive Elevation */
+    .product-card { 
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease; 
+    }
+    .product-card:hover { 
+      transform: translateY(-8px); 
+      box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(99, 102, 241, 0.15); 
+    }
+    .product-card:hover .product-img { transform: scale(1.09); }
+    .product-img { transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+    
+    /* Floating & Ambient Motion */
+    @keyframes float-subtle { 
+      0%, 100% { transform: translateY(0px); } 
+      50% { transform: translateY(-7px); } 
+    }
+    .float-anim { animation: float-subtle 4s ease-in-out infinite; }
+    
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.04); }
+    }
+    .pulse-subtle { animation: pulse-subtle 3s ease-in-out infinite; }
+    
+    /* Shimmer Effect for Loading & Highlights */
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    .shimmer-effect {
+      position: relative;
+      overflow: hidden;
+    }
+    .shimmer-effect::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+      animation: shimmer 2.5s infinite;
+    }
+    
+    /* Social Button micro-bounce */
+    .social-btn { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .social-btn:hover { transform: translateY(-4px) scale(1.08); }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white transition-colors duration-200">
@@ -91,77 +163,113 @@
     </div>
   </nav>
 
-  <!-- HERO BANNER -->
-  <header class="relative overflow-hidden pt-6 pb-8">
+  <!-- HERO BANNER (REVOLUTIONIZED ULTRA-MODERN) -->
+  <header class="relative overflow-hidden pt-4 pb-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div id="banner-container" class="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 text-white min-h-[320px] md:min-h-[420px] flex items-center">
-        <div class="p-8 md:p-14 max-w-2xl z-10 relative">
-          <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-brand-200 text-xs font-semibold mb-5 backdrop-blur-md">
-            <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span></span>
-            <span>Update Produk Affiliate Hari Ini</span>
+      <div id="banner-container" class="relative rounded-[2.5rem] overflow-hidden shadow-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white border border-slate-800/80 p-8 sm:p-12 md:p-16">
+        
+        <!-- Ambient Glowing Orbs -->
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl pointer-events-none pulse-subtle"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-pink-500/15 rounded-full blur-3xl pointer-events-none pulse-subtle" style="animation-delay: 1.5s;"></div>
+        
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-8 space-y-6">
+            <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-xl text-xs font-semibold text-brand-200">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>Kurasi Viral Harian • Shopee & TikTok Shop</span>
+            </div>
+            
+            <h1 id="banner-title" class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] text-white">
+              Temukan Produk Viral & Promo Diskon Terbaik
+            </h1>
+            
+            <p id="banner-subtitle" class="text-slate-300 text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed font-normal">
+              Satu portal terpadu kurasi link affiliate produk rekomendasi terpercaya, review jujur, dan harga termurah langsung ke official marketplace.
+            </p>
+            
+            <div class="flex flex-wrap items-center gap-3 pt-2">
+              <a id="banner-btn" href="#products" class="btn-bounce px-8 py-4 rounded-2xl bg-white text-slate-950 font-black text-sm shadow-xl hover:bg-slate-100 flex items-center space-x-2">
+                <span>Jelajahi Produk</span>
+                <i data-lucide="arrow-down" class="w-4 h-4"></i>
+              </a>
+              <a href="#trending-section" class="btn-bounce px-6 py-4 rounded-2xl bg-white/10 hover:bg-white/15 backdrop-blur-xl border border-white/15 text-white font-bold text-sm flex items-center space-x-2">
+                <i data-lucide="flame" class="w-4 h-4 text-pink-400"></i>
+                <span>Lihat Trending</span>
+              </a>
+            </div>
           </div>
-          <h1 id="banner-title" class="text-3xl md:text-5xl font-extrabold tracking-tight leading-[1.1] mb-5 text-white drop-shadow-lg">
-            Pusat Rekomendasi Link Affiliate Terpopuler & Paling Menguntungkan
-          </h1>
-          <p id="banner-subtitle" class="text-slate-300/90 text-sm md:text-base leading-relaxed mb-7 max-w-lg">
-            Jelajahi ratusan produk viral TikTok Shop dan Shopee dengan penawaran harga terbaik, ulasan terpercaya, dan komisi transparan.
-          </p>
-          <div class="flex flex-wrap gap-3">
-            <a id="banner-btn" href="#products" class="px-7 py-3.5 rounded-2xl bg-white text-slate-950 hover:bg-slate-100 font-bold text-sm shadow-xl transition-all hover:-translate-y-0.5 inline-flex items-center space-x-2">
-              <span>Eksplor Sekarang</span>
-              <i data-lucide="arrow-right" class="w-4 h-4"></i>
-            </a>
-            <a href="#stats-section" class="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-medium text-sm transition-all">
-              Lihat Statistik
-            </a>
+          
+          <!-- Hero Interactive Card -->
+          <div class="lg:col-span-4 hidden lg:block">
+            <div class="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-2xl shadow-2xl float-anim space-y-4">
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-300">
+                <span class="flex items-center space-x-1.5"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i><span>100% Terverifikasi</span></span>
+                <span class="text-[11px] bg-white/10 px-2.5 py-0.5 rounded-full">Official Links</span>
+              </div>
+              <div class="h-40 rounded-2xl bg-slate-800/60 overflow-hidden relative group">
+                <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&q=80" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Affiliate Hero">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-3">
+                  <span class="text-xs font-bold text-white">Diskon Flash Sale Harian</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-xs text-slate-300">
+                <span>Update Terakhir</span>
+                <span class="font-mono font-bold text-emerald-400">Hari Ini</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div id="banner-bg" class="absolute inset-0 z-0 bg-cover bg-center opacity-30 transition-all duration-700"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-transparent z-[1]"></div>
+
+        <div id="banner-bg" class="absolute inset-0 z-0 bg-cover bg-center opacity-25 transition-all duration-1000"></div>
       </div>
     </div>
   </header>
 
-  <!-- STATS -->
-  <section id="stats-section" class="py-5 reveal">
+  <!-- STATS BAR (MODERN SLEEK METRICS) -->
+  <section id="stats-section" class="py-4 reveal">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="p-5 rounded-2xl bg-white border border-slate-200/70 shadow-sm hover:shadow-md transition-all flex items-center space-x-4">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500/20 to-brand-600/10 text-brand-600 flex items-center justify-center shrink-0">
-            <i data-lucide="package" class="w-6 h-6"></i>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        
+        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex items-center space-x-3 sm:space-x-4 group">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+            <i data-lucide="box" class="w-5 h-5 sm:w-6 sm:h-6"></i>
           </div>
           <div>
-            <div id="stat-products" class="text-2xl font-extrabold tracking-tight">--</div>
-            <div class="text-xs text-slate-500 font-medium">Produk Aktif</div>
+            <div id="stat-products" class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">--</div>
+            <div class="text-[11px] sm:text-xs text-slate-500 font-medium">Produk Terkurasi</div>
           </div>
         </div>
-        <div class="p-5 rounded-2xl bg-white border border-slate-200/70 shadow-sm hover:shadow-md transition-all flex items-center space-x-4">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500/20 to-pink-600/10 text-pink-600 flex items-center justify-center shrink-0">
-            <i data-lucide="mouse-pointer-click" class="w-6 h-6"></i>
+
+        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex items-center space-x-3 sm:space-x-4 group">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-pink-50 text-pink-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+            <i data-lucide="mouse-pointer-click" class="w-5 h-5 sm:w-6 sm:h-6"></i>
           </div>
           <div>
-            <div id="stat-clicks" class="text-2xl font-extrabold tracking-tight">--</div>
-            <div class="text-xs text-slate-500 font-medium">Total Klik</div>
+            <div id="stat-clicks" class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">--</div>
+            <div class="text-[11px] sm:text-xs text-slate-500 font-medium">Total Klik Pengunjung</div>
           </div>
         </div>
-        <div class="p-5 rounded-2xl bg-white border border-slate-200/70 shadow-sm hover:shadow-md transition-all flex items-center space-x-4">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 text-[#ee4d2d] flex items-center justify-center shrink-0">
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 7.05h-2.73c-.28-2.67-2.1-4.8-4.77-4.8s-4.49 2.13-4.77 4.8H4.5c-.83 0-1.5.67-1.5 1.5l1.2 11.4c.08.77.73 1.35 1.5 1.35h12.6c.77 0 1.42-.58 1.5-1.35l1.2-11.4c0-.83-.67-1.5-1.5-1.5zm-7.5-3.3c1.83 0 3.32 1.49 3.47 3.3H8.53c.15-1.81 1.64-3.3 3.47-3.3zm5.7 15.75H6.3L5.25 8.55h13.5l-1.05 10.95z"/></svg>
+
+        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex items-center space-x-3 sm:space-x-4 group">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-orange-50 text-[#ee4d2d] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 7.05h-2.73c-.28-2.67-2.1-4.8-4.77-4.8s-4.49 2.13-4.77 4.8H4.5c-.83 0-1.5.67-1.5 1.5l1.2 11.4c.08.77.73 1.35 1.5 1.35h12.6c.77 0 1.42-.58 1.5-1.35l1.2-11.4c0-.83-.67-1.5-1.5-1.5zm-7.5-3.3c1.83 0 3.32 1.49 3.47 3.3H8.53c.15-1.81 1.64-3.3 3.47-3.3zm5.7 15.75H6.3L5.25 8.55h13.5l-1.05 10.95z"/></svg>
           </div>
           <div>
-            <div id="stat-shopee" class="text-2xl font-extrabold tracking-tight">--</div>
-            <div class="text-xs text-slate-500 font-medium">Shopee Clicks</div>
+            <div id="stat-shopee" class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">--</div>
+            <div class="text-[11px] sm:text-xs text-slate-500 font-medium">Shopee Affiliate</div>
           </div>
         </div>
-        <div class="p-5 rounded-2xl bg-white border border-slate-200/70 shadow-sm hover:shadow-md transition-all flex items-center space-x-4">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white flex items-center justify-center shrink-0">
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298 0 .592.046.87.136V9.4a6.33 6.33 0 0 0-.87-.06A6.34 6.34 0 0 0 3.14 15.7a6.34 6.34 0 0 0 9.15 5.62v-9.15a8.16 8.16 0 0 0 4.87 1.6v-3.47a4.85 4.85 0 0 1-2.57-1.61z"/></svg>
+
+        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex items-center space-x-3 sm:space-x-4 group">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298 0 .592.046.87.136V9.4a6.33 6.33 0 0 0-.87-.06A6.34 6.34 0 0 0 3.14 15.7a6.34 6.34 0 0 0 9.15 5.62v-9.15a8.16 8.16 0 0 0 4.87 1.6v-3.47a4.85 4.85 0 0 1-2.57-1.61z"/></svg>
           </div>
           <div>
-            <div id="stat-tiktok" class="text-2xl font-extrabold tracking-tight">--</div>
-            <div class="text-xs text-slate-500 font-medium">TikTok Clicks</div>
+            <div id="stat-tiktok" class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">--</div>
+            <div class="text-[11px] sm:text-xs text-slate-500 font-medium">TikTok Shop Viral</div>
           </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -547,14 +655,16 @@
         }
         empty.classList.add('hidden');
         document.getElementById('catalog-count-label').innerText = `Menampilkan ${json.data.length} dari total ${json.pagination.total} produk`;
-        grid.innerHTML = json.data.map(p => createProductCardHtml(p, false)).join('');
+        grid.innerHTML = json.data.map((p, idx) => createProductCardHtml(p, false, idx)).join('');
         renderPagination(json.pagination.total, json.pagination.page, json.pagination.limit);
         lucide.createIcons();
-        initScrollReveal();
+        requestAnimationFrame(() => {
+          initScrollReveal();
+        });
       } catch (err) { console.error('Failed to load products', err); }
     }
 
-    function createProductCardHtml(p, isFeatured = false) {
+    function createProductCardHtml(p, isFeatured = false, idx = 0) {
       const thumb = p.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80';
       const isTikTok = p.marketplace && p.marketplace.toLowerCase().includes('tiktok');
       let activeUrl = isTikTok ? (p.url_tiktok || p.url_shopee) : (p.url_shopee || p.url_tiktok);
@@ -564,39 +674,49 @@
       let marketBadge = 'bg-orange-500/15 text-orange-600 border border-orange-500/20';
       if (isTikTok) marketBadge = 'bg-pink-500/15 text-pink-600 border border-pink-500/20';
       const sliderWidthClass = isFeatured ? 'w-[72vw] sm:w-[260px] md:w-[280px] shrink-0 snap-center trending-card my-3' : 'w-full';
+      const staggerDelay = !isFeatured && idx < 8 ? `style="transition-delay: ${(idx % 4) * 75}ms;"` : '';
 
       return `
-        <div class="group ${sliderWidthClass} product-card reveal bg-white rounded-2xl border border-slate-200/80 shadow-sm flex flex-col overflow-hidden">
-          <a href="${activeUrl}" target="${directTarget}" onclick="trackProductClick('${p.id}', '${activeMarket}')" class="relative aspect-square overflow-hidden bg-slate-100 block">
-            <img src="${thumb}" alt="${p.name}" class="w-full h-full object-cover product-img" loading="lazy">
-            <div class="absolute top-3 left-3 flex flex-col gap-1.5 items-start pointer-events-none">
-              <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase backdrop-blur-md ${marketBadge}">${isTikTok ? 'TikTok Shop' : 'Shopee'}</span>
-              ${p.commission_rate ? `<span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-500/90 text-white backdrop-blur-md">Komisi ${p.commission_rate}</span>` : ''}
+        <div ${staggerDelay} class="group ${sliderWidthClass} product-card reveal bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-2xl hover:border-brand-500/30 flex flex-col overflow-hidden transition-all duration-500">
+          <div class="relative aspect-square overflow-hidden bg-slate-100 block">
+            <a href="${activeUrl}" target="${directTarget}" onclick="trackProductClick('${p.id}', '${activeMarket}')" class="block w-full h-full">
+              <img src="${thumb}" alt="${p.name}" class="w-full h-full object-cover product-img group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy">
+            </a>
+            <div class="absolute top-3.5 left-3.5 flex flex-col gap-1.5 items-start pointer-events-none z-10">
+              <span class="px-3 py-1 rounded-xl text-[10px] font-black tracking-wider uppercase backdrop-blur-xl shadow-sm ${isTikTok ? 'bg-slate-900/90 text-pink-400 border border-pink-500/30' : 'bg-[#ee4d2d]/90 text-white border border-white/20'}">
+                ${isTikTok ? 'TikTok Shop' : 'Shopee'}
+              </span>
+              ${p.commission_rate ? `<span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-500 text-white shadow-sm backdrop-blur-md">Komisi ${p.commission_rate}</span>` : ''}
             </div>
-            <button type="button" onclick="event.stopPropagation(); event.preventDefault(); openShareModal('${p.slug}', '${p.name.replace(/'/g, "\\'")}', '${p.thumbnail}')" class="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/90 backdrop-blur-md text-slate-700 flex items-center justify-center hover:bg-white shadow-md transition opacity-0 group-hover:opacity-100" title="Bagikan">
+            <button type="button" onclick="event.stopPropagation(); event.preventDefault(); openShareModal('${p.slug}', '${p.name.replace(/'/g, "\\'")}', '${p.thumbnail}')" class="absolute top-3.5 right-3.5 w-9 h-9 rounded-2xl bg-white/90 backdrop-blur-md text-slate-700 flex items-center justify-center hover:bg-white hover:text-brand-600 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-110" title="Bagikan">
               <i data-lucide="share-2" class="w-4 h-4"></i>
             </button>
-          </a>
-          <div class="p-3.5 sm:p-4 flex flex-col flex-1">
-            <div class="text-[10px] sm:text-[11px] font-medium text-slate-400 mb-1.5 flex items-center justify-between">
-              <span class="truncate">${p.category_name || 'Umum'}</span>
-              <span class="flex items-center space-x-1 text-slate-500 shrink-0"><i data-lucide="mouse-pointer-click" class="w-3 h-3"></i><span>${p.total_clicks || 0}</span></span>
+          </div>
+          <div class="p-4 sm:p-5 flex flex-col flex-1 bg-white justify-between">
+            <div>
+              <div class="text-[11px] font-semibold text-slate-400 mb-2 flex items-center justify-between">
+                <span class="uppercase tracking-wider font-bold text-brand-600/80">${p.category_name || 'Rekomendasi'}</span>
+                <span class="flex items-center space-x-1 text-slate-400 text-xs"><i data-lucide="eye" class="w-3.5 h-3.5"></i><span>${p.total_clicks || 0}</span></span>
+              </div>
+              <a href="${activeUrl}" target="${directTarget}" onclick="trackProductClick('${p.id}', '${activeMarket}')" class="font-bold text-sm text-slate-900 line-clamp-2 hover:text-brand-600 transition-colors leading-snug mb-3" title="${p.name}">${p.name}</a>
             </div>
-            <a href="${activeUrl}" target="${directTarget}" onclick="trackProductClick('${p.id}', '${activeMarket}')" class="font-bold text-xs sm:text-sm leading-snug line-clamp-2 hover:text-brand-600 transition mb-2.5" title="${p.name}">${p.name}</a>
-            <div class="mt-auto pt-2">
-              <div class="text-sm sm:text-base font-extrabold text-slate-900 mb-3">${formatRupiah(p.price)}</div>
+            <div class="pt-2 border-t border-slate-100">
+              <div class="flex items-baseline justify-between mb-3.5">
+                <span class="text-xs text-slate-400 font-medium">Harga Promo:</span>
+                <span class="text-base sm:text-lg font-black text-slate-900 tracking-tight">${formatRupiah(p.price)}</span>
+              </div>
               <div>
                 ${(isTikTok && p.url_tiktok) ? `
-                  <a href="${p.url_tiktok}" target="_blank" onclick="trackProductClick('${p.id}', 'TikTok Shop')" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white text-xs font-bold flex items-center justify-center space-x-2 shadow-md transition active:scale-[0.98]">
-                    <svg class="w-4 h-4 shrink-0 fill-current text-[#fe2c55]" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298 0 .592.046.87.136V9.4a6.33 6.33 0 0 0-.87-.06A6.34 6.34 0 0 0 3.14 15.7a6.34 6.34 0 0 0 9.15 5.62v-9.15a8.16 8.16 0 0 0 4.87 1.6v-3.47a4.85 4.85 0 0 1-2.57-1.61z"/></svg>
-                    <span>TikTok Shop</span>
+                  <a href="${p.url_tiktok}" target="_blank" onclick="trackProductClick('${p.id}', 'TikTok Shop')" class="btn-bounce w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 text-white text-xs font-black flex items-center justify-center space-x-2 shadow-lg shadow-slate-950/20 hover:shadow-slate-950/30">
+                    <svg class="w-4 h-4 fill-current text-[#fe2c55]" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298 0 .592.046.87.136V9.4a6.33 6.33 0 0 0-.87-.06A6.34 6.34 0 0 0 3.14 15.7a6.34 6.34 0 0 0 9.15 5.62v-9.15a8.16 8.16 0 0 0 4.87 1.6v-3.47a4.85 4.85 0 0 1-2.57-1.61z"/></svg>
+                    <span>Beli di TikTok Shop</span>
                   </a>` : ((!isTikTok && p.url_shopee) ? `
-                  <a href="${p.url_shopee}" target="_blank" onclick="trackProductClick('${p.id}', 'Shopee')" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#ee4d2d] to-[#f76c3f] hover:from-[#d43d1f] hover:to-[#e55a2a] text-white text-xs font-bold flex items-center justify-center space-x-2 shadow-md transition active:scale-[0.98]">
-                    <svg class="w-4 h-4 shrink-0 fill-current" viewBox="0 0 24 24"><path d="M19.5 7.05h-2.73c-.28-2.67-2.1-4.8-4.77-4.8s-4.49 2.13-4.77 4.8H4.5c-.83 0-1.5.67-1.5 1.5l1.2 11.4c.08.77.73 1.35 1.5 1.35h12.6c.77 0 1.42-.58 1.5-1.35l1.2-11.4c0-.83-.67-1.5-1.5-1.5zm-7.5-3.3c1.83 0 3.32 1.49 3.47 3.3H8.53c.15-1.81 1.64-3.3 3.47-3.3zm5.7 15.75H6.3L5.25 8.55h13.5l-1.05 10.95z"/></svg>
+                  <a href="${p.url_shopee}" target="_blank" onclick="trackProductClick('${p.id}', 'Shopee')" class="btn-bounce w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-[#ee4d2d] to-[#f76c3f] text-white text-xs font-black flex items-center justify-center space-x-2 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/35">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19.5 7.05h-2.73c-.28-2.67-2.1-4.8-4.77-4.8s-4.49 2.13-4.77 4.8H4.5c-.83 0-1.5.67-1.5 1.5l1.2 11.4c.08.77.73 1.35 1.5 1.35h12.6c.77 0 1.42-.58 1.5-1.35l1.2-11.4c0-.83-.67-1.5-1.5-1.5zm-7.5-3.3c1.83 0 3.32 1.49 3.47 3.3H8.53c.15-1.81 1.64-3.3 3.47-3.3zm5.7 15.75H6.3L5.25 8.55h13.5l-1.05 10.95z"/></svg>
                     <span>Beli di Shopee</span>
                   </a>` : `
-                  <a href="/product/${p.slug}" class="w-full py-2.5 px-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold flex items-center justify-center space-x-1.5 transition active:scale-[0.98]">
-                    <span>Lihat Detail</span><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                  <a href="/product/${p.slug}" class="btn-bounce w-full py-3 px-4 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-black flex items-center justify-center space-x-1.5 shadow-lg shadow-brand-500/20">
+                    <span>Lihat Penawaran</span><i data-lucide="chevron-right" class="w-4 h-4"></i>
                   </a>`)}
               </div>
             </div>
@@ -654,12 +774,22 @@
 
     let revealObserver = null;
     function initScrollReveal() {
+      const reveals = document.querySelectorAll('.reveal:not(.active)');
       if ('IntersectionObserver' in window) {
         if (!revealObserver) {
-          revealObserver = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('active'); revealObserver.unobserve(entry.target); } }); }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+          revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                revealObserver.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.08, rootMargin: '0px 0px -20px 0px' });
         }
-        document.querySelectorAll('.reveal:not(.active)').forEach(el => revealObserver.observe(el));
-      } else { document.querySelectorAll('.reveal').forEach(el => el.classList.add('active')); }
+        reveals.forEach(el => revealObserver.observe(el));
+      } else {
+        reveals.forEach(el => el.classList.add('active'));
+      }
     }
 
     async function loadSettings() {

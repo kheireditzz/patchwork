@@ -75,9 +75,13 @@
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(8px);
     }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeOutUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-10px); } }
-    .fade-in-up { animation: fadeInUp 0.35s ease-out; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeOutUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-12px); } }
+    .fade-in-up { animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+    
+    .btn-action { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+    .btn-action:hover { transform: translateY(-1.5px); }
+    .btn-action:active { transform: translateY(0) scale(0.98); }
   </style>
 </head>
 <body class="bg-slate-50/80 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
