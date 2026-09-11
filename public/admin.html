@@ -1117,22 +1117,24 @@
         }
 
         // Render Daily Chart with refined gradient
-        const chartCtx = document.getElementById('dailyClicksChart').getContext('2d');
-        const labels = (data.dailyClicks || []).map(d => d.date);
-        const counts = (data.dailyClicks || []).map(d => d.count);
+        const chartEl = document.getElementById('dailyClicksChart');
+        if (chartEl && typeof Chart !== 'undefined') {
+          const chartCtx = chartEl.getContext('2d');
+          const labels = (data.dailyClicks || []).map(d => d.date);
+          const counts = (data.dailyClicks || []).map(d => d.count);
 
-        const gradient = chartCtx.createLinearGradient(0, 0, 0, 240);
-        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.28)');
-        gradient.addColorStop(1, 'rgba(99, 102, 241, 0.00)');
+          const gradient = chartCtx.createLinearGradient(0, 0, 0, 240);
+          gradient.addColorStop(0, 'rgba(99, 102, 241, 0.28)');
+          gradient.addColorStop(1, 'rgba(99, 102, 241, 0.00)');
 
-        if (dailyChart) dailyChart.destroy();
-        dailyChart = new Chart(chartCtx, {
-          type: 'line',
-          data: {
-            labels: labels.length > 0 ? labels : ['Hari ini'],
-            datasets: [{
-              label: 'Klik Harian',
-              data: counts.length > 0 ? counts : [0],
+          if (dailyChart) dailyChart.destroy();
+          dailyChart = new Chart(chartCtx, {
+            type: 'line',
+            data: {
+              labels: labels.length > 0 ? labels : ['Hari ini'],
+              datasets: [{
+                label: 'Klik Harian',
+                data: counts.length > 0 ? counts : [0],
               borderColor: '#4f46e5',
               borderWidth: 2.5,
               pointBackgroundColor: '#4f46e5',
