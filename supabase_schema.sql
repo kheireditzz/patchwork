@@ -1,6 +1,6 @@
 -- ==========================================================
 -- PATCHWORK DATABASE SCHEMA FOR SUPABASE (POSTGRESQL)
--- Project: https://qyfmyxgmntpqydgrmanv.supabase.co
+-- Project: https://your-project.supabase.co
 -- ==========================================================
 
 -- Enable UUID extension if not enabled
