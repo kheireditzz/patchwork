@@ -1504,15 +1504,15 @@
               datasets: [{
                 label: 'Klik Harian',
                 data: counts.length > 0 ? counts : [0],
-              borderColor: '#4f46e5',
-              borderWidth: 2.5,
-              pointBackgroundColor: '#4f46e5',
-              pointHoverRadius: 6,
-              pointRadius: 3,
-              backgroundColor: gradient,
-              tension: 0.38,
-              fill: true
-            }]
+                borderColor: '#4f46e5',
+                borderWidth: 2.5,
+                pointBackgroundColor: '#4f46e5',
+                pointHoverRadius: 6,
+                pointRadius: 3,
+                backgroundColor: gradient,
+                tension: 0.38,
+                fill: true
+              }]
           },
           options: {
             responsive: true,
@@ -1542,6 +1542,7 @@
             }
           }
         });
+        }
       } catch (err) {
         console.error('Error loading overview:', err);
       }
