@@ -34,184 +34,322 @@
   </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-    body { 
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; 
-      letter-spacing: -0.012em; 
-      background-color: #f8fafc;
-      color: #0f172a;
+
+    :root {
+      --pw-bg: #f6f7f9;
+      --pw-ink: #0b1220;
+      --pw-line: #e5e8ee;
+      --pw-accent: #0f7a5a;
+      --pw-accent-soft: #ecfdf5;
+      --pw-radius: 18px;
+      --pw-shadow-sm: 0 1px 2px rgba(11, 18, 32, .05);
+      --pw-shadow-md: 0 8px 24px -12px rgba(11, 18, 32, .28);
     }
-    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      letter-spacing: -0.014em;
+      background-color: var(--pw-bg);
+      color: var(--pw-ink);
+      text-rendering: optimizeLegibility;
+    }
+
+    /* Consistent, readable inputs on mobile (16px prevents iOS/Android zoom) */
+    input, select, textarea, button { font-size: 16px; }
+    @media (min-width: 640px) {
+      input, select, textarea, button { font-size: inherit; }
+    }
+
+    .pw-input {
+      width: 100%;
+      padding: .7rem .85rem;
+      border-radius: 14px;
+      border: 1px solid var(--pw-line);
+      background: #fff;
+      color: var(--pw-ink);
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+      outline: none;
+    }
+    .pw-input::placeholder { color: #9aa4b2; }
+    .pw-input:hover { border-color: #d3d9e3; }
+    .pw-input:focus {
+      border-color: var(--pw-accent);
+      box-shadow: 0 0 0 3.5px rgba(15, 122, 90, .14);
+      background: #fff;
+    }
+
+    .pw-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+      padding: .7rem 1.1rem; border-radius: 14px; font-weight: 700;
+      transition: transform .12s ease, background .18s ease, box-shadow .18s ease;
+      cursor: pointer; border: 1px solid transparent; white-space: nowrap;
+    }
+    .pw-btn:active { transform: scale(.975); }
+    .pw-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    .pw-btn-primary { background: var(--pw-accent); color: #fff; box-shadow: var(--pw-shadow-md); }
+    .pw-btn-primary:hover:not(:disabled) { background: #0b674b; }
+    .pw-btn-dark { background: var(--pw-ink); color: #fff; }
+    .pw-btn-dark:hover:not(:disabled) { background: #1a2436; }
+    .pw-btn-ghost { background: #fff; border-color: var(--pw-line); color: #46536a; }
+    .pw-btn-ghost:hover:not(:disabled) { background: #f3f5f8; color: var(--pw-ink); }
+
+    .pw-card {
+      background: #fff;
+      border: 1px solid var(--pw-line);
+      border-radius: var(--pw-radius);
+      box-shadow: var(--pw-shadow-sm);
+    }
+
+    .pw-chip {
+      display: inline-flex; align-items: center; gap: .3rem;
+      padding: .2rem .55rem; border-radius: 999px;
+      font-size: 10px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { scrollbar-width: none; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+    .animate-enter { animation: fadeInUp .28s cubic-bezier(.22,1,.36,1) both; }
+    .animate-fade { animation: fadeIn .25s ease both; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-emerald-600 selection:text-white">
 
   <!-- ================= AUTH CONTAINER (LOGIN & REGISTER) ================= -->
-  <div id="auth-container" class="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-slate-950 relative overflow-hidden selection:bg-emerald-500 selection:text-white">
-    <!-- Ambient Lighting & Subtle Grid Background -->
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none"></div>
-    <div class="absolute -top-40 -left-40 w-96 h-96 bg-emerald-600/20 rounded-full blur-[128px] pointer-events-none"></div>
-    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-teal-600/20 rounded-full blur-[128px] pointer-events-none"></div>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-emerald-950/20 rounded-full blur-[140px] pointer-events-none"></div>
+  <div id="auth-container" class="min-h-screen grid lg:grid-cols-2 bg-[#0b1220] selection:bg-emerald-500 selection:text-white">
 
-    <div class="max-w-md w-full bg-white/95 backdrop-blur-xl rounded-3xl p-7 sm:p-9 border border-white/40 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.45)] relative z-10">
-      
-      <!-- Brand Header -->
-      <div class="text-center mb-6">
-        <div class="flex justify-center items-center w-full mb-4">
-          <a href="/" class="inline-flex items-center justify-center p-2 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 transition-transform active:scale-95 shadow-sm" title="Kembali ke Beranda">
-            <img 
-              src="/images/logo.png" 
-              onerror="this.onerror=null; this.src='https://i.ibb.co.com/mwpHfGn/263941-removebg-preview.png';" 
-              alt="PATCHWORK" 
-              class="h-10 w-auto max-w-[160px] object-contain drop-shadow-sm"
+    <!-- LEFT: BRAND PANEL (desktop) -->
+    <aside class="relative hidden lg:flex flex-col justify-between overflow-hidden p-10 xl:p-14 border-r border-white/5">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(16,185,129,.22),transparent_45%),radial-gradient(circle_at_85%_100%,rgba(13,148,136,.18),transparent_50%)] pointer-events-none"></div>
+      <div class="absolute inset-0 opacity-[0.04] bg-[linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] bg-[size:44px_44px] pointer-events-none"></div>
+
+      <div class="relative z-10 flex items-center gap-3">
+        <img
+          src="/images/logo.png"
+          onerror="this.onerror=null; this.src='https://i.ibb.co.com/mwpHfGn/263941-removebg-preview.png';"
+          alt="PATCHWORK"
+          class="h-9 w-auto max-w-[150px] object-contain brightness-0 invert"
+        >
+        <span class="w-px h-6 bg-white/15"></span>
+        <span class="text-white/70 text-xs font-semibold tracking-wide">Portal Mitra</span>
+      </div>
+
+      <div class="relative z-10 max-w-lg">
+        <span class="pw-chip bg-emerald-500/15 text-emerald-300 border border-emerald-400/25 mb-5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Kemitraan Penjual
+        </span>
+        <h2 class="text-3xl xl:text-4xl font-black text-white leading-[1.12] tracking-tight">
+          Etalase affiliate Anda,<br>langsung di katalog kurasi PATCHWORK.
+        </h2>
+        <p class="text-sm text-slate-400 mt-4 leading-relaxed">
+          Daftarkan produk Shopee &amp; TikTok Shop Anda, dapatkan subdomain etalase pribadi, dan pantau klik pengunjung secara real-time.
+        </p>
+
+        <div class="grid grid-cols-1 gap-3 mt-8">
+          <div class="flex items-start gap-3 p-4 rounded-2xl bg-white/[0.04] border border-white/10">
+            <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-300 flex items-center justify-center shrink-0"><i data-lucide="link" class="w-4 h-4"></i></div>
+            <div>
+              <div class="text-sm font-bold text-white">LYNK ID / Subdomain pribadi</div>
+              <div class="text-xs text-slate-400 mt-0.5">namaanda.kheireditz.my.id sebagai etalase mini Anda.</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 rounded-2xl bg-white/[0.04] border border-white/10">
+            <div class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-300 flex items-center justify-center shrink-0"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
+            <div>
+              <div class="text-sm font-bold text-white">Statistik klik transparan</div>
+              <div class="text-xs text-slate-400 mt-0.5">Pantau performa tiap produk yang Anda pasang.</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 rounded-2xl bg-white/[0.04] border border-white/10">
+            <div class="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-300 flex items-center justify-center shrink-0"><i data-lucide="shield-check" class="w-4 h-4"></i></div>
+            <div>
+              <div class="text-sm font-bold text-white">Verifikasi admin</div>
+              <div class="text-xs text-slate-400 mt-0.5">Akun ditinjau manual demi kualitas katalog.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative z-10 text-[11px] text-slate-500">
+        &copy; 2026 PATCHWORK &middot; Platform kurasi affiliate multi-marketplace
+      </div>
+    </aside>
+
+    <!-- RIGHT: AUTH FORM -->
+    <main class="relative flex items-center justify-center p-4 sm:p-8 bg-[#f6f7f9]">
+      <div class="w-full max-w-md">
+
+        <!-- Mobile brand -->
+        <div class="lg:hidden flex flex-col items-center text-center mb-6">
+          <a href="/" class="inline-flex items-center justify-center p-2 rounded-2xl bg-white border border-slate-200 shadow-sm active:scale-95 transition" title="Kembali ke Beranda">
+            <img
+              src="/images/logo.png"
+              onerror="this.onerror=null; this.src='https://i.ibb.co.com/mwpHfGn/263941-removebg-preview.png';"
+              alt="PATCHWORK"
+              class="h-9 w-auto max-w-[150px] object-contain"
             >
           </a>
+          <span class="pw-chip bg-emerald-50 text-emerald-700 border border-emerald-200 mt-3">
+            <i data-lucide="store" class="w-3 h-3"></i> Portal Mitra Penjual
+          </span>
         </div>
-        <div class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[11px] font-bold mb-2">
-          <i data-lucide="store" class="w-3.5 h-3.5 text-emerald-600"></i>
-          <span>Portal Mitra Penjual</span>
-        </div>
-        <h1 class="text-xl font-black text-slate-900 tracking-tight">Kemitraan & Penjual</h1>
-        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Kelola dan daftarkan produk Anda ke dalam katalog kurasi resmi PATCHWORK</p>
-      </div>
 
-      <!-- Tab Switch: Masuk vs Daftar Baru -->
-      <div class="flex p-1 bg-slate-100 rounded-xl mb-5 text-xs font-bold">
-        <button type="button" id="tab-auth-login" onclick="switchAuthTab('login')" class="flex-1 py-2 rounded-lg bg-white shadow-sm text-slate-900 transition text-center">
-          Masuk Akun
-        </button>
-        <button type="button" id="tab-auth-register" onclick="switchAuthTab('register')" class="flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition text-center">
-          Daftar Akun Mitra
-        </button>
-      </div>
+        <div class="pw-card p-6 sm:p-8 animate-enter">
+          <div class="hidden lg:block mb-6">
+            <span class="pw-chip bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <i data-lucide="store" class="w-3 h-3"></i> Portal Mitra Penjual
+            </span>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-3">Masuk ke Portal Mitra</h1>
+            <p class="text-sm text-slate-500 mt-1">Kelola dan daftarkan produk Anda ke katalog kurasi resmi PATCHWORK.</p>
+          </div>
 
-      <!-- Feedback Alert -->
-      <div id="auth-error" class="hidden mb-4 p-3.5 rounded-2xl text-xs font-semibold"></div>
+          <!-- Tab Switch -->
+          <div class="flex p-1 bg-slate-100 rounded-2xl mb-5 text-sm font-bold">
+            <button type="button" id="tab-auth-login" onclick="switchAuthTab('login')" class="pw-auth-tab flex-1 py-2.5 rounded-xl bg-white shadow-sm text-slate-900 transition">
+              Masuk Akun
+            </button>
+            <button type="button" id="tab-auth-register" onclick="switchAuthTab('register')" class="pw-auth-tab flex-1 py-2.5 rounded-xl text-slate-500 hover:text-slate-900 transition">
+              Daftar Mitra
+            </button>
+          </div>
 
-      <!-- 1. FORM LOGIN MITRA -->
-      <form id="partner-login-form" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5">Email Mitra</label>
-          <div class="relative">
-            <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-            <input type="email" id="login-email" placeholder="nama@tokoanda.com" required class="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-emerald-600 focus:bg-white transition">
+          <!-- Feedback Alert -->
+          <div id="auth-error" class="hidden mb-4 p-3.5 rounded-2xl text-xs font-semibold"></div>
+
+          <!-- 1. LOGIN -->
+          <form id="partner-login-form" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Email Mitra</label>
+              <div class="relative">
+                <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input type="email" id="login-email" placeholder="nama@tokoanda.com" required autocomplete="email" class="pw-input pl-10">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Password</label>
+              <div class="relative">
+                <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password" class="pw-input pl-10 pr-11">
+                <button type="button" onclick="togglePassword('login-password', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-700 rounded-lg transition" title="Lihat password">
+                  <i data-lucide="eye" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" id="btn-partner-login" class="pw-btn pw-btn-primary w-full">
+              <span>Masuk ke Portal Mitra</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+
+            <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl text-[11px] text-amber-900 flex items-start gap-2.5 leading-relaxed">
+              <i data-lucide="shield-check" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+              <span>Akun harus <strong>disetujui (Approved) oleh Admin</strong> sebelum dapat masuk dan memasukkan produk.</span>
+            </div>
+          </form>
+
+          <!-- 2. REGISTER -->
+          <form id="partner-reg-form" onsubmit="handlePartnerRegistration(event)" class="space-y-3.5 hidden">
+            <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-[11px] text-slate-700 flex items-start gap-2.5 leading-relaxed">
+              <i data-lucide="info" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+              <span>Wajib mengisi <strong>Nama Asli</strong> dan <strong>Nomor WhatsApp Asli</strong>. Admin akan memverifikasi sebelum menyetujui akun Anda.</span>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama Asli Lengkap *</label>
+              <input type="text" id="reg-name" required placeholder="Nama asli sesuai KTP/identitas" autocomplete="name" class="pw-input">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Nomor WhatsApp Asli (Aktif) *</label>
+              <input type="tel" id="reg-whatsapp" required placeholder="08xxxxxxxxxx atau 628xxxxxxxxxx" autocomplete="tel" class="pw-input">
+              <span class="text-[10px] text-slate-400 mt-1 block">Digunakan admin untuk konfirmasi &amp; persetujuan akun.</span>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Email Aktif *</label>
+              <input type="email" id="reg-email" required placeholder="email@tokoanda.com" autocomplete="email" class="pw-input">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Password Baru *</label>
+              <div class="relative">
+                <input type="password" id="reg-password" required minlength="6" placeholder="Minimal 6 karakter" autocomplete="new-password" class="pw-input pr-11">
+                <button type="button" onclick="togglePassword('reg-password', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-700 rounded-lg transition" title="Lihat password">
+                  <i data-lucide="eye" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" id="btn-partner-reg" class="pw-btn pw-btn-dark w-full mt-1">
+              <span>Kirim Pendaftaran Mitra</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </form>
+
+          <div class="pt-4 mt-5 border-t border-slate-100 text-center">
+            <a href="/" class="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 font-medium transition">
+              <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+              <span>Kembali ke Beranda</span>
+            </a>
           </div>
         </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5">Password</label>
-          <div class="relative">
-            <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-            <input type="password" id="login-password" placeholder="••••••••" required class="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-emerald-600 focus:bg-white transition">
-          </div>
-        </div>
-
-        <button type="submit" id="btn-partner-login" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2">
-          <span>Masuk ke Portal Mitra</span>
-          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-        </button>
-
-        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 flex items-start space-x-2">
-          <i data-lucide="shield-check" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
-          <span>Akun Anda harus <strong>disetujui (Approved) oleh Admin</strong> sebelum dapat masuk dan memasukkan produk.</span>
-        </div>
-      </form>
-
-      <!-- 2. FORM PENDAFTARAN AKUN MITRA -->
-      <form id="partner-reg-form" onsubmit="handlePartnerRegistration(event)" class="space-y-3.5 hidden">
-        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-700 flex items-start space-x-2">
-          <i data-lucide="info" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
-          <span>Wajib mengisi <strong>Nama Asli</strong> dan <strong>Nomor WhatsApp Asli</strong>. Admin akan memverifikasi sebelum menyetujui akun Anda.</span>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Nama Asli Lengkap *</label>
-          <input type="text" id="reg-name" required placeholder="Nama asli Anda sesuai KTP/identitas" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp Asli (Aktif) *</label>
-          <input type="tel" id="reg-whatsapp" required placeholder="08xxxxxxxxxx atau 628xxxxxxxxxx" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
-          <span class="text-[10px] text-slate-400 mt-0.5 block">Digunakan admin untuk konfirmasi dan notifikasi persetujuan akun</span>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Email Aktif *</label>
-          <input type="email" id="reg-email" required placeholder="email@tokoanda.com" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Password Baru *</label>
-          <input type="password" id="reg-password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
-        </div>
-
-        <button type="submit" id="btn-partner-reg" onclick="if(!this.form.checkValidity()) { this.form.reportValidity(); return false; } handlePartnerRegistration(event);" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2 active:scale-95 mt-2 cursor-pointer">
-          <span>Kirim Pendaftaran Mitra</span>
-          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-        </button>
-      </form>
-
-      <!-- Bottom Nav Links -->
-      <div class="pt-4 mt-5 border-t border-slate-100 flex items-center justify-center text-xs text-slate-500">
-        <a href="/" class="hover:text-slate-900 transition flex items-center space-x-1.5 font-medium">
-          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-          <span>Kembali ke Beranda</span>
-        </a>
       </div>
-
-    </div>
+    </main>
   </div>
 
   <!-- ================= DASHBOARD MITRA CONTAINER ================= -->
   <div id="partner-dashboard-container" class="hidden flex-1 flex flex-col h-screen overflow-hidden">
-    
+
     <!-- TOP HEADER -->
-    <header class="h-14 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
+    <header class="h-16 bg-white/85 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
       <!-- Left: Logo & Title -->
-      <div class="flex items-center space-x-3">
-        <a href="/" class="flex items-center group py-1" title="Ke Beranda Publik">
-          <img 
-            src="/images/logo.png" 
-            onerror="this.onerror=null; this.src='https://i.ibb.co.com/mwpHfGn/263941-removebg-preview.png';" 
-            alt="Logo" 
+      <div class="flex items-center gap-3 min-w-0">
+        <a href="/" class="flex items-center group py-1 shrink-0" title="Ke Beranda Publik">
+          <img
+            src="/images/logo.png"
+            onerror="this.onerror=null; this.src='https://i.ibb.co.com/mwpHfGn/263941-removebg-preview.png';"
+            alt="Logo"
             class="h-8 w-auto max-w-[120px] object-contain transition-opacity group-hover:opacity-80"
           >
         </a>
-        <span class="text-slate-300">/</span>
-        <div class="flex items-center space-x-2">
-          <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-black uppercase tracking-wide">Portal Mitra</span>
-          <h2 class="text-xs sm:text-sm font-bold text-slate-800 hidden sm:inline" id="partner-page-title">
-            Manajemen Produk Saya
-          </h2>
+        <span class="text-slate-200 hidden sm:block">/</span>
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="pw-chip bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">Portal Mitra</span>
+          <h2 class="text-sm font-bold text-slate-800 hidden md:block truncate" id="partner-page-title">Manajemen Produk Saya</h2>
         </div>
       </div>
 
       <!-- Right: User Info & Actions -->
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <a id="header-btn-lynk" href="#" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold hover:bg-emerald-100 flex items-center space-x-1.5 transition" title="Lihat LYNK ID Saya">
-          <i data-lucide="link" class="w-3.5 h-3.5 text-emerald-600"></i>
-          <span>LYNK ID Saya</span>
-        </a>
-        <a href="/" target="_blank" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 flex items-center space-x-1.5 transition" title="Lihat Katalog Publik">
-          <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
-          <span class="hidden md:inline">Katalog Publik</span>
+      <div class="flex items-center gap-2">
+        <a id="header-btn-lynk" href="#" target="_blank" class="pw-btn pw-btn-primary !py-2 !px-3 !text-xs" title="Lihat LYNK ID Saya">
+          <i data-lucide="link" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">LYNK ID Saya</span>
         </a>
 
         <!-- Partner User Pill -->
-        <div class="flex items-center space-x-2 pl-2 border-l border-slate-200">
-          <div class="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-sm" id="partner-avatar">
+        <div class="flex items-center gap-2 pl-2 sm:pl-3 border-l border-slate-200">
+          <div class="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-sm overflow-hidden shrink-0" id="partner-avatar">
             MP
           </div>
-          <div class="hidden sm:block text-left">
+          <div class="hidden sm:block text-left min-w-0">
             <div class="text-xs font-bold text-slate-800 truncate max-w-[120px]" id="partner-display-name">Mitra Penjual</div>
-            <div class="text-[10px] font-semibold text-emerald-600 flex items-center space-x-1">
+            <div class="text-[10px] font-semibold text-emerald-600 flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
               <span id="partner-display-status">Terverifikasi</span>
             </div>
           </div>
-          <button onclick="logoutPartner()" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition ml-1" title="Keluar dari Akun">
+          <button onclick="logoutPartner()" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition" title="Keluar dari Akun">
             <i data-lucide="log-out" class="w-4 h-4"></i>
           </button>
         </div>
@@ -219,93 +357,98 @@
     </header>
 
     <!-- CONTENT BODY -->
-    <div class="flex-1 flex flex-col overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full">
-      
+    <div class="flex-1 overflow-y-auto custom-scrollbar">
+      <div class="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full">
+
       <!-- WELCOME HERO BANNER -->
-      <div class="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-900 via-slate-900 to-slate-950 text-white shadow-xl relative overflow-hidden border border-emerald-950/40">
-        <div class="relative z-10 max-w-2xl">
-          <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-extrabold uppercase tracking-wider inline-flex items-center space-x-1.5 mb-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Akun Mitra Terverifikasi</span>
-          </span>
-          <h1 class="text-xl sm:text-2xl font-black tracking-tight mb-1" id="partner-welcome-heading">Selamat Datang di Portal Mitra!</h1>
-          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            Anda dapat menambahkan produk langsung ke katalog resmi PATCHWORK. Pastikan tautan marketplace Shopee atau TikTok Shop aktif dan memiliki penawaran menarik.
-          </p>
+      <div class="p-5 sm:p-7 rounded-3xl bg-[#0b1220] text-white shadow-xl relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_85%_10%,rgba(16,185,129,.25),transparent_45%)] pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div class="max-w-2xl">
+            <span class="pw-chip bg-emerald-500/15 text-emerald-300 border border-emerald-400/25 mb-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Akun Mitra Terverifikasi
+            </span>
+            <h1 class="text-xl sm:text-2xl font-black tracking-tight mb-1.5" id="partner-welcome-heading">Selamat Datang di Portal Mitra!</h1>
+            <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              Tambahkan produk langsung ke katalog resmi PATCHWORK. Pastikan tautan marketplace aktif dan penawaran kompetitif.
+            </p>
+          </div>
         </div>
       </div>
 
       <!-- KPI METRICS -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="pw-card p-4 sm:p-5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
             <i data-lucide="package" class="w-5 h-5"></i>
           </div>
-          <div>
-            <div class="text-lg font-black text-slate-900" id="stat-my-products">0</div>
-            <div class="text-[11px] text-slate-500">Produk Saya</div>
-          </div>
+          <div class="text-2xl font-black text-slate-900 leading-none" id="stat-my-products">0</div>
+          <div class="text-[11px] text-slate-500 mt-1.5 font-medium">Produk Saya</div>
         </div>
 
-        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+        <div class="pw-card p-4 sm:p-5">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
             <i data-lucide="mouse-pointer-click" class="w-5 h-5"></i>
           </div>
-          <div>
-            <div class="text-lg font-black text-slate-900" id="stat-my-clicks">0</div>
-            <div class="text-[11px] text-slate-500">Total Klik Pengunjung</div>
-          </div>
+          <div class="text-2xl font-black text-slate-900 leading-none" id="stat-my-clicks">0</div>
+          <div class="text-[11px] text-slate-500 mt-1.5 font-medium">Total Klik</div>
         </div>
 
-        <div class="col-span-2 sm:col-span-1 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+        <div class="pw-card p-4 sm:p-5">
+          <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-3">
             <i data-lucide="shield-check" class="w-5 h-5"></i>
           </div>
-          <div>
-            <div class="text-sm font-bold text-emerald-600">Disetujui Admin</div>
-            <div class="text-[11px] text-slate-500">Status Akun Aktif</div>
+          <div class="text-sm font-black text-emerald-600 leading-none mt-1">Disetujui</div>
+          <div class="text-[11px] text-slate-500 mt-1.5 font-medium">Status Akun Aktif</div>
+        </div>
+
+        <div class="pw-card p-4 sm:p-5 relative overflow-hidden">
+          <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center mb-3">
+            <i data-lucide="link" class="w-5 h-5"></i>
           </div>
+          <div class="text-sm font-black text-slate-900 leading-none truncate" id="stat-my-slug">—</div>
+          <div class="text-[11px] text-slate-500 mt-1.5 font-medium">LYNK ID Etalase</div>
         </div>
       </div>
 
-      <!-- NAVIGATION TABS: PRODUK & LYNK ID PROFIL -->
-      <div class="flex items-center space-x-2 border-b border-slate-200 pb-2">
-        <button onclick="switchPartnerTab('products')" id="partner-tab-btn-products" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm transition flex items-center space-x-2">
+      <!-- NAVIGATION TABS -->
+      <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl w-full sm:w-fit overflow-x-auto no-scrollbar">
+        <button onclick="switchPartnerTab('products')" id="partner-tab-btn-products" class="flex-1 sm:flex-none whitespace-nowrap px-4 py-2.5 rounded-xl text-xs font-bold bg-white text-slate-900 shadow-sm transition flex items-center justify-center gap-2">
           <i data-lucide="package" class="w-3.5 h-3.5"></i>
-          <span>Katalog Produk Saya</span>
+          <span>Katalog Produk</span>
         </button>
-        <button onclick="switchPartnerTab('profile')" id="partner-tab-btn-profile" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center space-x-2">
-          <i data-lucide="link" class="w-3.5 h-3.5 text-emerald-600"></i>
-          <span>Pengaturan LYNK ID & Profil</span>
+        <button onclick="switchPartnerTab('profile')" id="partner-tab-btn-profile" class="flex-1 sm:flex-none whitespace-nowrap px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900 transition flex items-center justify-center gap-2">
+          <i data-lucide="link" class="w-3.5 h-3.5"></i>
+          <span>LYNK ID &amp; Profil</span>
         </button>
       </div>
 
       <!-- SECTION 1: PRODUCTS MANAGEMENT -->
-      <div id="partner-section-products" class="space-y-6">
+      <div id="partner-section-products" class="space-y-5">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <h3 class="text-base font-bold text-slate-900">Daftar Produk Saya di Katalog</h3>
-            <p class="text-xs text-slate-500">Kelola produk affiliate yang Anda pasang di katalog PATCHWORK</p>
+            <h3 class="text-base font-bold text-slate-900">Daftar Produk Saya</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Produk affiliate yang Anda pasang di katalog PATCHWORK</p>
           </div>
-          <button onclick="openAddProductModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center space-x-2 transition">
+          <button onclick="openAddProductModal()" class="pw-btn pw-btn-primary w-full sm:w-auto">
             <i data-lucide="plus" class="w-4 h-4"></i>
-            <span>Tambah Produk Baru</span>
+            <span>Tambah Produk</span>
           </button>
         </div>
 
-        <!-- Table Card -->
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <!-- Desktop: Table -->
+        <div class="hidden md:block pw-card overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200 text-[10px]">
                 <tr>
-                  <th class="p-3.5">Produk</th>
-                  <th class="p-3.5">Kategori</th>
-                  <th class="p-3.5">Marketplace</th>
-                  <th class="p-3.5">Harga</th>
-                  <th class="p-3.5">Komisi</th>
-                  <th class="p-3.5">Klik</th>
-                  <th class="p-3.5 text-right">Aksi</th>
+                  <th class="p-4">Produk</th>
+                  <th class="p-4">Kategori</th>
+                  <th class="p-4">Marketplace</th>
+                  <th class="p-4">Harga</th>
+                  <th class="p-4">Komisi</th>
+                  <th class="p-4">Klik</th>
+                  <th class="p-4 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody id="partner-products-table" class="divide-y divide-slate-100">
@@ -314,197 +457,197 @@
             </table>
           </div>
         </div>
+
+        <!-- Mobile: Cards -->
+        <div id="partner-products-cards" class="md:hidden space-y-3">
+          <!-- Injected via JS -->
+        </div>
       </div>
 
       <!-- SECTION 2: LYNK ID & PROFILE SETTINGS -->
       <div id="partner-section-profile" class="hidden space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 class="text-base font-bold text-slate-900">Pengaturan LYNK ID & Profil Saya</h3>
-            <p class="text-xs text-slate-500">Kelola tampilan etalase mini Anda (seperti LYNK.id), tautan media sosial, bio, dan tema kartu produk</p>
+            <h3 class="text-base font-bold text-slate-900">Pengaturan LYNK ID & Profil</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Kelola etalase mini Anda, tautan sosial, bio, dan tema kartu</p>
           </div>
-          <div class="flex items-center space-x-2">
-            <a id="btn-preview-lynk" href="#" target="_blank" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center space-x-2 transition">
-              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-              <span>Lihat Halaman LYNK Saya</span>
-            </a>
-          </div>
+          <a id="btn-preview-lynk" href="#" target="_blank" class="pw-btn pw-btn-primary w-full sm:w-auto">
+            <i data-lucide="external-link" class="w-4 h-4"></i>
+            <span>Lihat Halaman LYNK</span>
+          </a>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <!-- Left: Form Edit Profile -->
-          <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-5">
-            <form id="partner-profile-form" onsubmit="handleSavePartnerProfile(event)" class="space-y-4">
-              
-              <!-- Avatar & Name -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Nama Toko / Mitra *</label>
-                  <input type="text" id="prof-name" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+          <div class="lg:col-span-2 pw-card p-5 sm:p-6">
+            <form id="partner-profile-form" onsubmit="handleSavePartnerProfile(event)" class="space-y-5">
+
+              <fieldset class="space-y-4">
+                <legend class="text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1">Identitas Toko</legend>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama Toko / Mitra *</label>
+                    <input type="text" id="prof-name" required class="pw-input">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Nomor WhatsApp *</label>
+                    <input type="tel" id="prof-phone" required class="pw-input">
+                  </div>
                 </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp *</label>
-                  <input type="tel" id="prof-phone" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+              </fieldset>
+
+              <!-- Custom Link ID / Subdomain -->
+              <div class="pt-1">
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">Link ID / Subdomain Etalase Anda</label>
+                <div class="flex items-center rounded-[14px] border border-slate-200 bg-white overflow-hidden focus-within:border-emerald-600 focus-within:ring-[3.5px] focus-within:ring-emerald-600/14 transition">
+                  <span class="pl-3.5 pr-1 text-sm text-slate-400 font-mono select-none">https://</span>
+                  <input type="text" id="prof-slug" placeholder="namatoko" class="py-2.5 px-1 text-sm bg-transparent text-slate-900 font-bold focus:outline-none flex-1 min-w-0" oninput="updateSlugLivePreview(this.value)">
+                  <span class="pr-3.5 pl-1 text-sm text-emerald-600 font-bold font-mono select-none">.kheireditz.my.id</span>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-1 text-[11px] mt-1.5 text-slate-500">
+                  <span>Dapat diakses di: <strong class="text-emerald-700 font-mono break-all" id="prof-slug-preview-text">kheireditz.my.id/lynk/...</strong></span>
+                  <span class="text-[10px] text-slate-400">Huruf kecil, angka &amp; minus</span>
                 </div>
               </div>
 
-              <!-- Custom Link ID / Subdomain kheireditz.my.id -->
+              <!-- Foto Profil / Avatar -->
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Link ID / Subdomain Etalase Anda</label>
-                <div class="flex items-center rounded-xl border border-slate-200 bg-slate-50 overflow-hidden focus-within:border-emerald-600 focus-within:bg-white transition">
-                  <span class="pl-3 pr-1 text-xs text-slate-400 font-mono select-none">https://</span>
-                  <input type="text" id="prof-slug" placeholder="namatoko" class="py-2.5 px-1 text-xs bg-transparent text-slate-900 font-bold focus:outline-none flex-1 min-w-0" oninput="updateSlugLivePreview(this.value)">
-                  <span class="pr-3 pl-1 text-xs text-emerald-600 font-bold font-mono select-none">.kheireditz.my.id</span>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">Foto Profil / Logo Toko</label>
+                <div class="flex items-center gap-3">
+                  <div class="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0" id="avatar-field-preview">
+                    <span class="text-sm font-black text-slate-400">MP</span>
+                  </div>
+                  <input type="url" id="prof-avatar" placeholder="https://... (link gambar)" oninput="updateAvatarFieldPreview(this.value)" class="pw-input flex-1 min-w-0">
                 </div>
-                <div class="flex items-center justify-between text-[11px] mt-1 text-slate-500">
-                  <span>Dapat diakses di: <strong class="text-emerald-700 font-mono" id="prof-slug-preview-text">kheireditz.my.id/lynk/...</strong></span>
-                  <span class="text-[10px] text-slate-400">Huruf kecil, angka & minus</span>
-                </div>
-              </div>
-
-              <!-- Foto Profil / Avatar URL -->
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Foto Profil / Logo Toko</label>
-                <div class="flex gap-2">
-                  <input type="url" id="prof-avatar" placeholder="https://... (link gambar logo/foto profil)" class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
-                  <label class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold cursor-pointer shrink-0 flex items-center space-x-1.5 transition active:scale-95">
+                <div class="flex flex-wrap gap-2 mt-2.5">
+                  <label class="pw-btn pw-btn-ghost !py-2 !px-3 !text-xs">
                     <i data-lucide="images" class="w-3.5 h-3.5"></i>
-                    <span class="hidden sm:inline">Dari Galeri</span>
+                    <span>Galeri</span>
                     <input type="file" class="hidden" accept="image/*" onchange="uploadAvatarFile(this)">
                   </label>
-                  <label class="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold cursor-pointer shrink-0 flex items-center space-x-1.5 transition active:scale-95">
+                  <label class="pw-btn pw-btn-ghost !py-2 !px-3 !text-xs">
                     <i data-lucide="camera" class="w-3.5 h-3.5"></i>
-                    <span class="hidden sm:inline">Kamera</span>
+                    <span>Kamera</span>
                     <input type="file" class="hidden" accept="image/*" capture="environment" onchange="uploadAvatarFile(this)">
                   </label>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-1">Pilih langsung dari galeri HP atau ambil pakai kamera.</p>
               </div>
 
-              <!-- Bio Singkat -->
+              <!-- Bio -->
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Bio Singkat / Deskripsi Etalase</label>
-                <textarea id="prof-bio" rows="3" placeholder="Contoh: Pusat fashion vintage & thrift terpercaya. Belanja promo Shopee & TikTok termurah di sini!" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition"></textarea>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">Bio Singkat / Deskripsi Etalase</label>
+                <textarea id="prof-bio" rows="3" placeholder="Contoh: Pusat fashion vintage & thrift terpercaya. Belanja promo Shopee & TikTok termurah di sini!" class="pw-input resize-none"></textarea>
               </div>
 
-              <!-- Social Media Links (TikTok, IG, Shopee, YouTube, Website) -->
-              <div class="pt-2 border-t border-slate-100">
-                <label class="block text-xs font-bold text-slate-900 mb-3">Tautan Akun Media Sosial & Marketplace (Sumber LYNK ID)</label>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Link Akun TikTok</label>
-                    <div class="relative">
-                      <input type="url" id="prof-tiktok" placeholder="https://tiktok.com/@tokokamu" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
-                    </div>
-                  </div>
+              <!-- Social Media Links -->
+              <div class="pt-4 border-t border-slate-100">
+                <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-3">Tautan Sosial & Marketplace</label>
 
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Link Akun Instagram</label>
-                    <div class="relative">
-                      <input type="url" id="prof-instagram" placeholder="https://instagram.com/tokokamu" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
-                    </div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">TikTok</label>
+                    <input type="url" id="prof-tiktok" placeholder="https://tiktok.com/@tokokamu" class="pw-input">
                   </div>
-
                   <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Link Toko Shopee</label>
-                    <div class="relative">
-                      <input type="url" id="prof-shopee" placeholder="https://shopee.co.id/tokokamu" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
-                    </div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">Instagram</label>
+                    <input type="url" id="prof-instagram" placeholder="https://instagram.com/tokokamu" class="pw-input">
                   </div>
-
                   <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Link YouTube Channel</label>
-                    <div class="relative">
-                      <input type="url" id="prof-youtube" placeholder="https://youtube.com/@channelkamu" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
-                    </div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">Toko Shopee</label>
+                    <input type="url" id="prof-shopee" placeholder="https://shopee.co.id/tokokamu" class="pw-input">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">YouTube</label>
+                    <input type="url" id="prof-youtube" placeholder="https://youtube.com/@channelkamu" class="pw-input">
                   </div>
                 </div>
 
-                <div class="mt-3.5">
-                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Website Pribadi / Portofolio Lainnya</label>
-                  <input type="url" id="prof-website" placeholder="https://tokoanda.com" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+                <div class="mt-4">
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">Website / Portofolio</label>
+                  <input type="url" id="prof-website" placeholder="https://tokoanda.com" class="pw-input">
                 </div>
               </div>
 
-              <!-- Pilihan Desain Template LYNK ID -->
-              <div class="pt-3 border-t border-slate-100">
-                <label class="block text-xs font-bold text-slate-900 mb-2">Pilihan Desain Template LYNK ID</label>
+              <!-- Template LYNK ID -->
+              <div class="pt-4 border-t border-slate-100">
+                <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-3">Desain Template LYNK ID</label>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                  <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-slate-900 cursor-pointer transition flex flex-col items-center space-y-1.5 text-center has-[:checked]:border-slate-900 has-[:checked]:bg-slate-50">
-                    <input type="radio" name="prof-template" value="modern" checked class="text-slate-900">
-                    <div class="w-full h-8 rounded-lg bg-slate-950 flex items-center justify-center text-white text-[10px] font-bold">Dark Night</div>
+                  <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-slate-900 cursor-pointer transition flex flex-col items-center gap-2 text-center has-[:checked]:border-slate-900 has-[:checked]:bg-slate-50">
+                    <input type="radio" name="prof-template" value="modern" checked class="sr-only">
+                    <div class="w-full h-9 rounded-lg bg-slate-950 flex items-center justify-center text-white text-[10px] font-bold">Dark Night</div>
                     <span class="text-[11px] font-bold text-slate-800">Modern Dark</span>
                   </label>
 
-                  <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-emerald-600 cursor-pointer transition flex flex-col items-center space-y-1.5 text-center has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/50">
-                    <input type="radio" name="prof-template" value="emerald" class="text-emerald-600">
-                    <div class="w-full h-8 rounded-lg bg-emerald-800 flex items-center justify-center text-white text-[10px] font-bold">Emerald Glow</div>
+                  <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-emerald-600 cursor-pointer transition flex flex-col items-center gap-2 text-center has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/50">
+                    <input type="radio" name="prof-template" value="emerald" class="sr-only">
+                    <div class="w-full h-9 rounded-lg bg-emerald-800 flex items-center justify-center text-white text-[10px] font-bold">Emerald Glow</div>
                     <span class="text-[11px] font-bold text-slate-800">Emerald Green</span>
                   </label>
 
-                  <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-rose-600 cursor-pointer transition flex flex-col items-center space-y-1.5 text-center has-[:checked]:border-rose-600 has-[:checked]:bg-rose-50/50">
-                    <input type="radio" name="prof-template" value="sunset" class="text-rose-600">
-                    <div class="w-full h-8 rounded-lg bg-gradient-to-br from-rose-900 to-indigo-950 flex items-center justify-center text-white text-[10px] font-bold">Sunset</div>
+                  <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-rose-600 cursor-pointer transition flex flex-col items-center gap-2 text-center has-[:checked]:border-rose-600 has-[:checked]:bg-rose-50/50">
+                    <input type="radio" name="prof-template" value="sunset" class="sr-only">
+                    <div class="w-full h-9 rounded-lg bg-gradient-to-br from-rose-900 to-indigo-950 flex items-center justify-center text-white text-[10px] font-bold">Sunset</div>
                     <span class="text-[11px] font-bold text-slate-800">Sunset Neon</span>
                   </label>
 
-                  <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-blue-600 cursor-pointer transition flex flex-col items-center space-y-1.5 text-center has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
-                    <input type="radio" name="prof-template" value="minimal" class="text-blue-600">
-                    <div class="w-full h-8 rounded-lg bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-800 text-[10px] font-bold">Clean Light</div>
+                  <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-blue-600 cursor-pointer transition flex flex-col items-center gap-2 text-center has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
+                    <input type="radio" name="prof-template" value="minimal" class="sr-only">
+                    <div class="w-full h-9 rounded-lg bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-800 text-[10px] font-bold">Clean Light</div>
                     <span class="text-[11px] font-bold text-slate-800">Minimalist Light</span>
                   </label>
                 </div>
               </div>
 
-              <div class="pt-3 border-t border-slate-100 flex items-center justify-end space-x-2">
-                <button type="submit" id="btn-save-partner-profile" class="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs shadow-md transition flex items-center space-x-2">
+              <div class="pt-4 border-t border-slate-100 flex justify-end">
+                <button type="submit" id="btn-save-partner-profile" class="pw-btn pw-btn-dark w-full sm:w-auto">
                   <i data-lucide="check" class="w-4 h-4"></i>
-                  <span>Simpan Perubahan LYNK ID</span>
+                  <span>Simpan Perubahan</span>
                 </button>
               </div>
             </form>
           </div>
 
           <!-- Right: Live Preview Box -->
-          <div class="bg-slate-900 text-white rounded-3xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between space-y-5">
-            <div>
-              <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Preview Tampilan LYNK ID</span>
-                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono">LIVE PREVIEW</span>
+          <div class="lg:sticky lg:top-6 h-fit bg-[#0b1220] text-white rounded-3xl p-6 border border-white/5 shadow-xl flex flex-col gap-5 overflow-hidden relative">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_80%_0%,rgba(16,185,129,.18),transparent_50%)] pointer-events-none"></div>
+            <div class="relative">
+              <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-5">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Preview LYNK ID</span>
+                <span class="pw-chip bg-emerald-500/15 text-emerald-400 border border-emerald-400/25">Live</span>
               </div>
-              
+
               <div class="text-center space-y-3">
                 <div class="w-20 h-20 rounded-2xl bg-slate-800 border-2 border-white/20 mx-auto flex items-center justify-center overflow-hidden shadow-lg" id="preview-box-avatar">
                   <span class="text-xl font-bold" id="preview-avatar-text">MP</span>
                 </div>
                 <div>
                   <h4 class="text-base font-black" id="preview-name">Mitra Penjual</h4>
-                  <p class="text-xs text-slate-400 mt-1 line-clamp-2" id="preview-bio">Bio profil Anda akan muncul di sini</p>
+                  <p class="text-xs text-slate-400 mt-1" id="preview-bio">Bio profil Anda akan muncul di sini</p>
                 </div>
-                
-                <div class="p-3 rounded-2xl bg-white/5 border border-white/10 text-left space-y-2">
+
+                <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-left space-y-1.5">
                   <div class="text-[11px] text-slate-400 font-semibold flex items-center justify-between">
-                    <span>Produk Terhubung Otomatis:</span>
+                    <span>Produk Terhubung:</span>
                     <span class="text-emerald-400 font-bold" id="preview-prod-count">0 Produk</span>
                   </div>
                   <p class="text-[10px] text-slate-500 leading-relaxed">
-                    Semua produk yang Anda masukkan ke katalog PATCHWORK secara otomatis akan tampil di halaman LYNK ID Anda dengan tautan belanja langsung.
+                    Produk yang Anda masukkan otomatis tampil di halaman LYNK ID dengan tautan belanja langsung.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div class="pt-4 border-t border-slate-800">
-              <button onclick="copyLynkUrl()" class="w-full py-2.5 rounded-xl bg-white text-slate-950 font-bold text-xs hover:bg-slate-100 transition flex items-center justify-center space-x-2">
+            <div class="relative pt-4 border-t border-white/10">
+              <button onclick="copyLynkUrl()" class="pw-btn w-full bg-white text-slate-950 hover:bg-slate-100">
                 <i data-lucide="copy" class="w-4 h-4"></i>
-                <span id="copy-lynk-text">Salin Tautan LYNK ID Saya</span>
+                <span id="copy-lynk-text">Salin Tautan LYNK ID</span>
               </button>
             </div>
           </div>
         </div>
       </div>
 
+      </div>
     </div>
   </div>
 
@@ -512,14 +655,17 @@
   <div id="partner-prod-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-7 border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
       
-      <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
-        <div class="flex items-center space-x-2.5">
-          <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-            <i data-lucide="package-plus" class="w-4 h-4"></i>
+      <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <i data-lucide="package-plus" class="w-5 h-5"></i>
           </div>
-          <h3 class="text-base font-bold text-slate-900" id="prod-modal-title">Tambah Produk ke Katalog</h3>
+          <div>
+            <h3 class="text-base font-black text-slate-900" id="prod-modal-title">Tambah Produk</h3>
+            <p class="text-[11px] text-slate-500">Lengkapi detail produk affiliate Anda</p>
+          </div>
         </div>
-        <button onclick="closeProductModal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition">
+        <button onclick="closeProductModal()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition shrink-0">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
@@ -528,62 +674,59 @@
         <input type="hidden" id="prod-id">
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Nama Produk *</label>
-          <input type="text" id="prod-name" required placeholder="Contoh: Kemeja Flannel Vintage Oversize" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama Produk *</label>
+          <input type="text" id="prod-name" required placeholder="Contoh: Kemeja Flannel Vintage Oversize" class="pw-input">
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Kategori Produk</label>
-            <select id="prod-category" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Kategori Produk</label>
+            <select id="prod-category" class="pw-input">
               <!-- Injected -->
             </select>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Harga Produk (Rp) *</label>
-            <input type="number" id="prod-price" required placeholder="149000" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Harga Produk (Rp) *</label>
+            <input type="number" id="prod-price" required inputmode="numeric" placeholder="149000" class="pw-input">
           </div>
         </div>
 
-        <!-- Marketplace Channel Selection (Shopee atau TikTok Shop) -->
-        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-          <label class="block text-xs font-bold text-slate-800">Platform Marketplace Penjualan *</label>
+        <!-- Marketplace Channel Selection -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3.5">
+          <label class="block text-xs font-bold text-slate-800">Platform Marketplace *</label>
           <div class="grid grid-cols-2 gap-3">
-            <label class="cursor-pointer border-2 rounded-xl p-2.5 flex items-center space-x-2.5 transition border-slate-200 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/50">
-              <input type="radio" name="prod_channel" id="channel-shopee" value="Shopee" checked onchange="toggleChannel('Shopee')" class="text-orange-600 focus:ring-orange-500">
+            <label class="cursor-pointer border-2 rounded-xl p-3 flex items-center gap-2.5 transition border-slate-200 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/60">
+              <input type="radio" name="prod_channel" id="channel-shopee" value="Shopee" checked onchange="toggleChannel('Shopee')" class="accent-orange-500 w-4 h-4">
               <span class="text-xs font-bold text-slate-800">Shopee</span>
             </label>
-            <label class="cursor-pointer border-2 rounded-xl p-2.5 flex items-center space-x-2.5 transition border-slate-200 has-[:checked]:border-pink-500 has-[:checked]:bg-pink-50/50">
-              <input type="radio" name="prod_channel" id="channel-tiktok" value="TikTok Shop" onchange="toggleChannel('TikTok Shop')" class="text-pink-600 focus:ring-pink-500">
+            <label class="cursor-pointer border-2 rounded-xl p-3 flex items-center gap-2.5 transition border-slate-200 has-[:checked]:border-pink-500 has-[:checked]:bg-pink-50/60">
+              <input type="radio" name="prod_channel" id="channel-tiktok" value="TikTok Shop" onchange="toggleChannel('TikTok Shop')" class="accent-pink-500 w-4 h-4">
               <span class="text-xs font-bold text-slate-800">TikTok Shop</span>
             </label>
           </div>
 
-          <!-- Shopee URL Input -->
           <div id="block-shopee-url">
-            <label class="block text-xs font-bold text-orange-600 mb-1">Tautan Produk Shopee *</label>
-            <input type="url" id="prod-url-shopee" placeholder="https://shopee.co.id/... atau https://s.shopee.co.id/..." class="w-full p-2.5 rounded-xl border border-orange-300 bg-white text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
+            <label class="block text-xs font-bold text-orange-600 mb-1.5">Tautan Produk Shopee *</label>
+            <input type="url" id="prod-url-shopee" placeholder="https://shopee.co.id/... atau https://s.shopee.co.id/..." class="pw-input">
           </div>
 
-          <!-- TikTok URL Input -->
           <div id="block-tiktok-url" class="hidden">
-            <label class="block text-xs font-bold text-pink-600 mb-1">Tautan Produk TikTok Shop *</label>
-            <input type="url" id="prod-url-tiktok" placeholder="https://vt.tiktok.com/... atau https://shop.tiktok.com/..." class="w-full p-2.5 rounded-xl border border-pink-300 bg-white text-xs focus:ring-2 focus:ring-pink-500 focus:outline-none">
+            <label class="block text-xs font-bold text-pink-600 mb-1.5">Tautan Produk TikTok Shop *</label>
+            <input type="url" id="prod-url-tiktok" placeholder="https://vt.tiktok.com/... atau https://shop.tiktok.com/..." class="pw-input">
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Tawaran Komisi Afiliasi (Opsional)</label>
-            <input type="text" id="prod-commission" placeholder="Contoh: 10% atau Rp 15.000" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Komisi Afiliasi (Opsional)</label>
+            <input type="text" id="prod-commission" placeholder="Contoh: 10% atau Rp 15.000" class="pw-input">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Foto / Thumbnail Produk</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">Thumbnail Produk</label>
             <div class="flex gap-2">
-              <input type="text" id="prod-thumbnail" oninput="updateThumbPreview(this.value)" placeholder="https://... atau upload" class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
-              <label class="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold cursor-pointer shrink-0 flex items-center space-x-1 transition active:scale-95">
-                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                <span class="hidden sm:inline">Pilih Foto</span>
+              <input type="text" id="prod-thumbnail" oninput="updateThumbPreview(this.value)" placeholder="https://..." class="pw-input flex-1 min-w-0">
+              <label class="pw-btn pw-btn-ghost shrink-0">
+                <i data-lucide="upload" class="w-4 h-4"></i>
                 <input type="file" class="hidden" accept="image/*" onchange="uploadProductImage(this)">
               </label>
             </div>
@@ -591,14 +734,14 @@
         </div>
 
         <!-- Thumbnail Preview -->
-        <div id="thumb-preview-box" class="hidden items-center space-x-3 p-2 rounded-xl bg-slate-50 border border-slate-200/80">
-          <img id="thumb-preview-img" src="" class="w-12 h-12 rounded-lg object-cover border border-slate-200 shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80'">
+        <div id="thumb-preview-box" class="hidden items-center gap-3 p-2.5 rounded-2xl bg-slate-50 border border-slate-200">
+          <img id="thumb-preview-img" src="" class="w-14 h-14 rounded-xl object-cover border border-slate-200 shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80'">
           <span class="text-[11px] text-slate-500">Preview foto produk</span>
         </div>
 
         <!-- Album Foto Produk (Galeri) -->
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Album Foto Produk (Galeri)</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Album Foto Produk (Galeri)</label>
           <input type="hidden" id="prod-gallery" value="[]">
           <div class="flex flex-wrap gap-2">
             <label class="w-24 h-24 rounded-2xl border-2 border-dashed border-slate-300 hover:border-emerald-400 bg-slate-50 flex flex-col items-center justify-center gap-1 cursor-pointer transition active:scale-95">
@@ -612,25 +755,22 @@
               <input type="file" class="hidden" accept="image/*" capture="environment" onchange="uploadGalleryImages(this)">
             </label>
           </div>
-          <div id="gallery-preview-box" class="hidden items-start space-x-2 p-2 mt-2 rounded-xl bg-slate-50 border border-slate-200/80">
+          <div id="gallery-preview-box" class="hidden items-start gap-2 p-2.5 mt-2 rounded-2xl bg-slate-50 border border-slate-200">
             <div id="gallery-images" class="flex flex-wrap gap-2"></div>
-            <span class="text-[11px] text-slate-500">Foto album produk</span>
           </div>
-          <p class="text-[10px] text-slate-400 mt-1">Boleh tambah beberapa foto. Foto pertama yang tampil = thumbnail.</p>
+          <p class="text-[10px] text-slate-400 mt-1.5">Boleh tambah beberapa foto. Foto pertama tampil = thumbnail.</p>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Deskripsi Singkat / Keunggulan</label>
-          <textarea id="prod-desc" rows="3" placeholder="Tuliskan keunggulan produk Anda..." class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition"></textarea>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Deskripsi Singkat / Keunggulan</label>
+          <textarea id="prod-desc" rows="3" placeholder="Tuliskan keunggulan produk Anda..." class="pw-input resize-none"></textarea>
         </div>
 
-        <div class="pt-3 border-t border-slate-100 flex items-center justify-end space-x-2">
-          <button type="button" onclick="closeProductModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
-            Batal
-          </button>
-          <button type="submit" id="btn-save-prod" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition flex items-center space-x-1.5 active:scale-95">
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2 sticky bottom-0 bg-white">
+          <button type="button" onclick="closeProductModal()" class="pw-btn pw-btn-ghost">Batal</button>
+          <button type="submit" id="btn-save-prod" class="pw-btn pw-btn-primary">
             <span>Simpan Produk</span>
-            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            <i data-lucide="check" class="w-4 h-4"></i>
           </button>
         </div>
       </form>
@@ -748,6 +888,18 @@
         el.textContent = clean ? `${clean}.kheireditz.my.id` : 'kheireditz.my.id/lynk/...';
       }
     }
+    function togglePassword(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      const icon = btn.querySelector('[data-lucide]');
+      if (icon) {
+        icon.setAttribute('data-lucide', show ? 'eye-off' : 'eye');
+        lucide.createIcons({ nodes: [icon] });
+      }
+    }
+
     function switchAuthTab(tab) {
       const loginForm = document.getElementById('partner-login-form');
       const regForm = document.getElementById('partner-reg-form');
@@ -756,16 +908,19 @@
       const errEl = document.getElementById('auth-error');
       if (errEl) errEl.classList.add('hidden');
 
+      const activeCls = 'pw-auth-tab flex-1 py-2.5 rounded-xl bg-white shadow-sm text-slate-900 transition';
+      const idleCls = 'pw-auth-tab flex-1 py-2.5 rounded-xl text-slate-500 hover:text-slate-900 transition';
+
       if (tab === 'login') {
         loginForm.classList.remove('hidden');
         regForm.classList.add('hidden');
-        btnLogin.className = 'flex-1 py-2 rounded-lg bg-white shadow-sm text-slate-900 transition text-center font-bold';
-        btnReg.className = 'flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition text-center font-bold';
+        btnLogin.className = activeCls;
+        btnReg.className = idleCls;
       } else {
         loginForm.classList.add('hidden');
         regForm.classList.remove('hidden');
-        btnReg.className = 'flex-1 py-2 rounded-lg bg-white shadow-sm text-slate-900 transition text-center font-bold';
-        btnLogin.className = 'flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition text-center font-bold';
+        btnReg.className = activeCls;
+        btnLogin.className = idleCls;
       }
       lucide.createIcons();
     }
@@ -839,7 +994,12 @@
         document.getElementById('partner-display-name').innerText = currentPartner.name || 'Mitra Penjual';
         document.getElementById('partner-welcome-heading').innerText = `Halo, ${currentPartner.name || 'Mitra'}!`;
         const initials = (currentPartner.name || 'M P').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-        document.getElementById('partner-avatar').innerText = initials;
+        const avatarEl = document.getElementById('partner-avatar');
+        if (currentPartner.avatar) {
+          avatarEl.innerHTML = `<img src="${escapeHtml(currentPartner.avatar)}" alt="" class="w-full h-full object-cover">`;
+        } else {
+          avatarEl.innerText = initials;
+        }
       }
 
       loadCategoriesDropdown();
@@ -857,17 +1017,28 @@
       if (tab === 'products') {
         secProd.classList.remove('hidden');
         secProf.classList.add('hidden');
-        btnProd.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm transition flex items-center space-x-2';
-        btnProf.className = 'px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center space-x-2';
+        btnProd.className = 'flex-1 sm:flex-none whitespace-nowrap px-4 py-2.5 rounded-xl text-xs font-bold bg-white text-slate-900 shadow-sm transition flex items-center justify-center gap-2';
+        btnProf.className = 'flex-1 sm:flex-none whitespace-nowrap px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900 transition flex items-center justify-center gap-2';
         loadMyProducts();
       } else {
         secProd.classList.add('hidden');
         secProf.classList.remove('hidden');
-        btnProf.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm transition flex items-center space-x-2';
-        btnProd.className = 'px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center space-x-2';
+        btnProf.className = 'flex-1 sm:flex-none whitespace-nowrap px-4 py-2.5 rounded-xl text-xs font-bold bg-white text-slate-900 shadow-sm transition flex items-center justify-center gap-2';
+        btnProd.className = 'flex-1 sm:flex-none whitespace-nowrap px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900 transition flex items-center justify-center gap-2';
         populateProfileFields();
       }
       lucide.createIcons();
+    }
+
+    function updateAvatarFieldPreview(url) {
+      const box = document.getElementById('avatar-field-preview');
+      if (!box) return;
+      if (url && url.trim().length > 5) {
+        box.innerHTML = `<img src="${url.trim()}" class="w-full h-full object-cover" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'text-sm font-black text-slate-400',textContent:'MP'}))">`;
+      } else {
+        const initials = (currentPartner?.name || 'M P').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+        box.innerHTML = `<span class="text-sm font-black text-slate-400">${initials}</span>`;
+      }
     }
 
     function populateProfileFields() {
@@ -890,6 +1061,11 @@
         slugInput.value = p.custom_slug || '';
         updateSlugLivePreview(p.custom_slug || '');
       }
+
+      const statSlug = document.getElementById('stat-my-slug');
+      if (statSlug) statSlug.innerText = p.custom_slug ? `${p.custom_slug}` : 'Belum diatur';
+
+      updateAvatarFieldPreview(p.avatar || '');
 
       const tmpl = p.template || 'modern';
       const rad = document.querySelector(`input[name="prof-template"][value="${tmpl}"]`);
@@ -961,7 +1137,7 @@
         showToast('Koneksi gagal saat menyimpan profil.', 'error');
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>Simpan Perubahan LYNK ID</span>';
+        btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>Simpan Perubahan</span>';
         lucide.createIcons();
       }
     }
@@ -1092,70 +1268,122 @@
     }
 
     // LOAD MY PRODUCTS
+    function escapeHtml(str) {
+      return String(str ?? '').replace(/[&<>"']/g, s => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[s]));
+    }
+
+    const FALLBACK_THUMB = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80';
+
+    function emptyProductsMarkup() {
+      return `
+        <div class="pw-card p-10 text-center">
+          <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+            <i data-lucide="package-search" class="w-6 h-6"></i>
+          </div>
+          <p class="font-bold text-slate-700 text-sm">Belum ada produk</p>
+          <p class="text-xs text-slate-400 mt-1 max-w-xs mx-auto">Tambahkan produk pertama Anda untuk mulai memajang di katalog PATCHWORK.</p>
+        </div>`;
+    }
+
     async function loadMyProducts() {
       if (!currentPartner) return;
       const tbody = document.getElementById('partner-products-table');
+      const cardsWrap = document.getElementById('partner-products-cards');
       try {
-        // Query produk yang dibuat oleh user partner ini
         const res = await fetch(`/api/products?limit=100&created_by=${currentPartner.id}`);
         const json = await res.json();
         cachedMyProducts = json.data || [];
 
-        // Hitung total produk & klik
         const totalClicks = cachedMyProducts.reduce((sum, p) => sum + (p.total_clicks || 0), 0);
         document.getElementById('stat-my-products').innerText = cachedMyProducts.length;
         document.getElementById('stat-my-clicks').innerText = totalClicks.toLocaleString('id-ID');
 
         if (cachedMyProducts.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="7" class="p-10 text-center text-slate-400">
-                <i data-lucide="package-search" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
-                <p class="font-semibold text-slate-600">Belum ada produk yang Anda tambahkan</p>
-                <p class="text-[11px] text-slate-400 mt-0.5">Klik tombol "Tambah Produk Baru" untuk mulai memajang produk Anda di katalog PATCHWORK.</p>
-              </td>
-            </tr>
-          `;
+          tbody.innerHTML = `<tr><td colspan="7" class="p-0">${emptyProductsMarkup()}</td></tr>`;
+          if (cardsWrap) cardsWrap.innerHTML = emptyProductsMarkup();
           lucide.createIcons();
           return;
         }
 
-        tbody.innerHTML = cachedMyProducts.map(p => `
-          <tr class="hover:bg-slate-50 transition border-b border-slate-100 last:border-b-0">
-            <td class="p-3.5 flex items-center space-x-3">
-              <img src="${p.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80'}" class="w-10 h-10 rounded-xl object-cover border border-slate-200">
-              <div>
-                <div class="font-bold text-slate-900 truncate max-w-xs">${p.name}</div>
-                <a href="/product/${p.slug}" target="_blank" class="text-[10px] text-emerald-600 hover:underline flex items-center space-x-1">
-                  <span>Lihat di web</span>
-                  <i data-lucide="external-link" class="w-2.5 h-2.5"></i>
-                </a>
+        // Desktop table rows
+        tbody.innerHTML = cachedMyProducts.map(p => {
+          const name = escapeHtml(p.name);
+          const thumb = escapeHtml(p.thumbnail || FALLBACK_THUMB);
+          const isShopee = p.marketplace === 'Shopee';
+          return `
+          <tr class="hover:bg-slate-50/80 transition">
+            <td class="p-4">
+              <div class="flex items-center gap-3">
+                <img src="${thumb}" alt="" class="w-11 h-11 rounded-xl object-cover border border-slate-200 shrink-0">
+                <div class="min-w-0">
+                  <div class="font-bold text-slate-900 truncate max-w-[220px]">${name}</div>
+                  <a href="/product/${encodeURIComponent(p.slug)}" target="_blank" class="text-[10px] text-emerald-600 hover:underline inline-flex items-center gap-1 mt-0.5">
+                    <span>Lihat di web</span>
+                    <i data-lucide="arrow-up-right" class="w-2.5 h-2.5"></i>
+                  </a>
+                </div>
               </div>
             </td>
-            <td class="p-3.5 text-slate-600 font-medium">${p.category_name || 'Umum'}</td>
-            <td class="p-3.5">
-              <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold ${p.marketplace === 'Shopee' ? 'bg-orange-50 text-orange-600 border border-orange-200' : 'bg-pink-50 text-pink-600 border border-pink-200'}">
-                ${p.marketplace}
+            <td class="p-4 text-slate-600 font-medium">${escapeHtml(p.category_name || 'Umum')}</td>
+            <td class="p-4">
+              <span class="pw-chip ${isShopee ? 'bg-orange-50 text-orange-600 border border-orange-200' : 'bg-pink-50 text-pink-600 border border-pink-200'}">
+                ${escapeHtml(p.marketplace)}
               </span>
             </td>
-            <td class="p-3.5 font-bold text-slate-900">Rp ${Number(p.price).toLocaleString('id-ID')}</td>
-            <td class="p-3.5 font-semibold text-emerald-600">${p.commission_rate || '-'}</td>
-            <td class="p-3.5 font-bold text-slate-700">
-              <div class="flex items-center space-x-1">
-                <i data-lucide="mouse-pointer" class="w-3 h-3 text-slate-400"></i>
-                <span>${p.total_clicks || 0}</span>
+            <td class="p-4 font-bold text-slate-900 whitespace-nowrap">Rp ${Number(p.price || 0).toLocaleString('id-ID')}</td>
+            <td class="p-4 font-semibold text-emerald-600 whitespace-nowrap">${escapeHtml(p.commission_rate || '-')}</td>
+            <td class="p-4 font-bold text-slate-700">
+              <span class="inline-flex items-center gap-1"><i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5 text-slate-400"></i>${p.total_clicks || 0}</span>
+            </td>
+            <td class="p-4">
+              <div class="flex items-center justify-end gap-1">
+                <button onclick="editMyProduct('${p.id}')" class="p-2 rounded-xl text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition" title="Edit Produk">
+                  <i data-lucide="pencil" class="w-4 h-4"></i>
+                </button>
+                <button onclick="deleteMyProduct('${p.id}')" class="p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition" title="Hapus Produk">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
               </div>
             </td>
-            <td class="p-3.5 text-right space-x-1">
-              <button onclick="editMyProduct('${p.id}')" class="p-1.5 rounded-lg text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition" title="Edit Produk">
-                <i data-lucide="edit-3" class="w-4 h-4"></i>
-              </button>
-              <button onclick="deleteMyProduct('${p.id}')" class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition" title="Hapus Produk">
-                <i data-lucide="trash-2" class="w-4 h-4"></i>
-              </button>
-            </td>
-          </tr>
-        `).join('');
+          </tr>`;
+        }).join('');
+
+        // Mobile cards
+        if (cardsWrap) {
+          cardsWrap.innerHTML = cachedMyProducts.map(p => {
+            const name = escapeHtml(p.name);
+            const thumb = escapeHtml(p.thumbnail || FALLBACK_THUMB);
+            const isShopee = p.marketplace === 'Shopee';
+            return `
+            <div class="pw-card p-3.5 flex gap-3">
+              <img src="${thumb}" alt="" class="w-16 h-16 rounded-2xl object-cover border border-slate-200 shrink-0">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-bold text-sm text-slate-900 line-clamp-2 leading-snug">${name}</div>
+                  <span class="pw-chip shrink-0 ${isShopee ? 'bg-orange-50 text-orange-600 border border-orange-200' : 'bg-pink-50 text-pink-600 border border-pink-200'}">
+                    ${escapeHtml(p.marketplace)}
+                  </span>
+                </div>
+                <div class="flex items-center gap-3 mt-2 text-[11px] text-slate-500">
+                  <span class="font-bold text-slate-900 text-xs">Rp ${Number(p.price || 0).toLocaleString('id-ID')}</span>
+                  <span class="text-slate-300">|</span>
+                  <span class="inline-flex items-center gap-1"><i data-lucide="mouse-pointer-click" class="w-3 h-3"></i>${p.total_clicks || 0} klik</span>
+                </div>
+                <div class="flex items-center gap-2 mt-3">
+                  <a href="/product/${encodeURIComponent(p.slug)}" target="_blank" class="flex-1 text-center py-2 rounded-xl bg-slate-100 text-slate-700 text-[11px] font-bold hover:bg-slate-200 transition">Lihat</a>
+                  <button onclick="editMyProduct('${p.id}')" class="p-2.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition" title="Edit">
+                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                  </button>
+                  <button onclick="deleteMyProduct('${p.id}')" class="p-2.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition" title="Hapus">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+            </div>`;
+          }).join('');
+        }
 
         lucide.createIcons();
       } catch (err) {
@@ -1234,6 +1462,7 @@
         const data = await res.json();
         if (res.ok && data.url) {
           document.getElementById('prof-avatar').value = data.url;
+          updateAvatarFieldPreview(data.url);
           showToast('Foto profil berhasil diunggah!', 'success');
         } else {
           showToast('Gagal upload: ' + (data.error || ''), 'error');
