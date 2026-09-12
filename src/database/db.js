@@ -311,6 +311,32 @@ export async function initDatabase() {
     console.warn('⚠️ ADMIN_EMAIL / ADMIN_PASSWORD tidak diatur. Super admin tidak dibuat/di-sinkronkan.');
   }
 
+  // Synchronize users from Supabase PostgreSQL if connected
+  if (supabase) {
+    try {
+      const { data: sbUsers, error: uErr } = await supabase.from('users').select('*');
+      if (!uErr && sbUsers && sbUsers.length > 0) {
+        const insU = sqlite.prepare(`
+          INSERT OR REPLACE INTO users (id, name, email, phone, password, role, status, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+        sbUsers.forEach(u => {
+          try {
+            insU.run(
+              u.id, u.name, u.email, u.phone || '', u.password, u.role, u.status,
+              u.bio || '', u.avatar || '', u.tiktok || '', u.instagram || '',
+              u.shopee || '', u.youtube || '', u.website || '', u.template || 'modern',
+              u.custom_slug || null, u.created_at, u.updated_at
+            );
+          } catch (e) {}
+        });
+        console.log(`✅ Synced ${sbUsers.length} user(s) from Supabase PostgreSQL.`);
+      }
+    } catch (err) {
+      console.warn('⚠️ Supabase users sync warning:', err.message);
+    }
+  }
+
   // Seed default categories
   const catCount = sqlite.prepare('SELECT count(*) as count FROM categories').get().count;
   if (catCount === 0) {

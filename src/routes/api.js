@@ -75,7 +75,7 @@ function slugify(text) {
 // -------------------------------------------------------------
 // 1. AUTHENTICATION & PROFILE
 // -------------------------------------------------------------
-router.post('/auth/register', (req, res) => {
+router.post('/auth/register', async (req, res) => {
   try {
     const { name, whatsapp, email, password } = req.body;
     if (!name || !whatsapp || !email || !password) {
@@ -86,18 +86,44 @@ router.post('/auth/register', (req, res) => {
     const cleanPhone = whatsapp.trim();
     const cleanName = name.trim();
 
-    // Check email uniqueness
-    const existing = sqlite.prepare('SELECT id FROM users WHERE LOWER(email) = ?').get(cleanEmail);
+    // Check email uniqueness locally and in Supabase
+    let existing = sqlite.prepare('SELECT id FROM users WHERE LOWER(email) = ?').get(cleanEmail);
+    if (!existing && supabase) {
+      try {
+        const { data: sbUser } = await supabase.from('users').select('id').ilike('email', cleanEmail).single();
+        if (sbUser) existing = sbUser;
+      } catch (e) {}
+    }
     if (existing) {
       return res.status(400).json({ error: 'Email tersebut sudah terdaftar. Silakan gunakan email lain atau login.' });
     }
 
-    const id = 'usr_p_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+    let id = 'usr_p_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
     const hash = bcrypt.hashSync(password, 10);
+
+    // Save to Supabase first if available
+    if (supabase) {
+      try {
+        const { data: sbUser, error: sbErr } = await supabase.from('users').insert({
+          name: cleanName,
+          email: cleanEmail,
+          phone: cleanPhone,
+          password: hash,
+          role: 'Partner',
+          status: 'Pending'
+        }).select('id').single();
+        if (sbUser && sbUser.id) {
+          id = sbUser.id;
+        }
+        if (sbErr) console.warn('Supabase partner insert notice:', sbErr.message);
+      } catch (sbErr) {
+        console.warn('Supabase partner insert err:', sbErr.message);
+      }
+    }
 
     // New partner registers with status 'Pending'
     sqlite.prepare(`
-      INSERT INTO users (id, name, email, phone, password, role, status)
+      INSERT OR REPLACE INTO users (id, name, email, phone, password, role, status)
       VALUES (?, ?, ?, ?, ?, 'Partner', 'Pending')
     `).run(id, cleanName, cleanEmail, cleanPhone, hash);
 
@@ -112,7 +138,7 @@ router.post('/auth/register', (req, res) => {
   }
 });
 
-router.post('/auth/login', (req, res) => {
+router.post('/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -120,7 +146,29 @@ router.post('/auth/login', (req, res) => {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const user = sqlite.prepare('SELECT * FROM users WHERE LOWER(email) = ?').get(cleanEmail);
+    let user = sqlite.prepare('SELECT * FROM users WHERE LOWER(email) = ?').get(cleanEmail);
+
+    // If user not in SQLite, check Supabase
+    if (!user && supabase) {
+      try {
+        const { data: sbUser } = await supabase.from('users').select('*').ilike('email', cleanEmail).single();
+        if (sbUser) {
+          user = sbUser;
+          try {
+            sqlite.prepare(`
+              INSERT OR REPLACE INTO users (id, name, email, phone, password, role, status, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug, created_at, updated_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `).run(
+              user.id, user.name, user.email, user.phone || '', user.password, user.role, user.status,
+              user.bio || '', user.avatar || '', user.tiktok || '', user.instagram || '',
+              user.shopee || '', user.youtube || '', user.website || '', user.template || 'modern',
+              user.custom_slug || null, user.created_at, user.updated_at
+            );
+          } catch (e) {}
+        }
+      } catch (e) {}
+    }
+
     if (!user) {
       return res.status(401).json({ error: 'Email atau password salah.' });
     }
@@ -852,9 +900,39 @@ router.delete('/banners/:id', authenticateToken, authorizeRole(['Super Admin', '
 // -------------------------------------------------------------
 // 7. USER MANAGEMENT (Role Based: Super Admin, Admin, Editor, Partner)
 // -------------------------------------------------------------
-router.get('/users', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.get('/users', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { role, status } = req.query;
+
+    if (supabase) {
+      try {
+        let query = supabase.from('users').select('*').order('created_at', { ascending: false });
+        if (role) query = query.eq('role', role);
+        if (status) query = query.eq('status', status);
+        const { data: sbUsers, error: sbErr } = await query;
+        if (!sbErr && sbUsers) {
+          // Sync into local SQLite
+          const upsertUser = sqlite.prepare(`
+            INSERT OR REPLACE INTO users (id, name, email, phone, password, role, status, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `);
+          sbUsers.forEach(u => {
+            try {
+              upsertUser.run(
+                u.id, u.name, u.email, u.phone || '', u.password, u.role, u.status,
+                u.bio || '', u.avatar || '', u.tiktok || '', u.instagram || '',
+                u.shopee || '', u.youtube || '', u.website || '', u.template || 'modern',
+                u.custom_slug || null, u.created_at, u.updated_at
+              );
+            } catch (e) {}
+          });
+          return res.json({ data: sbUsers });
+        }
+      } catch (err) {
+        console.warn('Supabase fetch users fallback to SQLite:', err.message);
+      }
+    }
+
     let sql = 'SELECT id, name, email, phone, role, status, created_at FROM users';
     const params = [];
     const where = [];
@@ -880,7 +958,7 @@ router.get('/users', authenticateToken, authorizeRole(['Super Admin', 'Admin']),
   }
 });
 
-router.post('/users', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.post('/users', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { name, email, phone = '', password, role = 'Partner', status = 'Approved' } = req.body;
     if (!name || !email || !password) {
@@ -892,27 +970,46 @@ router.post('/users', authenticateToken, authorizeRole(['Super Admin', 'Admin'])
       return res.status(400).json({ error: 'Role tidak valid.' });
     }
 
-    const conflict = sqlite.prepare('SELECT id FROM users WHERE LOWER(email) = ?').get(email.trim().toLowerCase());
+    const cleanEmail = email.trim().toLowerCase();
+    const conflict = sqlite.prepare('SELECT id FROM users WHERE LOWER(email) = ?').get(cleanEmail);
     if (conflict) {
       return res.status(400).json({ error: 'Email sudah terdaftar.' });
     }
 
-    const id = 'usr_' + Date.now();
+    let id = 'usr_' + Date.now();
     const hash = bcrypt.hashSync(password, 10);
+
+    if (supabase) {
+      try {
+        const { data: sbUser, error: sbErr } = await supabase.from('users').insert({
+          name: name.trim(),
+          email: cleanEmail,
+          phone: phone.trim(),
+          password: hash,
+          role,
+          status
+        }).select('id').single();
+        if (sbUser && sbUser.id) id = sbUser.id;
+        if (sbErr) console.warn('Supabase create user error:', sbErr.message);
+      } catch (err) {
+        console.warn('Supabase create user err:', err.message);
+      }
+    }
+
     sqlite.prepare(`
-      INSERT INTO users (id, name, email, phone, password, role, status)
+      INSERT OR REPLACE INTO users (id, name, email, phone, password, role, status)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(id, name.trim(), email.trim().toLowerCase(), phone.trim(), hash, role, status);
+    `).run(id, name.trim(), cleanEmail, phone.trim(), hash, role, status);
 
-    logActivity(req.user.id, req.user.name, 'CREATE_USER', `Membuat user baru: ${email} (${role}, ${status})`, req.ip);
+    logActivity(req.user.id, req.user.name, 'CREATE_USER', `Membuat user baru: ${cleanEmail} (${role}, ${status})`, req.ip);
 
-    res.status(201).json({ message: 'Pengguna berhasil dibuat.' });
+    res.status(201).json({ message: 'Pengguna berhasil dibuat.', userId: id });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.put('/users/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.put('/users/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email, phone, password, role, status } = req.body;
@@ -920,6 +1017,21 @@ router.put('/users/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin
     let hash = null;
     if (password) {
       hash = bcrypt.hashSync(password, 10);
+    }
+
+    if (supabase) {
+      try {
+        const updatePayload = { updated_at: new Date().toISOString() };
+        if (name) updatePayload.name = name.trim();
+        if (email) updatePayload.email = email.trim().toLowerCase();
+        if (phone !== undefined) updatePayload.phone = phone.trim();
+        if (hash) updatePayload.password = hash;
+        if (role) updatePayload.role = role;
+        if (status) updatePayload.status = status;
+        await supabase.from('users').update(updatePayload).eq('id', id);
+      } catch (err) {
+        console.warn('Supabase update user err:', err.message);
+      }
     }
 
     sqlite.prepare(`
@@ -932,7 +1044,7 @@ router.put('/users/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin
         status = coalesce(?, status),
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
-    `).run(name, email ? email.trim().toLowerCase() : null, phone, hash, role, status, id);
+    `).run(name ? name.trim() : null, email ? email.trim().toLowerCase() : null, phone !== undefined ? phone.trim() : null, hash, role, status, id);
 
     logActivity(req.user.id, req.user.name, 'UPDATE_USER', `Memperbarui user ID: ${id}`, req.ip);
 
@@ -943,16 +1055,28 @@ router.put('/users/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin
 });
 
 // Approve Partner Account
-router.post('/users/:id/approve', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.post('/users/:id/approve', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { id } = req.params;
-    const user = sqlite.prepare('SELECT id, name, email, phone, role, status FROM users WHERE id = ?').get(id);
+    let user = sqlite.prepare('SELECT id, name, email, phone, role, status FROM users WHERE id = ?').get(id);
+
+    if (supabase) {
+      try {
+        await supabase.from('users').update({ status: 'Approved', updated_at: new Date().toISOString() }).eq('id', id);
+        if (!user) {
+          const { data: sbUser } = await supabase.from('users').select('*').eq('id', id).single();
+          if (sbUser) user = sbUser;
+        }
+      } catch (err) {
+        console.warn('Supabase approve error:', err.message);
+      }
+    }
+
     if (!user) {
       return res.status(404).json({ error: 'Pengguna tidak ditemukan.' });
     }
 
     sqlite.prepare(`UPDATE users SET status = 'Approved', updated_at = CURRENT_TIMESTAMP WHERE id = ?`).run(id);
-
     logActivity(req.user.id, req.user.name, 'APPROVE_USER', `Menyetujui pendaftaran akun mitra: ${user.name} (${user.email})`, req.ip);
 
     res.json({ message: `Akun mitra "${user.name}" berhasil disetujui! User sekarang dapat login dan memasukkan produk.` });
@@ -962,16 +1086,28 @@ router.post('/users/:id/approve', authenticateToken, authorizeRole(['Super Admin
 });
 
 // Reject Partner Account
-router.post('/users/:id/reject', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.post('/users/:id/reject', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { id } = req.params;
-    const user = sqlite.prepare('SELECT id, name, email, phone, role, status FROM users WHERE id = ?').get(id);
+    let user = sqlite.prepare('SELECT id, name, email, phone, role, status FROM users WHERE id = ?').get(id);
+
+    if (supabase) {
+      try {
+        await supabase.from('users').update({ status: 'Rejected', updated_at: new Date().toISOString() }).eq('id', id);
+        if (!user) {
+          const { data: sbUser } = await supabase.from('users').select('*').eq('id', id).single();
+          if (sbUser) user = sbUser;
+        }
+      } catch (err) {
+        console.warn('Supabase reject error:', err.message);
+      }
+    }
+
     if (!user) {
       return res.status(404).json({ error: 'Pengguna tidak ditemukan.' });
     }
 
     sqlite.prepare(`UPDATE users SET status = 'Rejected', updated_at = CURRENT_TIMESTAMP WHERE id = ?`).run(id);
-
     logActivity(req.user.id, req.user.name, 'REJECT_USER', `Menolak pendaftaran akun mitra: ${user.name} (${user.email})`, req.ip);
 
     res.json({ message: `Pendaftaran akun "${user.name}" telah ditolak.` });
@@ -980,12 +1116,21 @@ router.post('/users/:id/reject', authenticateToken, authorizeRole(['Super Admin'
   }
 });
 
-router.delete('/users/:id', authenticateToken, authorizeRole(['Super Admin']), (req, res) => {
+router.delete('/users/:id', authenticateToken, authorizeRole(['Super Admin']), async (req, res) => {
   try {
     const { id } = req.params;
     if (id === req.user.id) {
       return res.status(400).json({ error: 'Tidak dapat menghapus akun Anda sendiri.' });
     }
+
+    if (supabase) {
+      try {
+        await supabase.from('users').delete().eq('id', id);
+      } catch (err) {
+        console.warn('Supabase delete user err:', err.message);
+      }
+    }
+
     sqlite.prepare('DELETE FROM users WHERE id = ?').run(id);
     logActivity(req.user.id, req.user.name, 'DELETE_USER', `Menghapus user ID: ${id}`, req.ip);
     res.json({ message: 'Pengguna berhasil dihapus.' });

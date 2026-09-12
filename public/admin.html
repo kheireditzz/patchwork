@@ -2097,12 +2097,33 @@
       }
 
       if (list.length === 0) {
+        let emptyTitle = 'Tidak ada data pengguna';
+        let emptyDesc = 'Coba ganti filter status atau kata kunci pencarian';
+        if (currentUsersStatusFilter === 'Pending') {
+          emptyTitle = 'Tidak Ada Mitra yang Menunggu Persetujuan';
+          emptyDesc = 'Saat ini belum ada pendaftaran mitra baru yang berstatus Pending.';
+        } else if (currentUsersStatusFilter === 'Approved') {
+          emptyTitle = 'Tidak Ada Pengguna Disetujui';
+          emptyDesc = 'Belum ada akun dengan status Disetujui pada filter ini.';
+        } else if (currentUsersStatusFilter === 'Rejected') {
+          emptyTitle = 'Tidak Ada Akun Ditolak';
+          emptyDesc = 'Belum ada pendaftaran mitra yang ditolak.';
+        }
+
         tbody.innerHTML = `
           <tr>
             <td colspan="6" class="p-8 text-center text-slate-400">
-              <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
-              <div class="font-bold text-slate-700 text-sm">Tidak ada data pengguna</div>
-              <p class="text-xs text-slate-400 mt-1">Coba ganti filter status atau kata kunci pencarian</p>
+              <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                <i data-lucide="users" class="w-6 h-6"></i>
+              </div>
+              <div class="font-bold text-slate-700 text-sm">${emptyTitle}</div>
+              <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">${emptyDesc}</p>
+              ${currentUsersStatusFilter ? `
+                <button type="button" onclick="setUserFilterStatus('')" class="mt-3 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition inline-flex items-center gap-1.5">
+                  <i data-lucide="list" class="w-3.5 h-3.5"></i>
+                  <span>Tampilkan Semua Pengguna (${cachedUsersList.length})</span>
+                </button>
+              ` : ''}
             </td>
           </tr>
         `;
