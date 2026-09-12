@@ -20,10 +20,14 @@
     tailwind.config = {
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
           colors: {
-            brand: { 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
+            brand: { 50: '#f8fafc', 100: '#f1f5f9', 500: '#0f172a', 600: '#020617', 700: '#000000' },
+            accent: { 500: '#2563eb', 600: '#1d4ed8' },
             shopee: '#ee4d2d',
-            tiktok: '#fe2c55',
+            tiktok: '#000000',
             tokopedia: '#03ac0e'
           }
         }
@@ -32,105 +36,134 @@
   </script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.011em; }
     
-    /* Premium Glassmorphism */
-    .glassmorphism { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    /* Header blur */
+    .glassmorphism { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
     
-    /* Scroll Reveal Animation Classes */
+    /* Smooth Scroll Reveal Animation */
     .reveal { 
       opacity: 1; 
       transform: translateY(0); 
-      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1); 
       will-change: opacity, transform; 
     }
     .js-ready .reveal:not(.active) { 
       opacity: 0; 
-      transform: translateY(24px); 
+      transform: translateY(28px); 
     }
     .js-ready .reveal.active { 
       opacity: 1; 
       transform: translateY(0); 
     }
     
-    /* Staggered transition delays for grid cards */
-    .reveal:nth-child(1) { transition-delay: 40ms; }
-    .reveal:nth-child(2) { transition-delay: 80ms; }
-    .reveal:nth-child(3) { transition-delay: 120ms; }
-    .reveal:nth-child(4) { transition-delay: 160ms; }
-    
     .slider-container { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    /* Trending Cards with Smooth Magnify */
+    /* Micro Keyframe Animations */
+    @keyframes subtleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .animate-subtle-float {
+      animation: subtleFloat 3.5s ease-in-out infinite;
+    }
+
+    @keyframes livePulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.35); opacity: 0.6; }
+    }
+    .animate-live-pulse {
+      animation: livePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .animate-gradient {
+      background-size: 200% 200%;
+      animation: gradientShift 8s ease infinite;
+    }
+
+    /* Trending Cards Smooth Magnify */
     .trending-card { 
-      transform: scale(0.92); 
-      opacity: 0.75; 
-      transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s, box-shadow 0.5s, border-color 0.5s; 
+      transform: scale(0.95); 
+      opacity: 0.85; 
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s, box-shadow 0.4s; 
       will-change: transform, opacity; 
     }
     .trending-card.is-active { 
-      transform: scale(1.03); 
+      transform: scale(1.02); 
       opacity: 1; 
-      box-shadow: 0 25px 50px -12px rgba(79, 70, 229, 0.28); 
+      box-shadow: 0 20px 35px -10px rgba(15, 23, 42, 0.12); 
       z-index: 10; 
     }
     .trending-card:hover { 
       opacity: 1; 
-      transform: scale(1.05) translateY(-4px); 
-      box-shadow: 0 28px 55px -12px rgba(79, 70, 229, 0.32);
+      transform: scale(1.04) translateY(-3px); 
+      box-shadow: 0 24px 44px -10px rgba(15, 23, 42, 0.16);
     }
     
-    /* Product Card Interactive Elevation */
+    /* Product Card Interactive Elevation & Image Zoom */
     .product-card { 
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease; 
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease; 
+      will-change: transform, box-shadow;
     }
     .product-card:hover { 
-      transform: translateY(-8px); 
-      box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(99, 102, 241, 0.15); 
+      transform: translateY(-6px); 
+      box-shadow: 0 20px 35px -8px rgba(15, 23, 42, 0.10); 
+      border-color: #cbd5e1;
     }
-    .product-card:hover .product-img { transform: scale(1.09); }
-    .product-img { transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
-    
-    /* Floating & Ambient Motion */
-    @keyframes float-subtle { 
-      0%, 100% { transform: translateY(0px); } 
-      50% { transform: translateY(-7px); } 
+    .product-card:hover .product-img { 
+      transform: scale(1.08); 
     }
-    .float-anim { animation: float-subtle 4s ease-in-out infinite; }
-    
-    @keyframes pulse-subtle {
-      0%, 100% { opacity: 0.8; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.04); }
+    .product-img { 
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
+      will-change: transform;
     }
-    .pulse-subtle { animation: pulse-subtle 3s ease-in-out infinite; }
-    
-    /* Shimmer Effect for Loading & Highlights */
-    @keyframes shimmer {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
+
+    /* Interactive Pill & Button micro-animations */
+    .btn-bounce {
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, box-shadow 0.2s ease;
     }
-    .shimmer-effect {
-      position: relative;
-      overflow: hidden;
+    .btn-bounce:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px -2px rgba(15, 23, 42, 0.12);
     }
-    .shimmer-effect::after {
-      content: '';
-      position: absolute;
-      top: 0; right: 0; bottom: 0; left: 0;
-      transform: translateX(-100%);
-      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
-      animation: shimmer 2.5s infinite;
+    .btn-bounce:active {
+      transform: translateY(0px) scale(0.97);
     }
-    
+
     /* Social Button micro-bounce */
-    .social-btn { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-    .social-btn:hover { transform: translateY(-4px) scale(1.08); }
+    .social-btn { 
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, color 0.25s ease; 
+    }
+    .social-btn:hover { 
+      transform: translateY(-3px) scale(1.08); 
+    }
+
+    /* Metrics card hover animation */
+    .metric-card {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+    }
+    .metric-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 28px -6px rgba(15, 23, 42, 0.08);
+      border-color: #94a3b8;
+    }
+    .metric-card:hover .metric-icon {
+      transform: scale(1.12) rotate(-3deg);
+    }
+    .metric-icon {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white transition-colors duration-200">
+<body class="bg-[#fcfcfd] text-slate-900 min-h-screen flex flex-col antialiased selection:bg-slate-900 selection:text-white">
 
   <!-- NAVBAR -->
   <nav class="sticky top-0 z-50 glassmorphism border-b border-slate-200/60 transition-all">
@@ -146,129 +179,258 @@
           </div>
         </div>
         <div class="flex items-center space-x-2">
-          <a href="/admin" class="hidden sm:inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold text-brand-600 hover:bg-brand-50 transition-all">
-            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-            <span>Admin</span>
+          <a href="https://wa.me/62895321154498" target="_blank" class="hidden md:inline-flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 shadow-sm transition-all hover:-translate-y-0.5">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            <span>WhatsApp</span>
           </a>
-          <a href="https://wa.me/62895321154498" target="_blank" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-0.5">
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            <span class="hidden sm:inline">Hubungi Kami</span>
-          </a>
+          <!-- HAMBURGER BUTTON -->
+          <button id="hamburger-btn" onclick="toggleSidebar(true)" class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-800 transition active:scale-95 flex items-center justify-center" title="Menu Lengkap">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
         </div>
       </div>
     </div>
     <div class="md:hidden px-4 pb-3">
       <div class="relative w-full">
         <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-        <input type="text" id="mobile-search-input" placeholder="Cari produk promo..." class="w-full pl-10 pr-4 py-2.5 bg-slate-100 rounded-2xl text-sm border border-transparent focus:border-brand-500 focus:outline-none transition-all">
+        <input type="text" id="mobile-search-input" placeholder="Cari produk promo..." class="w-full pl-10 pr-4 py-2 bg-slate-100 rounded-xl text-xs border border-transparent focus:border-slate-900 focus:bg-white focus:outline-none transition-all">
       </div>
     </div>
   </nav>
 
-  <!-- HERO BANNER (REVOLUTIONIZED ULTRA-MODERN) -->
-  <header class="relative overflow-hidden pt-4 pb-6">
+  <!-- SIDEBAR DRAWER (FULL FEATURES NAVIGATION) -->
+  <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="fixed inset-0 z-[100] bg-slate-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"></div>
+  <aside id="sidebar-drawer" class="fixed top-0 right-0 z-[101] w-full max-w-[340px] sm:max-w-[380px] h-full bg-white shadow-2xl border-l border-slate-200 transform translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between overflow-hidden">
+    <div class="flex-1 overflow-y-auto p-5 sm:p-6 hide-scrollbar space-y-6">
+      <!-- Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div class="flex items-center space-x-2.5">
+          <img src="/images/logo.png" onerror="this.onerror=null; this.src='https://i.ibb.co.com/mwpHfGn/263941-removebg-preview.png';" alt="PATCHWORK" class="h-8 w-auto">
+        </div>
+        <button onclick="toggleSidebar(false)" class="w-8 h-8 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition active:scale-90">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Quick Search inside Drawer -->
+      <div>
+        <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Cari di Katalog</label>
+        <div class="relative">
+          <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+          <input type="text" id="drawer-search-input" onkeyup="handleDrawerSearch(this.value)" placeholder="Ketik nama produk / kategori..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-900 transition">
+        </div>
+      </div>
+
+      <!-- Main Navigation Links -->
+      <div>
+        <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Navigasi Halaman</label>
+        <div class="space-y-1">
+          <a href="/" onclick="toggleSidebar(false)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-semibold transition group">
+            <span class="flex items-center space-x-2.5"><i data-lucide="home" class="w-4 h-4 text-slate-400 group-hover:text-slate-900"></i><span>Beranda Utama</span></span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
+          </a>
+          <a href="#trending-section" onclick="toggleSidebar(false)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-semibold transition group">
+            <span class="flex items-center space-x-2.5"><i data-lucide="flame" class="w-4 h-4 text-amber-500"></i><span>Produk Trending & Viral</span></span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
+          </a>
+          <a href="#products" onclick="toggleSidebar(false)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-semibold transition group">
+            <span class="flex items-center space-x-2.5"><i data-lucide="grid" class="w-4 h-4 text-slate-400 group-hover:text-slate-900"></i><span>Katalog Lengkap Produk</span></span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
+          </a>
+          <a href="#cta-join" onclick="toggleSidebar(false)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-semibold transition group">
+            <span class="flex items-center space-x-2.5"><i data-lucide="briefcase" class="w-4 h-4 text-slate-400 group-hover:text-slate-900"></i><span>Kemitraan & Afiliasi</span></span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
+          </a>
+          <button onclick="toggleSidebar(false); openPartnerModal();" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold transition group text-left">
+            <span class="flex items-center space-x-2.5"><i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i><span>Daftar Akun Mitra</span></span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-600 text-white">DAFTAR</span>
+          </button>
+          <a href="/partner" class="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold transition group">
+            <span class="flex items-center space-x-2.5"><i data-lucide="store" class="w-4 h-4 text-emerald-600"></i><span>Portal Mitra Penjual</span></span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-600 text-white font-mono">MITRA</span>
+          </a>
+          <a href="/admin" class="flex items-center justify-between p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs font-bold transition group">
+            <span class="flex items-center space-x-2.5"><i data-lucide="shield" class="w-4 h-4 text-slate-700"></i><span>Admin Panel Utama</span></span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-900 text-white font-mono">ADMIN</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Marketplace Official Stores -->
+      <div>
+        <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Toko Resmi Marketplace</label>
+        <div class="space-y-1.5">
+          <a href="https://id.shp.ee/x8z7g8i9?fromSource=copy_link&smtt=0.0.9" target="_blank" class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-[#ee4d2d] bg-white text-slate-800 text-xs font-semibold transition group">
+            <span class="flex items-center space-x-2.5">
+              <svg class="w-4 h-4 text-[#ee4d2d] fill-current" viewBox="0 0 24 24"><path d="M15.9414 17.9633c.229-1.879-.981-3.077-4.1758-4.0969-1.548-.528-2.277-1.22-2.26-2.1719.065-1.056 1.048-1.825 2.352-1.85a5.2898 5.2898 0 0 1 2.8838.89c.116.072.197.06.263-.039.09-.145.315-.494.39-.62.051-.081.061-.187-.068-.281-.185-.1369-.704-.4149-.983-.5319a6.4697 6.4697 0 0 0-2.5118-.514c-1.909.008-3.4129 1.215-3.5389 2.826-.082 1.1629.494 2.1078 1.73 2.8278.262.152 1.6799.716 2.2438.892 1.774.552 2.695 1.5419 2.478 2.6969-.197 1.047-1.299 1.7239-2.818 1.7439-1.2039-.046-2.2878-.537-3.1278-1.19l-.141-.11c-.104-.08-.218-.075-.287.03-.05.077-.376.547-.458.67-.077.108-.035.168.045.234.35.293.817.613 1.134.775a6.7097 6.7097 0 0 0 2.8289.727 4.9048 4.9048 0 0 0 2.0759-.354c1.095-.465 1.8029-1.394 1.9449-2.554zM11.9986 1.4009c-2.068 0-3.7539 1.95-3.8329 4.3899h7.6657c-.08-2.44-1.765-4.3899-3.8328-4.3899zm7.8516 22.5981-.08.001-15.7843-.002c-1.074-.04-1.863-.91-1.971-1.991l-.01-.195L1.298 6.2858a.459.459 0 0 1 .45-.494h4.9748C6.8448 2.568 9.1607 0 11.9996 0c2.8388 0 5.1537 2.5689 5.2757 5.7898h4.9678a.459.459 0 0 1 .458.483l-.773 15.5883-.007.131c-.094 1.094-.979 1.9769-2.0709 2.0059z"/></svg>
+              <span>Shopee Official Mall</span>
+            </span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
+          </a>
+          <a href="https://collshp.com/patchwoork" target="_blank" class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-[#ee4d2d] bg-white text-slate-800 text-xs font-semibold transition group">
+            <span class="flex items-center space-x-2.5">
+              <i data-lucide="shopping-bag" class="w-4 h-4 text-[#ee4d2d]"></i>
+              <span>Koleksi Terpilih Shopee</span>
+            </span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
+          </a>
+          <a href="https://www.tiktok.com/@patchwork.biz.id" target="_blank" class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-black bg-white text-slate-800 text-xs font-semibold transition group">
+            <span class="flex items-center space-x-2.5">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+              <span>TikTok Shop Showcase</span>
+            </span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Social Media Links -->
+      <div>
+        <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Sosial Media Resmi</label>
+        <div class="grid grid-cols-4 gap-2">
+          <a href="https://www.tiktok.com/@patchwork.biz.id" target="_blank" class="p-2.5 rounded-xl border border-slate-200 flex flex-col items-center justify-center hover:bg-slate-50 transition" title="TikTok">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+            <span class="text-[10px] font-medium text-slate-600 mt-1">TikTok</span>
+          </a>
+          <a href="https://www.instagram.com/patchwork.biz.id" target="_blank" class="p-2.5 rounded-xl border border-slate-200 flex flex-col items-center justify-center hover:bg-slate-50 transition" title="Instagram">
+            <svg class="w-4 h-4 fill-current text-pink-600" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            <span class="text-[10px] font-medium text-slate-600 mt-1">Instagram</span>
+          </a>
+          <a href="https://www.threads.com/@patchwork.biz.id" target="_blank" class="p-2.5 rounded-xl border border-slate-200 flex flex-col items-center justify-center hover:bg-slate-50 transition" title="Threads">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.263 11.097c-.03-3.486-1.92-5.586-5.111-5.586-2.13 0-3.922.963-4.863 2.499l2.062 1.438c.535-.843 1.272-1.543 2.628-1.543 1.528 0 2.318.85 2.544 2.431a15 15 0 0 0-2.236-.173c-4.125 0-6.068 1.867-6.068 4.336s1.943 3.99 4.804 3.99c3.139 0 5.013-2.115 5.781-4.735.798.361 1.348 1.204 1.348 2.47 0 3.387-3.907 5.232-7.22 5.232-4.885 0-8.077-3.207-8.077-8.424 0-6.392 4.223-10.487 9.9-10.487 3.808 0 5.69 1.671 6.97 3.914l2.108-1.475C21.44 2.078 18.331 0 13.663 0 6.227 0 1.168 5.277 1.168 12.934c0 7 4.953 11.066 10.856 11.066 4.878 0 9.809-2.846 9.809-7.716 0-2.545-1.46-4.231-3.569-5.187m-6.33 4.855c-1.077 0-2.026-.512-2.026-1.453 0-1.483 1.822-1.934 3.606-1.934.678 0 1.34.045 1.927.173-.422 1.927-1.671 3.215-3.508 3.214Z"/></svg>
+            <span class="text-[10px] font-medium text-slate-600 mt-1">Threads</span>
+          </a>
+          <a href="https://pin.it/cNvqFFJGH" target="_blank" class="p-2.5 rounded-xl border border-slate-200 flex flex-col items-center justify-center hover:bg-slate-50 transition" title="Pinterest">
+            <svg class="w-4 h-4 fill-current text-[#E60023]" viewBox="0 0 24 24"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/></svg>
+            <span class="text-[10px] font-medium text-slate-600 mt-1">Pinterest</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drawer Footer / CTA -->
+    <div class="p-4 border-t border-slate-100 bg-slate-50">
+      <a href="https://wa.me/62895321154498" target="_blank" class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center space-x-2 transition active:scale-95 shadow">
+        <svg class="w-4 h-4 fill-current text-emerald-400" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        <span>Hubungi Kami via WhatsApp</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- HERO BANNER SLIDER (DYNAMIC & SYNCED WITH ADMIN) -->
+  <header class="relative pt-4 pb-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div id="banner-container" class="relative rounded-[2.5rem] overflow-hidden shadow-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white border border-slate-800/80 p-8 sm:p-12 md:p-16">
-        
-        <!-- Ambient Glowing Orbs -->
-        <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl pointer-events-none pulse-subtle"></div>
-        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-pink-500/15 rounded-full blur-3xl pointer-events-none pulse-subtle" style="animation-delay: 1.5s;"></div>
-        
-        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div class="lg:col-span-8 space-y-6">
-            <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-xl text-xs font-semibold text-brand-200">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span>Kurasi Viral Harian • Shopee & TikTok Shop</span>
-            </div>
-            
-            <h1 id="banner-title" class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] text-white">
-              Temukan Produk Viral & Promo Diskon Terbaik
-            </h1>
-            
-            <p id="banner-subtitle" class="text-slate-300 text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed font-normal">
-              Satu portal terpadu kurasi link affiliate produk rekomendasi terpercaya, review jujur, dan harga termurah langsung ke official marketplace.
-            </p>
-            
-            <div class="flex flex-wrap items-center gap-3 pt-2">
-              <a id="banner-btn" href="#products" class="btn-bounce px-8 py-4 rounded-2xl bg-white text-slate-950 font-black text-sm shadow-xl hover:bg-slate-100 flex items-center space-x-2">
-                <span>Jelajahi Produk</span>
-                <i data-lucide="arrow-down" class="w-4 h-4"></i>
-              </a>
-              <a href="#trending-section" class="btn-bounce px-6 py-4 rounded-2xl bg-white/10 hover:bg-white/15 backdrop-blur-xl border border-white/15 text-white font-bold text-sm flex items-center space-x-2">
-                <i data-lucide="flame" class="w-4 h-4 text-pink-400"></i>
-                <span>Lihat Trending</span>
-              </a>
-            </div>
-          </div>
-          
-          <!-- Hero Interactive Card -->
-          <div class="lg:col-span-4 hidden lg:block">
-            <div class="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-2xl shadow-2xl float-anim space-y-4">
-              <div class="flex items-center justify-between text-xs font-semibold text-slate-300">
-                <span class="flex items-center space-x-1.5"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i><span>100% Terverifikasi</span></span>
-                <span class="text-[11px] bg-white/10 px-2.5 py-0.5 rounded-full">Official Links</span>
+      <div id="banner-slider-wrapper" class="relative rounded-3xl overflow-hidden bg-slate-950 text-white border border-slate-800 shadow-2xl min-h-[380px] sm:min-h-[420px] flex items-center group">
+        <!-- Banner Slides Injected via JS -->
+        <div id="banner-slides-container" class="w-full h-full relative">
+          <!-- Default Fallback Slide -->
+          <div class="banner-slide active w-full p-8 sm:p-12 md:p-14 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div class="lg:col-span-8 space-y-5">
+              <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-lg bg-white/10 border border-white/15 text-xs font-semibold text-slate-200">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span id="banner-tag">Kurasi Harian Produk Affiliate Pilihan</span>
               </div>
-              <div class="h-40 rounded-2xl bg-slate-800/60 overflow-hidden relative group">
-                <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&q=80" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Affiliate Hero">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-3">
-                  <span class="text-xs font-bold text-white">Diskon Flash Sale Harian</span>
+              <h1 id="banner-title" class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight text-white">
+                Koleksi Link Produk Viral & Promo Marketplace
+              </h1>
+              <p id="banner-subtitle" class="text-slate-300 text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed font-normal">
+                Akses cepat ke tautan resmi Shopee Affiliate dan TikTok Shop. Cek harga promo langsung ke toko terverifikasi.
+              </p>
+              <div class="flex flex-wrap items-center gap-3 pt-2">
+                <a id="banner-btn" href="#products" class="btn-bounce px-6 py-3.5 rounded-xl bg-white text-slate-950 font-bold text-xs tracking-wide shadow hover:bg-slate-100 flex items-center space-x-2">
+                  <span>Lihat Katalog Produk</span>
+                  <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                </a>
+                <a href="#trending-section" class="btn-bounce px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-semibold text-xs tracking-wide flex items-center space-x-2">
+                  <i data-lucide="flame" class="w-3.5 h-3.5 text-amber-400"></i>
+                  <span>Produk Trending</span>
+                </a>
+              </div>
+            </div>
+            <!-- Side Visual / Thumbnail Preview -->
+            <div class="lg:col-span-4 hidden lg:block">
+              <div class="p-5 rounded-2xl bg-white/5 border border-white/10 shadow-lg space-y-4 animate-subtle-float backdrop-blur-sm">
+                <div class="flex items-center justify-between text-xs font-semibold text-slate-300">
+                  <span class="flex items-center space-x-1.5"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i><span>Tautan Resmi</span></span>
+                  <span class="text-[11px] bg-white/10 px-2 py-0.5 rounded text-slate-300">Official Stores</span>
                 </div>
-              </div>
-              <div class="flex items-center justify-between text-xs text-slate-300">
-                <span>Update Terakhir</span>
-                <span class="font-mono font-bold text-emerald-400">Hari Ini</span>
+                <div class="h-36 rounded-xl bg-slate-900 overflow-hidden relative group cursor-pointer">
+                  <img id="banner-side-img" src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&q=80" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" alt="Affiliate Banner">
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-3">
+                    <span class="text-xs font-bold text-white">Promo Diskon Terkini</span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                  <span>Pembaruan Data</span>
+                  <span class="font-semibold text-emerald-400 flex items-center space-x-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-live-pulse"></span>
+                    <span>Real-time</span>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div id="banner-bg" class="absolute inset-0 z-0 bg-cover bg-center opacity-25 transition-all duration-1000"></div>
+        <!-- Background Image Layer with Blur & Dark Fade -->
+        <div id="banner-bg" class="absolute inset-0 z-0 bg-cover bg-center opacity-25 transition-all duration-1000 scale-105"></div>
+
+        <!-- Slider Navigation Arrows -->
+        <button onclick="slideHeroBanner('prev')" class="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 border border-white/15 text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100 active:scale-95" title="Banner Sebelumnya">
+          <i data-lucide="chevron-left" class="w-5 h-5"></i>
+        </button>
+        <button onclick="slideHeroBanner('next')" class="absolute right-3.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 border border-white/15 text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100 active:scale-95" title="Banner Berikutnya">
+          <i data-lucide="chevron-right" class="w-5 h-5"></i>
+        </button>
+
+        <!-- Slider Dot Indicators -->
+        <div id="banner-dots" class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2"></div>
       </div>
     </div>
   </header>
 
-  <!-- STATS BAR (MODERN SLEEK METRICS) -->
-  <section id="stats-section" class="py-4 reveal">
+  <!-- STATS BAR (ANIMATED METRICS) -->
+  <section id="stats-section" class="py-3 reveal">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         
-        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex items-center space-x-3 sm:space-x-4 group">
-          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-            <i data-lucide="box" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+        <div class="metric-card p-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm flex items-center space-x-3.5 cursor-pointer">
+          <div class="metric-icon w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center shrink-0 shadow-inner">
+            <i data-lucide="package" class="w-5 h-5"></i>
           </div>
           <div>
-            <div id="stat-products" class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">--</div>
-            <div class="text-[11px] sm:text-xs text-slate-500 font-medium">Produk Terkurasi</div>
+            <div id="stat-products" class="text-xl font-bold tracking-tight text-slate-900">--</div>
+            <div class="text-xs text-slate-500">Produk Terdaftar</div>
           </div>
         </div>
 
-        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex items-center space-x-3 sm:space-x-4 group">
-          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-pink-50 text-pink-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-            <i data-lucide="mouse-pointer-click" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+        <div class="metric-card p-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm flex items-center space-x-3.5 cursor-pointer">
+          <div class="metric-icon w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center shrink-0 shadow-inner">
+            <i data-lucide="mouse-pointer" class="w-5 h-5"></i>
           </div>
           <div>
-            <div id="stat-clicks" class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">--</div>
-            <div class="text-[11px] sm:text-xs text-slate-500 font-medium">Total Klik Pengunjung</div>
+            <div id="stat-clicks" class="text-xl font-bold tracking-tight text-slate-900">--</div>
+            <div class="text-xs text-slate-500">Total Kunjungan</div>
           </div>
         </div>
 
-        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex items-center space-x-3 sm:space-x-4 group">
-          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-orange-50 text-[#ee4d2d] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-            <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 7.05h-2.73c-.28-2.67-2.1-4.8-4.77-4.8s-4.49 2.13-4.77 4.8H4.5c-.83 0-1.5.67-1.5 1.5l1.2 11.4c.08.77.73 1.35 1.5 1.35h12.6c.77 0 1.42-.58 1.5-1.35l1.2-11.4c0-.83-.67-1.5-1.5-1.5zm-7.5-3.3c1.83 0 3.32 1.49 3.47 3.3H8.53c.15-1.81 1.64-3.3 3.47-3.3zm5.7 15.75H6.3L5.25 8.55h13.5l-1.05 10.95z"/></svg>
+        <div class="metric-card p-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm flex items-center space-x-3.5 cursor-pointer">
+          <div class="metric-icon w-10 h-10 rounded-xl bg-orange-50 text-[#ee4d2d] flex items-center justify-center shrink-0 shadow-inner">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M15.9414 17.9633c.229-1.879-.981-3.077-4.1758-4.0969-1.548-.528-2.277-1.22-2.26-2.1719.065-1.056 1.048-1.825 2.352-1.85a5.2898 5.2898 0 0 1 2.8838.89c.116.072.197.06.263-.039.09-.145.315-.494.39-.62.051-.081.061-.187-.068-.281-.185-.1369-.704-.4149-.983-.5319a6.4697 6.4697 0 0 0-2.5118-.514c-1.909.008-3.4129 1.215-3.5389 2.826-.082 1.1629.494 2.1078 1.73 2.8278.262.152 1.6799.716 2.2438.892 1.774.552 2.695 1.5419 2.478 2.6969-.197 1.047-1.299 1.7239-2.818 1.7439-1.2039-.046-2.2878-.537-3.1278-1.19l-.141-.11c-.104-.08-.218-.075-.287.03-.05.077-.376.547-.458.67-.077.108-.035.168.045.234.35.293.817.613 1.134.775a6.7097 6.7097 0 0 0 2.8289.727 4.9048 4.9048 0 0 0 2.0759-.354c1.095-.465 1.8029-1.394 1.9449-2.554zM11.9986 1.4009c-2.068 0-3.7539 1.95-3.8329 4.3899h7.6657c-.08-2.44-1.765-4.3899-3.8328-4.3899zm7.8516 22.5981-.08.001-15.7843-.002c-1.074-.04-1.863-.91-1.971-1.991l-.01-.195L1.298 6.2858a.459.459 0 0 1 .45-.494h4.9748C6.8448 2.568 9.1607 0 11.9996 0c2.8388 0 5.1537 2.5689 5.2757 5.7898h4.9678a.459.459 0 0 1 .458.483l-.773 15.5883-.007.131c-.094 1.094-.979 1.9769-2.0709 2.0059z"/></svg>
           </div>
           <div>
-            <div id="stat-shopee" class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">--</div>
-            <div class="text-[11px] sm:text-xs text-slate-500 font-medium">Shopee Affiliate</div>
+            <div id="stat-shopee" class="text-xl font-bold tracking-tight text-slate-900">--</div>
+            <div class="text-xs text-slate-500">Klik Shopee</div>
           </div>
         </div>
 
-        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex items-center space-x-3 sm:space-x-4 group">
-          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-            <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298 0 .592.046.87.136V9.4a6.33 6.33 0 0 0-.87-.06A6.34 6.34 0 0 0 3.14 15.7a6.34 6.34 0 0 0 9.15 5.62v-9.15a8.16 8.16 0 0 0 4.87 1.6v-3.47a4.85 4.85 0 0 1-2.57-1.61z"/></svg>
+        <div class="metric-card p-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm flex items-center space-x-3.5 cursor-pointer">
+          <div class="metric-icon w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shrink-0 shadow-inner">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
           </div>
           <div>
-            <div id="stat-tiktok" class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">--</div>
-            <div class="text-[11px] sm:text-xs text-slate-500 font-medium">TikTok Shop Viral</div>
+            <div id="stat-tiktok" class="text-xl font-bold tracking-tight text-slate-900">--</div>
+            <div class="text-xs text-slate-500">Klik TikTok Shop</div>
           </div>
         </div>
 
@@ -277,70 +439,69 @@
   </section>
 
   <!-- CATEGORIES -->
-  <section class="py-6 reveal">
+  <section class="py-5 reveal">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center justify-between mb-3">
         <div>
-          <h2 class="text-xl font-bold tracking-tight">Kategori Produk</h2>
-          <p class="text-xs text-slate-500">Pilih kategori untuk memfilter</p>
+          <h2 class="text-base sm:text-lg font-bold tracking-tight text-slate-900">Kategori Pilihan</h2>
+          <p class="text-xs text-slate-500">Filter berdasarkan jenis produk</p>
         </div>
-        <button onclick="filterCategory('')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 transition">Reset Filter</button>
+        <button onclick="filterCategory('')" class="text-xs font-semibold text-slate-600 hover:text-slate-900 transition">Reset Filter</button>
       </div>
-      <div id="categories-container" class="flex items-center gap-3 overflow-x-auto pb-3 hide-scrollbar">
-        <div class="animate-pulse flex space-x-3">
-          <div class="h-10 w-28 bg-slate-200 rounded-xl"></div>
-          <div class="h-10 w-32 bg-slate-200 rounded-xl"></div>
-          <div class="h-10 w-28 bg-slate-200 rounded-xl"></div>
+      <div id="categories-container" class="flex items-center gap-2 overflow-x-auto pb-2 hide-scrollbar">
+        <div class="animate-pulse flex space-x-2">
+          <div class="h-9 w-24 bg-slate-200 rounded-xl"></div>
+          <div class="h-9 w-28 bg-slate-200 rounded-xl"></div>
+          <div class="h-9 w-24 bg-slate-200 rounded-xl"></div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- TRENDING -->
-  <section class="py-6 reveal" id="trending-section">
+  <section class="py-5 reveal" id="trending-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between mb-5">
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 text-white flex items-center justify-center shadow-lg shadow-pink-500/25">
-            <i data-lucide="flame" class="w-5 h-5"></i>
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center">
+            <i data-lucide="flame" class="w-4 h-4 text-amber-400"></i>
           </div>
           <div>
-            <h2 class="text-xl font-bold tracking-tight">Trending & Rekomendasi</h2>
-            <p class="text-xs text-slate-500">Produk affiliate paling viral</p>
+            <h2 class="text-base sm:text-lg font-bold tracking-tight text-slate-900">Produk Trending</h2>
+            <p class="text-xs text-slate-500">Rekomendasi paling banyak diminati</p>
           </div>
         </div>
-        <div class="flex items-center space-x-2">
-          <span class="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-pink-500/10 to-rose-500/10 text-pink-600 border border-pink-500/20">🔥 Viral</span>
-          <button onclick="slideTrending('prev')" class="w-9 h-9 rounded-xl border border-slate-200 bg-white shadow-sm flex items-center justify-center hover:bg-slate-50 transition active:scale-95">
-            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+        <div class="flex items-center space-x-1.5">
+          <button onclick="slideTrending('prev')" class="w-8 h-8 rounded-xl border border-slate-200 bg-white flex items-center justify-center hover:bg-slate-50 transition active:scale-95">
+            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
           </button>
-          <button onclick="slideTrending('next')" class="w-9 h-9 rounded-xl border border-slate-200 bg-white shadow-sm flex items-center justify-center hover:bg-slate-50 transition active:scale-95">
-            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          <button onclick="slideTrending('next')" class="w-8 h-8 rounded-xl border border-slate-200 bg-white flex items-center justify-center hover:bg-slate-50 transition active:scale-95">
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
           </button>
         </div>
       </div>
       <div id="featured-slider-wrapper" class="relative group">
-        <div id="featured-products" class="flex items-stretch gap-4 sm:gap-6 overflow-x-auto slider-container hide-scrollbar py-3 snap-x snap-mandatory"></div>
+        <div id="featured-products" class="flex items-stretch gap-4 sm:gap-5 overflow-x-auto slider-container hide-scrollbar py-2 snap-x snap-mandatory"></div>
       </div>
     </div>
   </section>
 
   <!-- MAIN CATALOG -->
-  <main id="products" class="py-8 flex-1 reveal">
+  <main id="products" class="py-6 flex-1 reveal">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b border-slate-200">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-200/80">
         <div>
-          <h2 class="text-2xl font-extrabold tracking-tight">Katalog Lengkap Produk</h2>
-          <p class="text-xs text-slate-500 mt-1" id="catalog-count-label">Menampilkan katalog produk terbaru</p>
+          <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">Katalog Produk</h2>
+          <p class="text-xs text-slate-500 mt-0.5" id="catalog-count-label">Menampilkan katalog produk</p>
         </div>
-        <div class="flex flex-wrap items-center gap-3">
-          <select id="filter-marketplace" onchange="applyFilters()" class="text-xs font-semibold px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 shadow-sm cursor-pointer transition">
+        <div class="flex flex-wrap items-center gap-2.5">
+          <select id="filter-marketplace" onchange="applyFilters()" class="text-xs font-semibold px-3.5 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-slate-900 shadow-sm cursor-pointer transition">
             <option value="">Semua Marketplace</option>
             <option value="Shopee">Shopee</option>
             <option value="TikTok Shop">TikTok Shop</option>
             <option value="Tokopedia">Tokopedia</option>
           </select>
-          <select id="filter-sort" onchange="applyFilters()" class="text-xs font-semibold px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 shadow-sm cursor-pointer transition">
+          <select id="filter-sort" onchange="applyFilters()" class="text-xs font-semibold px-3.5 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-slate-900 shadow-sm cursor-pointer transition">
             <option value="newest">Terbaru</option>
             <option value="popular">Paling Populer</option>
             <option value="price_asc">Harga Terendah</option>
@@ -354,53 +515,103 @@
           <i data-lucide="package-search" class="w-10 h-10"></i>
         </div>
         <h3 class="text-lg font-bold">Tidak ada produk ditemukan</h3>
-        <p class="text-sm text-slate-500 mt-2 max-w-sm mx-auto">Coba gunakan kata kunci lain atau bersihkan filter.</p>
-        <button onclick="resetAllFilters()" class="mt-5 px-5 py-2.5 text-sm font-bold text-brand-600 bg-brand-50 rounded-xl hover:bg-brand-100 transition">Reset Pencarian</button>
+        <button onclick="resetAllFilters()" class="mt-4 px-4 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Reset Pencarian</button>
       </div>
-      <div id="pagination-wrapper" class="flex items-center justify-center space-x-2 mt-10"></div>
+      <div id="pagination-wrapper" class="flex items-center justify-center space-x-2 mt-8"></div>
     </div>
   </main>
 
-  <!-- CTA -->
-  <section id="cta-join" class="py-20 relative overflow-hidden reveal">
-    <!-- Background Image -->
-    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1600&q=80')"></div>
-    <div class="absolute inset-0 bg-gradient-to-r from-brand-700/95 via-indigo-700/90 to-purple-700/95"></div>
-    <!-- Decorative Elements -->
-    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-      <div class="absolute -right-16 -top-16 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
-      <div class="absolute -left-16 -bottom-16 w-72 h-72 bg-pink-500/15 rounded-full blur-3xl"></div>
-      <div class="absolute right-1/4 top-1/3 w-40 h-40 bg-indigo-400/10 rounded-full blur-2xl"></div>
-    </div>
-    <div class="max-w-5xl mx-auto px-4 text-center relative z-10">
-      <div class="inline-flex items-center space-x-2 px-5 py-2 rounded-full bg-white/15 backdrop-blur-md text-white/90 text-xs font-bold uppercase tracking-wider mb-6 border border-white/20">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/></svg>
-        <span>Rekomendasi Terbaik untuk Anda</span>
-      </div>
-      <h2 id="cta-text" class="text-3xl md:text-5xl font-extrabold tracking-tight mb-6 text-white leading-tight drop-shadow-lg">
-        Temukan Produk Viral<br class="hidden md:block"> Sebelum Kehabisan!
-      </h2>
-      <p class="text-white/80 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
-        Dapatkan akses pertama ke flash sale Shopee, produk trending TikTok Shop, dan voucher diskon eksklusif langsung di HP Anda.
-      </p>
-      <div class="flex flex-wrap items-center justify-center gap-4">
-        <a id="cta-button" href="https://wa.me/62895321154498" target="_blank" class="px-8 py-4 rounded-2xl bg-white text-brand-700 font-extrabold text-sm shadow-2xl hover:bg-slate-50 transition-all hover:-translate-y-1 hover:shadow-3xl flex items-center space-x-3 group">
-          <svg class="w-5 h-5 text-emerald-600 fill-current transition-transform group-hover:scale-110" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          <span>Hubungi via WhatsApp</span>
-        </a>
-        <a href="https://www.instagram.com/patchwork.biz.id" target="_blank" class="px-7 py-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold text-sm transition-all backdrop-blur-md hover:-translate-y-0.5 flex items-center space-x-2">
-          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          <span>Follow Instagram</span>
-        </a>
-        <a href="#products" class="px-7 py-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold text-sm transition-all backdrop-blur-md hover:-translate-y-0.5">
-          Lihat Katalog
-        </a>
+  <!-- CTA (CURVED PREMIUM BANNER) -->
+  <section id="cta-join" class="py-10 reveal">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="relative rounded-3xl overflow-hidden bg-slate-950 text-white border border-slate-800 p-8 sm:p-12 md:p-14 shadow-xl text-center">
+        <!-- Subtle Background Glow / Texture -->
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950 pointer-events-none opacity-90"></div>
+        <div class="max-w-3xl mx-auto relative z-10">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-lg bg-white/10 text-slate-200 text-xs font-semibold mb-5 border border-white/15">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Kemitraan & Rekomendasi Resmi</span>
+          </div>
+          <h2 id="cta-text" class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-white leading-tight">
+            Ingin Produk Anda Masuk Katalog PATCHWORK?
+          </h2>
+          <p class="text-slate-300 text-sm sm:text-base max-w-xl mx-auto mb-8 leading-relaxed font-normal">
+            Hubungi kami untuk kolaborasi afiliasi, peninjauan produk resmi, atau update promo diskon terbaru.
+          </p>
+          <div class="flex items-center justify-center">
+            <button onclick="openPartnerModal()" class="btn-bounce px-8 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm tracking-wide shadow-lg shadow-emerald-500/25 transition flex items-center space-x-2 active:scale-95">
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              <span>Daftar Mitra Penjual</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
+  <!-- PARTNER REGISTRATION & PRODUCT MODAL -->
+  <div id="partner-modal" class="fixed inset-0 z-[120] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto hide-scrollbar">
+      <button onclick="closePartnerModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="flex items-center space-x-3 mb-5">
+        <div class="w-11 h-11 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+          <i data-lucide="user-plus" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-black text-slate-900 tracking-tight">Pendaftaran Akun Mitra Penjual</h3>
+          <p class="text-xs text-slate-500">Daftarkan akun Anda. Setelah disetujui Admin, Anda dapat login ke Portal Mitra untuk memasukkan produk.</p>
+        </div>
+      </div>
+
+      <div id="partner-msg" class="hidden mb-4 p-3.5 rounded-2xl text-xs font-semibold"></div>
+
+      <!-- FORM PENDAFTARAN AKUN MITRA -->
+      <form id="partner-reg-form" onsubmit="submitPartnerRegistration(event)" class="space-y-4">
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 flex items-start space-x-2">
+          <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+          <span>Wajib mengisi <strong>Nama Asli</strong> dan <strong>Nomor WhatsApp Asli</strong> yang aktif. Admin akan memverifikasi sebelum menyetujui akun Anda.</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nama Asli Lengkap *</label>
+          <input type="text" id="reg-name" required placeholder="Nama asli Anda sesuai identitas/KTP" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:border-slate-900 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp Asli (Aktif) *</label>
+          <div class="relative">
+            <input type="tel" id="reg-whatsapp" required placeholder="08xxxxxxxxxx atau 628xxxxxxxxxx" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:border-slate-900 focus:outline-none">
+          </div>
+          <span class="text-[10px] text-slate-400 mt-1 block">Digunakan admin untuk konfirmasi dan notifikasi persetujuan akun</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Alamat Email *</label>
+          <input type="email" id="reg-email" required placeholder="email@tokoanda.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:border-slate-900 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Password Baru *</label>
+          <input type="password" id="reg-password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:border-slate-900 focus:outline-none">
+          <span class="text-[10px] text-slate-400 mt-1 block">Password untuk login ke Portal Mitra setelah disetujui admin</span>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+          <a href="/partner" class="text-xs text-slate-500 hover:text-emerald-700 underline font-medium">Sudah disetujui? Login ke Portal Mitra</a>
+          <button type="submit" id="btn-reg-submit" onclick="if(!this.form.checkValidity()) { this.form.reportValidity(); return false; } submitPartnerRegistration(event);" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition flex items-center space-x-2 active:scale-95 cursor-pointer">
+            <span>Kirim Pendaftaran</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- SHARE MODAL -->
-  <div id="share-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+  <div id="share-modal" class="fixed inset-0 z-[120] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full p-7 shadow-2xl border border-slate-200 relative">
       <button onclick="closeShareModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 transition">
         <i data-lucide="x" class="w-5 h-5"></i>
@@ -428,103 +639,24 @@
     <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
   </a>
 
-  <!-- FOOTER -->
-  <footer class="bg-gradient-to-b from-slate-900 to-slate-950 text-white pt-16 pb-8 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-        <!-- Brand -->
-        <div class="lg:col-span-1">
-          <div class="flex items-center space-x-3 mb-4">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/25">
-              <i data-lucide="layers" class="w-5 h-5"></i>
-            </div>
-            <span class="text-lg font-extrabold tracking-tight">PATCHWORK</span>
-          </div>
-          <p class="text-sm text-slate-400 leading-relaxed mb-5">Platform kurasi link affiliate terpercaya untuk produk viral TikTok Shop, Shopee, dan marketplace terkemuka.</p>
-          <a href="https://wa.me/62895321154498" target="_blank" class="inline-flex items-center space-x-2 text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition">
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            <span>+62 895-3211-54498</span>
-          </a>
-        </div>
-
-        <!-- Quick Links -->
-        <div>
-          <h4 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4">Navigasi</h4>
-          <ul class="space-y-3 text-sm text-slate-400">
-            <li><a href="/" class="hover:text-white transition flex items-center space-x-2"><i data-lucide="home" class="w-4 h-4"></i><span>Beranda</span></a></li>
-            <li><a href="#products" class="hover:text-white transition flex items-center space-x-2"><i data-lucide="package" class="w-4 h-4"></i><span>Katalog Produk</span></a></li>
-            <li><a href="#trending-section" class="hover:text-white transition flex items-center space-x-2"><i data-lucide="flame" class="w-4 h-4"></i><span>Trending</span></a></li>
-            <li><a href="/admin" class="hover:text-white transition flex items-center space-x-2"><i data-lucide="layout-dashboard" class="w-4 h-4"></i><span>Admin Panel</span></a></li>
-            <li><a href="/sitemap.xml" target="_blank" class="hover:text-white transition flex items-center space-x-2"><i data-lucide="file-text" class="w-4 h-4"></i><span>Sitemap</span></a></li>
-          </ul>
-        </div>
-
-        <!-- Marketplace -->
-        <div>
-          <h4 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4">Marketplace</h4>
-          <ul class="space-y-3 text-sm text-slate-400">
-            <li><a href="https://id.shp.ee/x8z7g8i9?fromSource=copy_link&smtt=0.0.9" target="_blank" class="hover:text-[#ee4d2d] transition flex items-center space-x-2">
-              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19.5 7.05h-2.73c-.28-2.67-2.1-4.8-4.77-4.8s-4.49 2.13-4.77 4.8H4.5c-.83 0-1.5.67-1.5 1.5l1.2 11.4c.08.77.73 1.35 1.5 1.35h12.6c.77 0 1.42-.58 1.5-1.35l1.2-11.4c0-.83-.67-1.5-1.5-1.5zm-7.5-3.3c1.83 0 3.32 1.49 3.47 3.3H8.53c.15-1.81 1.64-3.3 3.47-3.3zm5.7 15.75H6.3L5.25 8.55h13.5l-1.05 10.95z"/></svg>
-              <span>Toko Shopee Kami</span></a>
-            </li>
-            <li><a href="https://collshp.com/patchwoork" target="_blank" class="hover:text-[#ee4d2d] transition flex items-center space-x-2">
-              <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-              <span>Koleksi Shopee</span></a>
-            </li>
-            <li><a href="https://www.tiktok.com/@patchwork.biz.id" target="_blank" class="hover:text-white transition flex items-center space-x-2">
-              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298 0 .592.046.87.136V9.4a6.33 6.33 0 0 0-.87-.06A6.34 6.34 0 0 0 3.14 15.7a6.34 6.34 0 0 0 9.15 5.62v-9.15a8.16 8.16 0 0 0 4.87 1.6v-3.47a4.85 4.85 0 0 1-2.57-1.61z"/></svg>
-              <span>TikTok Shop</span></a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Social Media -->
-        <div>
-          <h4 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4">Ikuti Kami</h4>
-          <div class="grid grid-cols-4 gap-3">
-            <!-- TikTok -->
-            <a href="https://www.tiktok.com/@patchwork.biz.id" target="_blank" class="social-btn w-11 h-11 rounded-xl bg-slate-800 hover:bg-black flex items-center justify-center transition-all group" title="TikTok">
-              <svg class="w-5 h-5 fill-current text-slate-400 group-hover:text-white" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298 0 .592.046.87.136V9.4a6.33 6.33 0 0 0-.87-.06A6.34 6.34 0 0 0 3.14 15.7a6.34 6.34 0 0 0 9.15 5.62v-9.15a8.16 8.16 0 0 0 4.87 1.6v-3.47a4.85 4.85 0 0 1-2.57-1.61z"/></svg>
-            </a>
-            <!-- Instagram -->
-            <a href="https://www.instagram.com/patchwork.biz.id" target="_blank" class="social-btn w-11 h-11 rounded-xl bg-slate-800 hover:bg-gradient-to-br hover:from-purple-600 hover:via-pink-500 hover:to-orange-400 flex items-center justify-center transition-all group" title="Instagram">
-              <svg class="w-5 h-5 fill-current text-slate-400 group-hover:text-white" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-            </a>
-            <!-- Threads -->
-            <a href="https://www.threads.com/@patchwork.biz.id" target="_blank" class="social-btn w-11 h-11 rounded-xl bg-slate-800 hover:bg-black flex items-center justify-center transition-all group" title="Threads">
-              <svg class="w-5 h-5 fill-current text-slate-400 group-hover:text-white" viewBox="0 0 24 24"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.59 12c.025 3.086.718 5.496 2.057 7.164 1.432 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.96-.065-1.186.408-2.228 1.33-2.934.812-.622 1.903-.977 3.07-1.003.87-.019 1.684.092 2.42.33-.07-.6-.244-1.074-.521-1.424-.396-.501-1.03-.764-1.883-.782-.784.015-1.46.205-1.975.467l-.876-1.72c.75-.38 1.724-.63 2.85-.66 1.396.03 2.49.455 3.245 1.262.643.686.984 1.602 1.074 2.735.474.196.905.435 1.29.718 1.092.802 1.835 1.87 2.15 3.088.406 1.564.285 3.836-1.634 5.756C18.04 22.838 15.592 23.979 12.186 24zm-.09-7.778c-.858.037-1.474.298-1.83.616-.316.283-.468.616-.441.988.024.359.2.695.498.946.397.333 1.001.528 1.698.492 1.07-.058 1.876-.453 2.394-1.174.354-.494.586-1.124.688-1.882-.515-.14-1.078-.22-1.671-.206-.45.01-.901.067-1.336.22z"/></svg>
-            </a>
-            <!-- Pinterest -->
-            <a href="https://pin.it/cNvqFFJGH" target="_blank" class="social-btn w-11 h-11 rounded-xl bg-slate-800 hover:bg-[#E60023] flex items-center justify-center transition-all group" title="Pinterest">
-              <svg class="w-5 h-5 fill-current text-slate-400 group-hover:text-white" viewBox="0 0 24 24"><path d="M12 0a12 12 0 0 0-4.373 23.178c-.07-.633-.133-1.604.028-2.295.145-.624.938-3.977.938-3.977s-.239-.479-.239-1.187c0-1.113.645-1.943 1.448-1.943.683 0 1.012.512 1.012 1.127 0 .687-.437 1.714-.663 2.668-.189.796.399 1.446 1.185 1.446 1.42 0 2.514-1.498 2.514-3.662 0-1.915-1.377-3.254-3.342-3.254-2.276 0-3.612 1.707-3.612 3.471 0 .688.265 1.425.595 1.826a.24.24 0 0 1 .056.23c-.061.252-.196.796-.222.907-.035.146-.116.177-.268.107-1-.465-1.624-1.926-1.624-3.1 0-2.523 1.834-4.84 5.286-4.84 2.775 0 4.932 1.977 4.932 4.62 0 2.757-1.739 4.976-4.151 4.976-.811 0-1.573-.421-1.834-.919l-.498 1.902c-.181.695-.669 1.566-.995 2.097A12 12 0 1 0 12 0z"/></svg>
-            </a>
-            <!-- Shopee -->
-            <a href="https://id.shp.ee/x8z7g8i9?fromSource=copy_link&smtt=0.0.9" target="_blank" class="social-btn w-11 h-11 rounded-xl bg-slate-800 hover:bg-[#ee4d2d] flex items-center justify-center transition-all group" title="Shopee">
-              <svg class="w-5 h-5 fill-current text-slate-400 group-hover:text-white" viewBox="0 0 24 24"><path d="M19.5 7.05h-2.73c-.28-2.67-2.1-4.8-4.77-4.8s-4.49 2.13-4.77 4.8H4.5c-.83 0-1.5.67-1.5 1.5l1.2 11.4c.08.77.73 1.35 1.5 1.35h12.6c.77 0 1.42-.58 1.5-1.35l1.2-11.4c0-.83-.67-1.5-1.5-1.5zm-7.5-3.3c1.83 0 3.32 1.49 3.47 3.3H8.53c.15-1.81 1.64-3.3 3.47-3.3zm5.7 15.75H6.3L5.25 8.55h13.5l-1.05 10.95z"/></svg>
-            </a>
-            <!-- WhatsApp -->
-            <a href="https://wa.me/62895321154498" target="_blank" class="social-btn w-11 h-11 rounded-xl bg-slate-800 hover:bg-emerald-600 flex items-center justify-center transition-all group" title="WhatsApp">
-              <svg class="w-5 h-5 fill-current text-slate-400 group-hover:text-white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            </a>
-            <!-- Koleksi Shopee -->
-            <a href="https://collshp.com/patchwoork" target="_blank" class="social-btn w-11 h-11 rounded-xl bg-slate-800 hover:bg-[#ee4d2d] flex items-center justify-center transition-all group" title="Koleksi Shopee">
-              <i data-lucide="shopping-bag" class="w-5 h-5 text-slate-400 group-hover:text-white"></i>
-            </a>
-          </div>
-        </div>
+  <!-- FOOTER (CLEAN & MINIMALIST) -->
+  <footer class="bg-slate-950 text-white py-8 border-t border-slate-900 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-5">
+      <div class="flex items-center space-x-3 text-xs">
+        <span class="text-sm font-black tracking-wider text-white">PATCHWORK</span>
+        <span class="text-slate-600">&bull;</span>
+        <span class="text-[11px] text-slate-400">&copy; 2026 All rights reserved.</span>
       </div>
-
-      <!-- Bottom Bar -->
-      <div class="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-        <p class="text-xs text-slate-500 text-center md:text-left">
-          &copy; 2026 PATCHWORK. Dikembangkan untuk menghubungkan kreator affiliate, TikTok Shop & Shopee.
-        </p>
-        <div class="flex items-center space-x-6 text-xs text-slate-500">
-          <a href="https://www.tiktok.com/@patchwork.biz.id" target="_blank" class="hover:text-white transition">TikTok</a>
-          <a href="https://www.instagram.com/patchwork.biz.id" target="_blank" class="hover:text-white transition">Instagram</a>
-          <a href="https://www.threads.com/@patchwork.biz.id" target="_blank" class="hover:text-white transition">Threads</a>
-          <a href="https://pin.it/cNvqFFJGH" target="_blank" class="hover:text-white transition">Pinterest</a>
-        </div>
+      <div class="flex flex-wrap items-center gap-4 sm:gap-5 text-xs text-slate-400">
+        <a href="https://wa.me/62895321154498" target="_blank" class="hover:text-emerald-400 transition flex items-center space-x-1.5">
+          <svg class="w-3.5 h-3.5 fill-current text-emerald-500" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          <span>WhatsApp Hubungi Kami</span>
+        </a>
+        <span class="hidden sm:inline">&bull;</span>
+        <button onclick="toggleSidebar(true)" class="hover:text-white transition flex items-center space-x-1.5">
+          <i data-lucide="menu" class="w-3.5 h-3.5"></i>
+          <span>Buka Menu Lengkap</span>
+        </button>
       </div>
     </div>
   </footer>
@@ -556,18 +688,84 @@
       } catch (err) { console.warn('Failed to load stats', err); }
     }
 
+    let heroBanners = [];
+    let currentBannerIdx = 0;
+    let heroBannerTimer = null;
+
     async function loadBanners() {
       try {
         const res = await fetch('/api/banners?status=Published');
         const json = await res.json();
         if (json.data && json.data.length > 0) {
-          const banner = json.data[0];
-          document.getElementById('banner-title').innerText = banner.title;
-          if (banner.subtitle) document.getElementById('banner-subtitle').innerText = banner.subtitle;
-          if (banner.image) document.getElementById('banner-bg').style.backgroundImage = `url(${banner.image})`;
-          if (banner.target_url) document.getElementById('banner-btn').href = banner.target_url;
+          heroBanners = json.data;
+          renderHeroBanners();
         }
       } catch (err) { console.warn('Failed to load banners', err); }
+    }
+
+    function renderHeroBanners() {
+      if (!heroBanners.length) return;
+      const dotsContainer = document.getElementById('banner-dots');
+      
+      // Render dots
+      if (dotsContainer) {
+        dotsContainer.innerHTML = heroBanners.map((_, idx) => `
+          <button onclick="goToHeroBanner(${idx})" class="w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === currentBannerIdx ? 'bg-white w-7' : 'bg-white/40 hover:bg-white/70'}" title="Slide ${idx + 1}"></button>
+        `).join('');
+      }
+
+      showHeroSlide(currentBannerIdx);
+
+      // Setup timer
+      if (heroBannerTimer) clearInterval(heroBannerTimer);
+      if (heroBanners.length > 1) {
+        heroBannerTimer = setInterval(() => slideHeroBanner('next'), 5000);
+      }
+    }
+
+    function showHeroSlide(index) {
+      if (!heroBanners.length) return;
+      const b = heroBanners[index];
+      if (!b) return;
+
+      const titleEl = document.getElementById('banner-title');
+      const subtitleEl = document.getElementById('banner-subtitle');
+      const bgEl = document.getElementById('banner-bg');
+      const btnEl = document.getElementById('banner-btn');
+      const sideImg = document.getElementById('banner-side-img');
+
+      if (titleEl) titleEl.innerText = b.title;
+      if (subtitleEl) subtitleEl.innerText = b.subtitle || 'Akses cepat ke tautan resmi Shopee Affiliate dan TikTok Shop.';
+      if (bgEl && b.image) bgEl.style.backgroundImage = `url('${b.image}')`;
+      if (sideImg && b.image) sideImg.src = b.image;
+      if (btnEl) btnEl.href = b.target_url || '#products';
+
+      // Update active dot
+      const dots = document.querySelectorAll('#banner-dots button');
+      dots.forEach((dot, idx) => {
+        if (idx === index) {
+          dot.className = 'w-7 h-2.5 rounded-full bg-white transition-all duration-300';
+        } else {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-white/40 hover:bg-white/70 transition-all duration-300';
+        }
+      });
+    }
+
+    function slideHeroBanner(dir) {
+      if (!heroBanners.length) return;
+      if (dir === 'next') {
+        currentBannerIdx = (currentBannerIdx + 1) % heroBanners.length;
+      } else {
+        currentBannerIdx = (currentBannerIdx - 1 + heroBanners.length) % heroBanners.length;
+      }
+      showHeroSlide(currentBannerIdx);
+    }
+
+    function goToHeroBanner(idx) {
+      currentBannerIdx = idx;
+      showHeroSlide(currentBannerIdx);
+      if (heroBannerTimer) clearInterval(heroBannerTimer);
+      heroBannerTimer = setInterval(() => slideHeroBanner('next'), 5000);
     }
 
     async function loadCategories() {
@@ -575,10 +773,10 @@
         const res = await fetch('/api/categories');
         const json = await res.json();
         const container = document.getElementById('categories-container');
-        let html = `<button onclick="filterCategory('')" class="shrink-0 px-5 py-2.5 rounded-xl text-xs font-bold border transition-all ${state.category === '' ? 'bg-brand-600 text-white border-brand-600 shadow-lg shadow-brand-500/25' : 'bg-white border-slate-200 text-slate-700 hover:border-brand-500'}">Semua</button>`;
+        let html = `<button onclick="filterCategory('')" class="shrink-0 px-4 py-2 rounded-xl text-xs font-semibold border transition ${state.category === '' ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}">Semua</button>`;
         json.data.forEach(c => {
           const isActive = state.category === c.slug;
-          html += `<button onclick="filterCategory('${c.slug}')" class="shrink-0 px-5 py-2.5 rounded-xl text-xs font-bold border flex items-center space-x-2 transition-all ${isActive ? 'bg-brand-600 text-white border-brand-600 shadow-lg shadow-brand-500/25' : 'bg-white border-slate-200 text-slate-700 hover:border-brand-500'}"><span>${c.name}</span><span class="text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? 'bg-white/20' : 'bg-slate-100 text-slate-500'}">${c.product_count || 0}</span></button>`;
+          html += `<button onclick="filterCategory('${c.slug}')" class="shrink-0 px-4 py-2 rounded-xl text-xs font-semibold border flex items-center space-x-1.5 transition ${isActive ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}"><span>${c.name}</span><span class="text-[10px] px-1.5 py-0.2 rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}">${c.product_count || 0}</span></button>`;
         });
         container.innerHTML = html;
       } catch (err) { console.warn('Failed to load categories', err); }
@@ -656,7 +854,7 @@
           return;
         }
         empty.classList.add('hidden');
-        document.getElementById('catalog-count-label').innerText = `Menampilkan ${json.data.length} dari total ${json.pagination.total} produk`;
+        document.getElementById('catalog-count-label').innerText = `Menampilkan ${json.data.length} dari ${json.pagination.total} produk`;
         grid.innerHTML = json.data.map((p, idx) => createProductCardHtml(p, false, idx)).join('');
         renderPagination(json.pagination.total, json.pagination.page, json.pagination.limit);
         lucide.createIcons();
@@ -673,52 +871,50 @@
       let activeMarket = isTikTok ? 'TikTok Shop' : 'Shopee';
       if (!activeUrl) { activeUrl = `/product/${p.slug}`; activeMarket = 'Detail'; }
       const directTarget = activeUrl.startsWith('http') ? '_blank' : '_self';
-      let marketBadge = 'bg-orange-500/15 text-orange-600 border border-orange-500/20';
-      if (isTikTok) marketBadge = 'bg-pink-500/15 text-pink-600 border border-pink-500/20';
-      const sliderWidthClass = isFeatured ? 'w-[72vw] sm:w-[260px] md:w-[280px] shrink-0 snap-center trending-card my-3' : 'w-full';
-      const staggerDelay = !isFeatured && idx < 8 ? `style="transition-delay: ${(idx % 4) * 75}ms;"` : '';
+      const sliderWidthClass = isFeatured ? 'w-[72vw] sm:w-[260px] md:w-[270px] shrink-0 snap-center trending-card my-2' : 'w-full';
+      const staggerDelay = !isFeatured && idx < 8 ? `style="transition-delay: ${(idx % 4) * 60}ms;"` : '';
 
       return `
-        <div ${staggerDelay} class="group ${sliderWidthClass} product-card reveal bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-2xl hover:border-brand-500/30 flex flex-col overflow-hidden transition-all duration-500">
+        <div ${staggerDelay} class="group ${sliderWidthClass} product-card reveal bg-white rounded-2xl border border-slate-200 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:border-slate-300 flex flex-col overflow-hidden transition-all duration-300">
           <div class="relative aspect-square overflow-hidden bg-slate-100 block">
             <a href="${activeUrl}" target="${directTarget}" onclick="trackProductClick('${p.id}', '${activeMarket}')" class="block w-full h-full">
-              <img src="${thumb}" alt="${p.name}" class="w-full h-full object-cover product-img group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy">
+              <img src="${thumb}" alt="${p.name}" class="w-full h-full object-cover product-img group-hover:scale-105 transition-transform duration-500 ease-out" loading="lazy">
             </a>
-            <div class="absolute top-3.5 left-3.5 flex flex-col gap-1.5 items-start pointer-events-none z-10">
-              <span class="px-3 py-1 rounded-xl text-[10px] font-black tracking-wider uppercase backdrop-blur-xl shadow-sm ${isTikTok ? 'bg-slate-900/90 text-pink-400 border border-pink-500/30' : 'bg-[#ee4d2d]/90 text-white border border-white/20'}">
-                ${isTikTok ? 'TikTok Shop' : 'Shopee'}
+            <div class="absolute top-3 left-3 flex flex-col gap-1 items-start pointer-events-none z-10">
+              <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase shadow-sm ${isTikTok ? 'bg-slate-900 text-white' : 'bg-[#ee4d2d] text-white'}">
+                ${isTikTok ? 'TikTok' : 'Shopee'}
               </span>
-              ${p.commission_rate ? `<span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-500 text-white shadow-sm backdrop-blur-md">Komisi ${p.commission_rate}</span>` : ''}
+              ${p.commission_rate ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-600 text-white shadow-sm">Komisi ${p.commission_rate}</span>` : ''}
             </div>
-            <button type="button" onclick="event.stopPropagation(); event.preventDefault(); openShareModal('${p.slug}', '${p.name.replace(/'/g, "\\'")}', '${p.thumbnail}')" class="absolute top-3.5 right-3.5 w-9 h-9 rounded-2xl bg-white/90 backdrop-blur-md text-slate-700 flex items-center justify-center hover:bg-white hover:text-brand-600 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-110" title="Bagikan">
-              <i data-lucide="share-2" class="w-4 h-4"></i>
+            <button type="button" onclick="event.stopPropagation(); event.preventDefault(); openShareModal('${p.slug}', '${p.name.replace(/'/g, "\\'")}', '${p.thumbnail}')" class="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/95 text-slate-700 flex items-center justify-center hover:bg-white hover:text-slate-900 shadow transition-all opacity-0 group-hover:opacity-100 hover:scale-105" title="Bagikan">
+              <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
             </button>
           </div>
-          <div class="p-4 sm:p-5 flex flex-col flex-1 bg-white justify-between">
+          <div class="p-4 flex flex-col flex-1 bg-white justify-between">
             <div>
-              <div class="text-[11px] font-semibold text-slate-400 mb-2 flex items-center justify-between">
-                <span class="uppercase tracking-wider font-bold text-brand-600/80">${p.category_name || 'Rekomendasi'}</span>
-                <span class="flex items-center space-x-1 text-slate-400 text-xs"><i data-lucide="eye" class="w-3.5 h-3.5"></i><span>${p.total_clicks || 0}</span></span>
+              <div class="text-[11px] font-medium text-slate-400 mb-1.5 flex items-center justify-between">
+                <span class="font-semibold text-slate-600">${p.category_name || 'Rekomendasi'}</span>
+                <span class="flex items-center space-x-1 text-slate-400 text-[11px]"><i data-lucide="eye" class="w-3 h-3"></i><span>${p.total_clicks || 0}</span></span>
               </div>
-              <a href="${activeUrl}" target="${directTarget}" onclick="trackProductClick('${p.id}', '${activeMarket}')" class="font-bold text-sm text-slate-900 line-clamp-2 hover:text-brand-600 transition-colors leading-snug mb-3" title="${p.name}">${p.name}</a>
+              <a href="${activeUrl}" target="${directTarget}" onclick="trackProductClick('${p.id}', '${activeMarket}')" class="font-bold text-xs sm:text-sm text-slate-900 line-clamp-2 hover:text-slate-600 transition-colors leading-snug mb-3" title="${p.name}">${p.name}</a>
             </div>
             <div class="pt-2 border-t border-slate-100">
-              <div class="flex items-baseline justify-between mb-3.5">
-                <span class="text-xs text-slate-400 font-medium">Harga Promo:</span>
-                <span class="text-base sm:text-lg font-black text-slate-900 tracking-tight">${formatRupiah(p.price)}</span>
+              <div class="flex items-baseline justify-between mb-3">
+                <span class="text-[11px] text-slate-400 font-medium">Harga:</span>
+                <span class="text-sm sm:text-base font-extrabold text-slate-900">${formatRupiah(p.price)}</span>
               </div>
               <div>
                 ${(isTikTok && p.url_tiktok) ? `
-                  <a href="${p.url_tiktok}" target="_blank" onclick="trackProductClick('${p.id}', 'TikTok Shop')" class="btn-bounce w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 text-white text-xs font-black flex items-center justify-center space-x-2 shadow-lg shadow-slate-950/20 hover:shadow-slate-950/30">
-                    <svg class="w-4 h-4 fill-current text-[#fe2c55]" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298 0 .592.046.87.136V9.4a6.33 6.33 0 0 0-.87-.06A6.34 6.34 0 0 0 3.14 15.7a6.34 6.34 0 0 0 9.15 5.62v-9.15a8.16 8.16 0 0 0 4.87 1.6v-3.47a4.85 4.85 0 0 1-2.57-1.61z"/></svg>
+                  <a href="${p.url_tiktok}" target="_blank" onclick="trackProductClick('${p.id}', 'TikTok Shop')" class="btn-bounce w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center space-x-1.5 transition">
+                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
                     <span>Beli di TikTok Shop</span>
                   </a>` : ((!isTikTok && p.url_shopee) ? `
-                  <a href="${p.url_shopee}" target="_blank" onclick="trackProductClick('${p.id}', 'Shopee')" class="btn-bounce w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-[#ee4d2d] to-[#f76c3f] text-white text-xs font-black flex items-center justify-center space-x-2 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/35">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19.5 7.05h-2.73c-.28-2.67-2.1-4.8-4.77-4.8s-4.49 2.13-4.77 4.8H4.5c-.83 0-1.5.67-1.5 1.5l1.2 11.4c.08.77.73 1.35 1.5 1.35h12.6c.77 0 1.42-.58 1.5-1.35l1.2-11.4c0-.83-.67-1.5-1.5-1.5zm-7.5-3.3c1.83 0 3.32 1.49 3.47 3.3H8.53c.15-1.81 1.64-3.3 3.47-3.3zm5.7 15.75H6.3L5.25 8.55h13.5l-1.05 10.95z"/></svg>
+                  <a href="${p.url_shopee}" target="_blank" onclick="trackProductClick('${p.id}', 'Shopee')" class="btn-bounce w-full py-2.5 px-3 rounded-xl bg-[#ee4d2d] hover:bg-[#d94324] text-white text-xs font-bold flex items-center justify-center space-x-1.5 transition">
+                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M15.9414 17.9633c.229-1.879-.981-3.077-4.1758-4.0969-1.548-.528-2.277-1.22-2.26-2.1719.065-1.056 1.048-1.825 2.352-1.85a5.2898 5.2898 0 0 1 2.8838.89c.116.072.197.06.263-.039.09-.145.315-.494.39-.62.051-.081.061-.187-.068-.281-.185-.1369-.704-.4149-.983-.5319a6.4697 6.4697 0 0 0-2.5118-.514c-1.909.008-3.4129 1.215-3.5389 2.826-.082 1.1629.494 2.1078 1.73 2.8278.262.152 1.6799.716 2.2438.892 1.774.552 2.695 1.5419 2.478 2.6969-.197 1.047-1.299 1.7239-2.818 1.7439-1.2039-.046-2.2878-.537-3.1278-1.19l-.141-.11c-.104-.08-.218-.075-.287.03-.05.077-.376.547-.458.67-.077.108-.035.168.045.234.35.293.817.613 1.134.775a6.7097 6.7097 0 0 0 2.8289.727 4.9048 4.9048 0 0 0 2.0759-.354c1.095-.465 1.8029-1.394 1.9449-2.554zM11.9986 1.4009c-2.068 0-3.7539 1.95-3.8329 4.3899h7.6657c-.08-2.44-1.765-4.3899-3.8328-4.3899zm7.8516 22.5981-.08.001-15.7843-.002c-1.074-.04-1.863-.91-1.971-1.991l-.01-.195L1.298 6.2858a.459.459 0 0 1 .45-.494h4.9748C6.8448 2.568 9.1607 0 11.9996 0c2.8388 0 5.1537 2.5689 5.2757 5.7898h4.9678a.459.459 0 0 1 .458.483l-.773 15.5883-.007.131c-.094 1.094-.979 1.9769-2.0709 2.0059z"/></svg>
                     <span>Beli di Shopee</span>
                   </a>` : `
-                  <a href="/product/${p.slug}" class="btn-bounce w-full py-3 px-4 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-black flex items-center justify-center space-x-1.5 shadow-lg shadow-brand-500/20">
-                    <span>Lihat Penawaran</span><i data-lucide="chevron-right" class="w-4 h-4"></i>
+                  <a href="/product/${p.slug}" class="btn-bounce w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center space-x-1 transition">
+                    <span>Lihat Penawaran</span><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
                   </a>`)}
               </div>
             </div>
@@ -731,13 +927,13 @@
       const container = document.getElementById('pagination-wrapper');
       if (totalPages <= 1) { container.innerHTML = ''; return; }
       let html = '';
-      if (currentPage > 1) html += `<button onclick="goToPage(${currentPage - 1})" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold hover:bg-slate-100 transition">Sebelumnya</button>`;
+      if (currentPage > 1) html += `<button onclick="goToPage(${currentPage - 1})" class="px-3.5 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold hover:bg-slate-50 transition">Sebelumnya</button>`;
       for (let i = 1; i <= totalPages; i++) {
         if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
-          html += `<button onclick="goToPage(${i})" class="w-9 h-9 rounded-xl text-xs font-bold transition ${i === currentPage ? 'bg-brand-600 text-white shadow-md shadow-brand-500/25' : 'border border-slate-200 hover:bg-slate-100">${i}</button>`;
+          html += `<button onclick="goToPage(${i})" class="w-8 h-8 rounded-xl text-xs font-semibold transition ${i === currentPage ? 'bg-slate-900 text-white' : 'border border-slate-200 hover:bg-slate-50'}">${i}</button>`;
         }
       }
-      if (currentPage < totalPages) html += `<button onclick="goToPage(${currentPage + 1})" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold hover:bg-slate-100 transition">Selanjutnya</button>`;
+      if (currentPage < totalPages) html += `<button onclick="goToPage(${currentPage + 1})" class="px-3.5 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold hover:bg-slate-50 transition">Selanjutnya</button>`;
       container.innerHTML = html;
     }
 
@@ -758,10 +954,14 @@
       qrEl.innerHTML = '';
       new QRCode(qrEl, { text: currentShareUrl, width: 160, height: 160, colorDark: "#0f172a", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
       document.getElementById('share-modal').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
       lucide.createIcons();
     }
 
-    function closeShareModal() { document.getElementById('share-modal').classList.add('hidden'); }
+    function closeShareModal() {
+      document.getElementById('share-modal').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
     function copyCurrentLink() { navigator.clipboard.writeText(currentShareUrl).then(() => { const btnText = document.getElementById('copy-btn-text'); btnText.innerText = 'Tersalin! ✅'; setTimeout(() => { btnText.innerText = 'Salin Link Halaman'; }, 2000); }); }
     function shareWhatsApp() { const text = `Cek produk rekomendasi ini di PATCHWORK: ${currentShareTitle}\n${currentShareUrl}`; window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank'); }
 
@@ -771,6 +971,151 @@
     function handleSearch(val) { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => { state.search = val; state.page = 1; loadProducts(); }, 400); }
     navSearch.addEventListener('input', (e) => handleSearch(e.target.value));
     mobileSearch.addEventListener('input', (e) => handleSearch(e.target.value));
+
+    // SIDEBAR DRAWER TOGGLE & SEARCH
+    function toggleSidebar(open) {
+      const drawer = document.getElementById('sidebar-drawer');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (!drawer || !backdrop) return;
+      if (open) {
+        backdrop.classList.remove('opacity-0', 'pointer-events-none');
+        backdrop.classList.add('opacity-100', 'pointer-events-auto');
+        drawer.classList.remove('translate-x-full');
+        drawer.classList.add('translate-x-0');
+        document.body.classList.add('overflow-hidden');
+        lucide.createIcons();
+      } else {
+        backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+        backdrop.classList.add('opacity-0', 'pointer-events-none');
+        drawer.classList.remove('translate-x-0');
+        drawer.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    let drawerDebounce;
+    function handleDrawerSearch(val) {
+      clearTimeout(drawerDebounce);
+      drawerDebounce = setTimeout(() => {
+        state.search = val;
+        state.page = 1;
+        loadProducts();
+      }, 400);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        toggleSidebar(false);
+        closeShareModal();
+        closePartnerModal();
+      }
+    });
+
+    // PARTNER REGISTRATION MODAL HANDLER
+    function openPartnerModal() {
+      const modal = document.getElementById('partner-modal');
+      const msg = document.getElementById('partner-msg');
+      if (msg) msg.classList.add('hidden');
+      if (modal) {
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        lucide.createIcons();
+      }
+    }
+
+    function closePartnerModal() {
+      const modal = document.getElementById('partner-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    async function submitPartnerRegistration(e) {
+      if (e) e.preventDefault();
+      const btn = document.getElementById('btn-reg-submit');
+      const msg = document.getElementById('partner-msg');
+      const modalBox = document.querySelector('#partner-modal > div');
+
+      const nameVal = document.getElementById('reg-name').value.trim();
+      const whatsappVal = document.getElementById('reg-whatsapp').value.trim();
+      const emailVal = document.getElementById('reg-email').value.trim();
+      const passwordVal = document.getElementById('reg-password').value;
+
+      if (!nameVal || !whatsappVal || !emailVal || !passwordVal) {
+        msg.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 block';
+        msg.innerText = 'Mohon lengkapi semua kolom bertanda bintang (*).';
+        if (modalBox) modalBox.scrollTop = 0;
+        return;
+      }
+
+      if (passwordVal.length < 6) {
+        msg.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 block';
+        msg.innerText = 'Password minimal 6 karakter.';
+        if (modalBox) modalBox.scrollTop = 0;
+        return;
+      }
+
+      const payload = {
+        name: nameVal,
+        whatsapp: whatsappVal,
+        email: emailVal,
+        password: passwordVal
+      };
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="inline-block animate-spin mr-1.5">⏳</span><span>Mendaftarkan...</span>';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          msg.className = 'mb-4 p-4 rounded-2xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 block';
+          msg.innerHTML = `
+            <div class="flex items-start space-x-2">
+              <span class="text-lg">🎉</span>
+              <div>
+                <strong class="block text-sm mb-1">Pendaftaran Berhasil Terkirim!</strong>
+                <p class="leading-relaxed">Data pendaftaran <strong>${escapeHtml(payload.name)}</strong> telah masuk ke antrean verifikasi Admin PATCHWORK.</p>
+                <div class="mt-2.5 p-2.5 rounded-xl bg-white/80 border border-emerald-300/60 text-emerald-900 text-[11px]">
+                  ⏳ <strong>Tahap Selanjutnya:</strong> Admin akan meninjau akun & nomor WhatsApp Anda. Setelah status disetujui (Approved), Anda dapat langsung login di <strong><a href="/partner" class="underline text-emerald-700 font-bold">Portal Mitra (/partner)</a></strong> menggunakan email & password tadi untuk memasukkan produk ke katalog.
+                </div>
+              </div>
+            </div>
+          `;
+          document.getElementById('partner-reg-form').reset();
+          if (modalBox) modalBox.scrollTop = 0;
+        } else {
+          msg.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 block';
+          msg.innerText = data.error || 'Gagal mendaftar. Pastikan data terisi dengan benar.';
+          if (modalBox) modalBox.scrollTop = 0;
+        }
+      } catch (err) {
+        console.error('Registration error:', err);
+        msg.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 block';
+        msg.innerText = (err && err.message) ? `Gagal mendaftar: ${err.message}` : 'Koneksi ke server terganggu. Silakan coba lagi.';
+        if (modalBox) modalBox.scrollTop = 0;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Kirim Pendaftaran</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>';
+        lucide.createIcons();
+      }
+    }
 
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW failed:', err)); }); }
 

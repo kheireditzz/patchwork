@@ -16,17 +16,24 @@ export function authenticateToken(req, res, next) {
       return res.status(403).json({ error: 'Token tidak valid atau telah kedaluwarsa.' });
     }
     
-    // Fetch user details from DB to ensure fresh status and role
-    let user = sqlite.prepare('SELECT id, name, email, role FROM users WHERE id = ?').get(decoded.id);
+    // Fetch user details from DB to ensure fresh status, role, and profile fields
+    let user = sqlite.prepare('SELECT id, name, email, phone, role, status, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug FROM users WHERE id = ?').get(decoded.id);
     if (!user && decoded.email) {
-      user = sqlite.prepare('SELECT id, name, email, role FROM users WHERE email = ?').get(decoded.email);
+      user = sqlite.prepare('SELECT id, name, email, phone, role, status, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug FROM users WHERE email = ?').get(decoded.email);
     }
     if (!user && decoded.role) {
       // If user was created in previous container instance, allow valid decoded token payload
-      user = { id: decoded.id, name: decoded.name, email: decoded.email, role: decoded.role };
+      user = { id: decoded.id, name: decoded.name, email: decoded.email, phone: decoded.phone, role: decoded.role, status: decoded.status || 'Approved' };
     }
     if (!user) {
       return res.status(403).json({ error: 'Pengguna tidak ditemukan.' });
+    }
+
+    if (user.status === 'Pending') {
+      return res.status(403).json({ error: 'Akun Anda masih menunggu persetujuan dari Admin. Harap tunggu hingga akun di-approve.' });
+    }
+    if (user.status === 'Rejected') {
+      return res.status(403).json({ error: 'Pendaftaran akun Anda ditolak oleh Admin. Silakan hubungi admin.' });
     }
 
     req.user = user;

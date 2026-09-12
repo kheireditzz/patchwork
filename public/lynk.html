@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Etalase Rekomendasi - PATCHWORK</title>
+  <meta name="description" id="page-desc" content="Koleksi produk rekomendasi resmi & promo marketplace pilihan.">
+  <meta property="og:title" id="og-title" content="Etalase Rekomendasi - PATCHWORK">
+  <meta property="og:description" id="og-desc" content="Koleksi produk rekomendasi pilihan">
+  <meta property="og:image" id="og-img" content="">
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      letter-spacing: -0.015em;
+    }
+    .product-card {
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.2s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-4px);
+    }
+    .btn-action {
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+    .btn-action:active {
+      transform: scale(0.97);
+    }
+  </style>
+</head>
+<body id="lynk-body" class="bg-slate-950 text-white min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white pb-16">
+
+  <!-- TOP BAR -->
+  <header class="w-full max-w-xl mx-auto px-4 pt-6 pb-2 flex items-center justify-between">
+    <a href="/" class="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-white transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      <span>Beranda PATCHWORK</span>
+    </a>
+    <button onclick="openShareModal()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 transition" title="Bagikan">
+      <i data-lucide="share-2" class="w-4 h-4"></i>
+    </button>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="w-full max-w-xl mx-auto px-4 flex-1 flex flex-col items-center">
+    
+    <!-- LOADING SKELETON -->
+    <div id="lynk-loading" class="w-full py-12 flex flex-col items-center space-y-4 animate-pulse">
+      <div class="w-24 h-24 rounded-3xl bg-white/10"></div>
+      <div class="h-6 w-48 bg-white/10 rounded-xl"></div>
+      <div class="h-4 w-64 bg-white/10 rounded-lg"></div>
+      <div class="w-full h-24 bg-white/5 rounded-2xl mt-6"></div>
+      <div class="w-full h-32 bg-white/5 rounded-2xl"></div>
+    </div>
+
+    <!-- ERROR STATE -->
+    <div id="lynk-error" class="hidden w-full py-20 text-center space-y-3">
+      <div class="w-16 h-16 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto mb-2">
+        <i data-lucide="alert-circle" class="w-8 h-8"></i>
+      </div>
+      <h2 class="text-lg font-extrabold text-white">Profil Tidak Ditemukan</h2>
+      <p class="text-xs text-slate-400 max-w-xs mx-auto">Link profil atau ID mitra yang Anda buka tidak terdaftar di sistem.</p>
+      <div class="pt-2">
+        <a href="/" class="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-white/10 text-xs font-bold text-white hover:bg-white/20 transition">
+          <i data-lucide="home" class="w-3.5 h-3.5"></i>
+          <span>Kembali ke Beranda</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- PROFILE CONTENT -->
+    <div id="lynk-content" class="hidden w-full flex flex-col items-center space-y-6">
+      
+      <!-- PROFILE HEADER -->
+      <div class="text-center flex flex-col items-center pt-2 space-y-3">
+        <!-- Avatar -->
+        <div class="relative">
+          <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden border-2 border-white/20 shadow-2xl bg-white/10 flex items-center justify-center" id="profile-avatar-box">
+            <span class="text-2xl font-black tracking-wider text-white" id="profile-avatar-initials">--</span>
+          </div>
+          <span class="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-slate-950 shadow-md" id="profile-badge">
+            VERIFIED
+          </span>
+        </div>
+
+        <!-- Name & Bio -->
+        <div class="space-y-1 max-w-md">
+          <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center justify-center gap-1.5" id="profile-name">
+            <span>--</span>
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal" id="profile-bio">
+            --
+          </p>
+          <div class="pt-1">
+            <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-white/10 text-slate-300 border border-white/15" id="profile-slug-pill">
+              <i data-lucide="link" class="w-3 h-3 text-emerald-400"></i>
+              <span id="profile-slug-text">kheireditz.my.id</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Social Media Buttons -->
+        <div class="flex flex-wrap items-center justify-center gap-2 pt-2" id="profile-socials">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <!-- SEARCH & FILTER BAR -->
+      <div class="w-full space-y-3 pt-2">
+        <div class="relative w-full">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="lynk-search" oninput="filterProducts(this.value)" placeholder="Cari produk di etalase ini..." class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white/10 border border-white/15 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-white/40 focus:bg-white/15 transition">
+        </div>
+
+        <!-- Categories horizontal pills -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1" id="lynk-categories-bar" style="scrollbar-width:none;">
+          <button onclick="filterCategory('')" class="cat-pill px-3 py-1 rounded-xl text-xs font-bold bg-white text-slate-950 shrink-0 transition" data-cat="">
+            Semua
+          </button>
+        </div>
+      </div>
+
+      <!-- PRODUCTS SECTION -->
+      <div class="w-full space-y-3.5">
+        <div class="flex items-center justify-between text-xs text-slate-400 font-semibold px-1">
+          <span>Katalog Produk (<span id="count-products">0</span>)</span>
+          <span class="text-[11px]">Tautan Belanja Resmi</span>
+        </div>
+
+        <div class="grid grid-cols-1 gap-3" id="lynk-products-list">
+          <!-- Injected via JS -->
+        </div>
+
+        <div id="lynk-no-products" class="hidden py-12 text-center space-y-2">
+          <div class="w-12 h-12 rounded-xl bg-white/5 text-slate-400 flex items-center justify-center mx-auto">
+            <i data-lucide="package-search" class="w-6 h-6"></i>
+          </div>
+          <p class="text-xs text-slate-400">Tidak ada produk yang cocok dengan pencarian.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER BRANDING -->
+  <footer class="w-full text-center pt-10 text-[11px] text-slate-400 space-y-1">
+    <div>Powered by <a href="/" class="font-extrabold text-white hover:underline">PATCHWORK Affiliate</a></div>
+    <div class="text-[10px] text-slate-400">Temukan promo Shopee & TikTok Shop terpercaya</div>
+  </footer>
+
+  <!-- SHARE & QR MODAL -->
+  <div id="share-modal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl relative">
+      <button onclick="closeShareModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="space-y-1 pt-2">
+        <h3 class="text-base font-black text-white">Bagikan Etalase</h3>
+        <p class="text-xs text-slate-400" id="share-modal-subtitle">Scan QR Code atau salin tautan berikut</p>
+      </div>
+
+      <div class="p-4 bg-white rounded-2xl flex items-center justify-center shadow-inner mx-auto w-fit">
+        <div id="qrcode-box"></div>
+      </div>
+
+      <div class="space-y-2 pt-2">
+        <button onclick="copyCurrentLynkUrl()" class="w-full py-2.5 px-4 rounded-xl bg-white text-slate-950 text-xs font-bold hover:bg-slate-100 flex items-center justify-center space-x-2 transition btn-action">
+          <i data-lucide="copy" class="w-4 h-4"></i>
+          <span id="copy-btn-text">Salin Tautan Etalase</span>
+        </button>
+        <button onclick="shareViaWhatsApp()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 flex items-center justify-center space-x-2 transition btn-action">
+          <i data-lucide="message-circle" class="w-4 h-4"></i>
+          <span>Bagikan ke WhatsApp</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    let identifier = pathParts[1] || '';
+    
+    // Check query params if any
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!identifier && urlParams.get('id')) {
+      identifier = urlParams.get('id');
+    }
+
+    // Check host for subdomain like mitra1.kheireditz.my.id
+    const host = window.location.hostname || '';
+    if (host.includes('.kheireditz.my.id')) {
+      const sub = host.split('.kheireditz.my.id')[0];
+      if (sub && sub !== 'www' && sub !== 'app') {
+        identifier = sub;
+      }
+    }
+
+    let profileData = null;
+    let allProducts = [];
+    let activeCategory = '';
+    let searchQuery = '';
+
+    const themeStyles = {
+      modern: {
+        bodyBg: 'bg-slate-950 text-white selection:bg-indigo-500',
+        cardBg: 'bg-slate-900/90 border-slate-800 hover:border-slate-700',
+        badge: 'bg-indigo-600 text-white',
+        button: 'bg-indigo-600 hover:bg-indigo-700 text-white',
+        pillActive: 'bg-white text-slate-950',
+        pillInactive: 'bg-white/10 text-slate-300 hover:bg-white/20'
+      },
+      emerald: {
+        bodyBg: 'bg-[#031b14] text-white selection:bg-emerald-500',
+        cardBg: 'bg-emerald-950/40 border-emerald-900/60 hover:border-emerald-700',
+        badge: 'bg-emerald-500 text-slate-950',
+        button: 'bg-emerald-600 hover:bg-emerald-700 text-white',
+        pillActive: 'bg-emerald-400 text-slate-950',
+        pillInactive: 'bg-white/10 text-emerald-100 hover:bg-white/20'
+      },
+      sunset: {
+        bodyBg: 'bg-[#18051e] text-white selection:bg-rose-500',
+        cardBg: 'bg-rose-950/30 border-rose-900/50 hover:border-rose-700',
+        badge: 'bg-rose-500 text-white',
+        button: 'bg-rose-600 hover:bg-rose-700 text-white',
+        pillActive: 'bg-rose-400 text-slate-950',
+        pillInactive: 'bg-white/10 text-rose-100 hover:bg-white/20'
+      },
+      minimal: {
+        bodyBg: 'bg-slate-100 text-slate-900 selection:bg-slate-900 selection:text-white',
+        cardBg: 'bg-white border-slate-200 hover:border-slate-300 shadow-sm',
+        badge: 'bg-slate-900 text-white',
+        button: 'bg-slate-900 hover:bg-slate-800 text-white',
+        pillActive: 'bg-slate-900 text-white',
+        pillInactive: 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+      }
+    };
+
+    async function loadLynkData() {
+      if (!identifier) {
+        showError();
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/profile/${encodeURIComponent(identifier)}`);
+        if (!res.ok) {
+          showError();
+          return;
+        }
+
+        const data = await res.json();
+        profileData = data.user;
+        allProducts = data.products || [];
+
+        renderProfile(data);
+      } catch (err) {
+        showError();
+      }
+    }
+
+    function renderProfile(data) {
+      document.getElementById('lynk-loading').classList.add('hidden');
+      document.getElementById('lynk-content').classList.remove('hidden');
+
+      const u = data.user;
+      const tmplKey = u.template || 'modern';
+      const tmpl = themeStyles[tmplKey] || themeStyles.modern;
+
+      // Apply theme to body
+      const bodyEl = document.getElementById('lynk-body');
+      bodyEl.className = `${tmpl.bodyBg} min-h-screen flex flex-col antialiased pb-16`;
+
+      // Set Page titles
+      document.title = `${u.name || 'Etalase'} - Rekomendasi Resmi PATCHWORK`;
+      document.getElementById('page-title').innerText = `${u.name || 'Etalase'} - LYNK ID`;
+      document.getElementById('page-desc').content = u.bio || `Koleksi produk resmi dari ${u.name}`;
+
+      // Name & Bio
+      document.getElementById('profile-name').innerText = u.name || 'Mitra Penjual';
+      document.getElementById('profile-bio').innerText = u.bio || 'Selamat datang di etalase rekomendasi produk pilihan saya!';
+
+      // Slug pill
+      const displaySlug = u.custom_slug ? `${u.custom_slug}.kheireditz.my.id` : `kheireditz.my.id/lynk/${u.id}`;
+      document.getElementById('profile-slug-text').innerText = displaySlug;
+
+      // Avatar
+      const avBox = document.getElementById('profile-avatar-box');
+      if (u.avatar) {
+        avBox.innerHTML = `<img src="${u.avatar}" alt="${u.name}" class="w-full h-full object-cover">`;
+      } else {
+        const initials = (u.name || 'M P').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        avBox.innerHTML = `<span class="text-2xl font-black tracking-wider">${initials}</span>`;
+      }
+
+      // Social Links
+      const socialsContainer = document.getElementById('profile-socials');
+      socialsContainer.innerHTML = '';
+
+      const socialConfigs = [
+        { key: 'shopee', label: 'Shopee', icon: 'shopping-bag', color: 'bg-orange-500/20 text-orange-400 border-orange-500/30' },
+        { key: 'tiktok', label: 'TikTok', icon: 'video', color: 'bg-pink-500/20 text-pink-400 border-pink-500/30' },
+        { key: 'instagram', label: 'Instagram', icon: 'camera', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
+        { key: 'youtube', label: 'YouTube', icon: 'play-circle', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
+        { key: 'website', label: 'Website', icon: 'globe', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+        { key: 'phone', label: 'WhatsApp', icon: 'message-circle', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' }
+      ];
+
+      socialConfigs.forEach(s => {
+        let link = u[s.key];
+        if (s.key === 'phone' && link) {
+          const cleanPhone = link.replace(/[^0-9]/g, '');
+          link = `https://wa.me/${cleanPhone.startsWith('0') ? '62' + cleanPhone.substring(1) : cleanPhone}`;
+        }
+        if (link) {
+          const a = document.createElement('a');
+          a.href = link;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.className = `inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition hover:scale-105 active:scale-95 ${s.color}`;
+          a.innerHTML = `<i data-lucide="${s.icon}" class="w-3.5 h-3.5"></i><span>${s.label}</span>`;
+          socialsContainer.appendChild(a);
+        }
+      });
+
+      // Categories Bar
+      const catBar = document.getElementById('lynk-categories-bar');
+      const cats = data.categories || [];
+      catBar.innerHTML = `
+        <button onclick="filterCategory('')" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${activeCategory === '' ? tmpl.pillActive : tmpl.pillInactive}" data-cat="">
+          Semua (${allProducts.length})
+        </button>
+      `;
+      cats.forEach(c => {
+        catBar.innerHTML += `
+          <button onclick="filterCategory('${c.id}')" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${activeCategory === c.id ? tmpl.pillActive : tmpl.pillInactive}" data-cat="${c.id}">
+            ${c.name}
+          </button>
+        `;
+      });
+
+      renderProductsList();
+      lucide.createIcons();
+    }
+
+    function renderProductsList() {
+      const container = document.getElementById('lynk-products-list');
+      const countEl = document.getElementById('count-products');
+      const noProd = document.getElementById('lynk-no-products');
+
+      let filtered = allProducts;
+      if (activeCategory) {
+        filtered = filtered.filter(p => p.category_id === activeCategory);
+      }
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(q) || (p.description || '').toLowerCase().includes(q));
+      }
+
+      countEl.innerText = filtered.length;
+
+      if (filtered.length === 0) {
+        container.innerHTML = '';
+        noProd.classList.remove('hidden');
+        return;
+      }
+      noProd.classList.add('hidden');
+
+      const u = profileData || {};
+      const tmplKey = u.template || 'modern';
+      const tmpl = themeStyles[tmplKey] || themeStyles.modern;
+
+      container.innerHTML = filtered.map(p => {
+        const shopeeLink = p.url_shopee || '';
+        const tiktokLink = p.url_tiktok || '';
+        const hasShopee = Boolean(shopeeLink);
+        const hasTiktok = Boolean(tiktokLink);
+
+        return `
+          <div class="product-card rounded-2xl border p-3 sm:p-3.5 ${tmpl.cardBg} flex items-center space-x-3 sm:space-x-3.5 group">
+            <a href="/product/${p.slug}" class="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border border-white/10 bg-black/20 block">
+              <img src="${p.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80'}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80'">
+            </a>
+
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center space-x-1.5 mb-1">
+                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${p.marketplace === 'Shopee' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' : 'bg-pink-500/20 text-pink-400 border border-pink-500/30'}">
+                  ${p.marketplace || 'Marketplace'}
+                </span>
+                ${p.commission_rate ? `<span class="text-[10px] font-bold text-emerald-400 hidden sm:inline">Komisi ${p.commission_rate}</span>` : ''}
+              </div>
+
+              <a href="/product/${p.slug}" class="block font-bold text-xs sm:text-sm truncate hover:underline" title="${p.name}">
+                ${p.name}
+              </a>
+
+              <div class="flex items-center justify-between mt-1.5 gap-2">
+                <div class="font-black text-xs sm:text-sm text-emerald-400">
+                  Rp ${Number(p.price || 0).toLocaleString('id-ID')}
+                </div>
+
+                <!-- DIRECT ACTION BUTTONS -->
+                <div class="flex items-center space-x-1.5 shrink-0">
+                  ${hasShopee ? `
+                    <a href="${shopeeLink}" target="_blank" onclick="trackClick('${p.id}', 'Shopee')" class="px-3 py-1.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-[11px] flex items-center space-x-1 shadow-sm transition btn-action" title="Beli di Shopee">
+                      <span>Shopee</span>
+                      <i data-lucide="external-link" class="w-3 h-3"></i>
+                    </a>
+                  ` : ''}
+                  ${hasTiktok ? `
+                    <a href="${tiktokLink}" target="_blank" onclick="trackClick('${p.id}', 'TikTok Shop')" class="px-3 py-1.5 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-[11px] flex items-center space-x-1 shadow-sm transition btn-action" title="Beli di TikTok Shop">
+                      <span>TikTok</span>
+                      <i data-lucide="external-link" class="w-3 h-3"></i>
+                    </a>
+                  ` : ''}
+                  ${!hasShopee && !hasTiktok ? `
+                    <a href="/product/${p.slug}" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] flex items-center space-x-1 transition btn-action">
+                      <span>Detail</span>
+                      <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </a>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function filterCategory(catId) {
+      activeCategory = catId;
+      const u = profileData || {};
+      const tmplKey = u.template || 'modern';
+      const tmpl = themeStyles[tmplKey] || themeStyles.modern;
+
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        if (btn.getAttribute('data-cat') === catId) {
+          btn.className = `cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${tmpl.pillActive}`;
+        } else {
+          btn.className = `cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${tmpl.pillInactive}`;
+        }
+      });
+      renderProductsList();
+    }
+
+    function filterProducts(query) {
+      searchQuery = query;
+      renderProductsList();
+    }
+
+    function trackClick(productId, marketplace) {
+      fetch('/api/clicks/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id: productId, marketplace })
+      }).catch(() => {});
+    }
+
+    function showError() {
+      document.getElementById('lynk-loading').classList.add('hidden');
+      document.getElementById('lynk-error').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function getShareableUrl() {
+      const u = profileData || {};
+      if (u.custom_slug) {
+        return `https://${u.custom_slug}.kheireditz.my.id`;
+      }
+      return `${window.location.origin}/lynk/${u.id || identifier}`;
+    }
+
+    function openShareModal() {
+      const modal = document.getElementById('share-modal');
+      const shareUrl = getShareableUrl();
+      modal.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+
+      const qrContainer = document.getElementById('qrcode-box');
+      qrContainer.innerHTML = '';
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrContainer, {
+          text: shareUrl,
+          width: 160,
+          height: 160,
+          colorDark: "#0f172a",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
+      lucide.createIcons();
+    }
+
+    function closeShareModal() {
+      document.getElementById('share-modal').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    function copyCurrentLynkUrl() {
+      const shareUrl = getShareableUrl();
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        const txt = document.getElementById('copy-btn-text');
+        txt.innerText = 'Tautan Tersalin ke Clipboard!';
+        setTimeout(() => { txt.innerText = 'Salin Tautan Etalase'; }, 2000);
+      }).catch(() => {
+        prompt('Salin tautan profil ini:', shareUrl);
+      });
+    }
+
+    function shareViaWhatsApp() {
+      const u = profileData || {};
+      const shareUrl = getShareableUrl();
+      const text = `Halo! Yuk cek etalase rekomendasi belanja resmi ${u.name || ''} di sini: ${shareUrl}`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    // Initialize
+    loadLynkData();
+  </script>
+</body>
+</html>

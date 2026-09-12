@@ -5,3 +5,4 @@ public/uploads/temp_excel/
 *.log
 .DS_Store
 .vercel
+.env*

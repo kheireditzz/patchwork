@@ -20,11 +20,18 @@
         extend: {
           colors: {
             brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
+              50: '#f5f7ff',
+              100: '#ebf0fe',
+              200: '#cedaff',
+              500: '#4361ee',
+              600: '#3a53d0',
+              700: '#2f43aa',
+              900: '#1e2b6c',
+            },
+            surface: {
+              subtle: '#f8fafc',
+              border: '#e2e8f0',
+              card: '#ffffff',
             }
           }
         }
@@ -32,19 +39,28 @@
     }
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
-    body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; letter-spacing: -0.01em; }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { 
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; 
+      letter-spacing: -0.012em; 
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     
     .admin-card {
-      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 1rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
     .admin-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 20px 35px -12px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(99, 102, 241, 0.08);
+      border-color: #cbd5e1;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04), 0 8px 10px -6px rgba(15, 23, 42, 0.02);
     }
+    
     .top-nav-slider {
       scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
@@ -54,79 +70,108 @@
     .top-nav-slider::-webkit-scrollbar { display: none; }
     
     .tab-pill {
-      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.18s ease;
       white-space: nowrap;
       position: relative;
     }
     .tab-pill:hover:not(.active) {
-      background: #f8fafc;
+      background: #f1f5f9;
       color: #0f172a;
       border-color: #cbd5e1;
-      transform: translateY(-1px);
     }
     .tab-pill.active {
-      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #7c3aed 100%);
+      background: #0f172a;
       color: #ffffff !important;
-      box-shadow: 0 8px 24px -4px rgba(79, 70, 229, 0.45);
-      transform: translateY(-1px) scale(1.02);
-      border-color: transparent !important;
+      border-color: #0f172a !important;
+      box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.25);
     }
-    .metric-badge {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(8px);
-    }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeOutUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-12px); } }
-    .fade-in-up { animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
     
-    .btn-action { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
-    .btn-action:hover { transform: translateY(-1.5px); }
-    .btn-action:active { transform: translateY(0) scale(0.98); }
+    @keyframes fadeInUp { 
+      from { opacity: 0; transform: translateY(8px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+    @keyframes fadeOutUp { 
+      from { opacity: 1; transform: translateY(0); } 
+      to { opacity: 0; transform: translateY(-8px); } 
+    }
+    .fade-in-up { animation: fadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+    
+    .btn-action { transition: background-color 0.15s ease, transform 0.1s ease; }
+    .btn-action:active { transform: scale(0.97); }
   </style>
 </head>
-<body class="bg-slate-50/80 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-slate-900 selection:text-white">
 
   <!-- ================= AUTH CONTAINER (LOGIN) ================= -->
-  <div id="login-container" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-tr from-slate-950 via-brand-950 to-purple-950 relative overflow-hidden">
-    <div class="absolute inset-0 opacity-20">
-      <div class="absolute -right-20 -top-20 w-96 h-96 bg-brand-500 rounded-full blur-3xl"></div>
-      <div class="absolute -left-20 -bottom-20 w-96 h-96 bg-purple-500 rounded-full blur-3xl"></div>
-    </div>
-    <div class="max-w-md w-full bg-white rounded-3xl p-8 border border-slate-200 shadow-2xl relative z-10">
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 to-purple-500 flex items-center justify-center text-white mx-auto shadow-xl shadow-brand-500/30 mb-5">
-          <i data-lucide="layers" class="w-8 h-8"></i>
+  <div id="login-container" class="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-slate-950 relative overflow-hidden selection:bg-indigo-500 selection:text-white">
+    <!-- Ambient Lighting & Subtle Grid Background -->
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none"></div>
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-[128px] pointer-events-none"></div>
+    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-600/20 rounded-full blur-[128px] pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-slate-800/25 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <div class="max-w-md w-full bg-white/95 backdrop-blur-xl rounded-3xl p-8 sm:p-9 border border-white/40 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.45)] relative z-10">
+      <div class="text-center mb-6">
+        <div class="flex justify-center items-center w-full mb-4">
+          <a href="/" class="inline-flex items-center justify-center p-2 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 transition-transform active:scale-95 shadow-sm" title="Kembali ke Beranda">
+            <img 
+              src="/images/logo.png" 
+              onerror="this.onerror=null; this.src='https://i.ibb.co.com/mwpHfGn/263941-removebg-preview.png';" 
+              alt="PATCHWORK" 
+              class="h-10 w-auto max-w-[160px] object-contain drop-shadow-sm"
+            >
+          </a>
         </div>
-        <h1 class="text-2xl font-extrabold tracking-tight">Admin PATCHWORK</h1>
-        <p class="text-xs text-slate-500 mt-1">Masuk untuk mengelola link affiliate, banner & statistik</p>
+        <h1 class="text-xl font-black text-slate-900 tracking-tight">Login Administrator</h1>
+        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">Kelola katalog produk, persetujuan mitra, link affiliate, dan analitik</p>
       </div>
 
-      <form id="login-form" class="space-y-4">
-        <div id="login-error" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold"></div>
+      <form id="login-form" onsubmit="submitAdminLogin(event)" class="space-y-4">
+        <div id="login-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium"></div>
 
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Email</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Email Administrator *</label>
           <div class="relative">
             <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-            <input type="email" id="login-email" placeholder="Masukkan email admin" required class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-brand-500">
+            <input type="email" id="login-email" placeholder="admin@patchwork.com" required class="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-900 focus:bg-white transition">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Password</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Password *</label>
           <div class="relative">
             <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-            <input type="password" id="login-password" placeholder="Masukkan password" required class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-brand-500">
+            <input type="password" id="login-password" placeholder="••••••••" required class="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-900 focus:bg-white transition">
           </div>
         </div>
 
-        <button type="submit" id="btn-login-submit" class="w-full py-3.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-lg shadow-brand-500/25 transition duration-200 flex items-center justify-center space-x-2">
+        <button type="submit" id="btn-login-submit" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-bold text-xs transition duration-150 flex items-center justify-center space-x-2 cursor-pointer shadow-md">
           <span>Masuk ke Dashboard</span>
-          <i data-lucide="log-in" class="w-4 h-4"></i>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
         </button>
 
-        <div class="text-center pt-2">
-          <a href="/" class="text-xs text-slate-500 hover:text-brand-500 transition">← Kembali ke Halaman Publik</a>
+        <!-- Akun Default Super Admin Helper -->
+        <div class="p-3 rounded-2xl bg-indigo-50/80 border border-indigo-100 flex items-center justify-between text-[11px] text-indigo-950">
+          <div class="space-y-0.5">
+            <div class="font-bold flex items-center gap-1 text-indigo-900">
+              <i data-lucide="key" class="w-3.5 h-3.5 text-indigo-600"></i>
+              <span>Akun Default Super Admin</span>
+            </div>
+            <div class="text-[10px] text-slate-500 font-mono">admin@patchwork.com &bull; admin123</div>
+          </div>
+          <button type="button" onclick="fillAdminCredentials(false)" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] shadow-sm transition active:scale-95">
+            Gunakan
+          </button>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 text-center space-y-2">
+          <div class="text-xs text-slate-600">
+            Anda Mitra Penjual? 
+            <a href="/partner" class="text-emerald-700 font-bold hover:underline">Masuk ke Portal Mitra</a>
+          </div>
+          <div>
+            <a href="/" class="text-xs text-slate-500 hover:text-slate-900 transition">← Halaman Beranda Publik</a>
+          </div>
         </div>
       </form>
     </div>
@@ -136,7 +181,7 @@
   <div id="dashboard-container" class="hidden flex-1 flex flex-col h-screen overflow-hidden">
     
     <!-- TOP HEADER -->
-    <header class="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-sm z-20">
+    <header class="h-14 bg-white border-b border-slate-200/90 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
       <!-- Left: Brand Logo & Title -->
       <div class="flex items-center space-x-3">
         <a href="/" class="flex items-center group py-1" title="Ke Beranda Publik">
@@ -144,90 +189,98 @@
             src="/images/logo.png" 
             onerror="this.onerror=null; this.src='https://i.ibb.co.com/mwpHfGn/263941-removebg-preview.png';" 
             alt="Logo" 
-            class="h-10 w-auto max-w-[130px] object-contain drop-shadow transition-transform duration-200 group-hover:scale-105"
+            class="h-8 w-auto max-w-[120px] object-contain transition-opacity group-hover:opacity-80"
           >
         </a>
         <span class="text-slate-300">/</span>
-        <h2 class="text-xs sm:text-sm font-bold text-slate-700 truncate max-w-[120px] sm:max-w-none" id="section-title">
+        <h2 class="text-xs sm:text-sm font-semibold text-slate-800 truncate max-w-[140px] sm:max-w-none" id="section-title">
           Ringkasan & Analytics
         </h2>
       </div>
 
       <!-- Right: Actions & User Info -->
       <div class="flex items-center space-x-2 sm:space-x-3">
-        <a href="/" target="_blank" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold hover:bg-slate-100 flex items-center space-x-1.5 transition shadow-sm" title="Lihat Web Publik">
-          <i data-lucide="external-link" class="w-3.5 h-3.5 text-brand-500"></i>
-          <span class="hidden md:inline">Web Publik</span>
+        <a href="/" target="_blank" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 flex items-center space-x-1.5 transition" title="Lihat Web Publik">
+          <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span class="hidden md:inline">Lihat Web</span>
         </a>
-
-
-
 
         <!-- User Profile Pill -->
         <div class="flex items-center space-x-2 pl-2 border-l border-slate-200">
-          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-brand-600 to-indigo-500 text-white flex items-center justify-center font-bold text-xs shadow-sm" id="user-avatar">
+          <div class="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs" id="user-avatar">
             SA
           </div>
           <div class="hidden sm:block text-left">
-            <div class="text-xs font-bold truncate max-w-[100px]" id="user-display-name">Super Admin</div>
-            <div class="text-[9px] text-slate-400 font-semibold uppercase tracking-wider" id="user-display-role">Admin</div>
+            <div class="text-xs font-semibold text-slate-800 truncate max-w-[110px]" id="user-display-name">Super Admin</div>
+            <div class="text-[10px] text-slate-400" id="user-display-role">Admin</div>
           </div>
-          <button onclick="logout()" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition" title="Keluar">
+          <button onclick="logout()" class="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Keluar">
             <i data-lucide="log-out" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
     </header>
 
-    <!-- HORIZONTAL SCROLLING FEATURE NAVIGATION (FITUR ATAS MODEL GESER) -->
-    <div class="bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-2 sm:px-6 py-2 shrink-0 flex items-center gap-1 sm:gap-2 z-10 shadow-sm">
-      <button onclick="slideAdminNav('prev')" class="w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:text-slate-900 shadow-sm shrink-0 active:scale-90 transition hover:border-brand-500" title="Geser Kiri">
+    <!-- HORIZONTAL SCROLLING FEATURE NAVIGATION -->
+    <div class="bg-white border-b border-slate-200 px-3 sm:px-6 py-2 shrink-0 flex items-center gap-1 sm:gap-2 z-10">
+      <button onclick="slideAdminNav('prev')" class="w-7 h-7 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-50 shrink-0 transition" title="Geser Kiri">
         <i data-lucide="chevron-left" class="w-4 h-4"></i>
       </button>
 
-      <div id="admin-nav-slider" class="flex-1 flex items-center gap-2 overflow-x-auto top-nav-slider py-1 px-1">
-        <button onclick="navigateTab('overview')" id="nav-overview" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
-          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-          <span>Ringkasan & Analytics</span>
+      <div id="admin-nav-slider" class="flex-1 flex items-center gap-1.5 overflow-x-auto top-nav-slider py-0.5 px-0.5">
+        <button onclick="navigateTab('overview')" id="nav-overview" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition">
+          <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
+          <span>Ringkasan</span>
         </button>
 
-        <button onclick="navigateTab('products')" id="nav-products" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
-          <i data-lucide="package" class="w-4 h-4"></i>
-          <span>Manajemen Produk</span>
+        <button onclick="navigateTab('products')" id="nav-products" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition">
+          <i data-lucide="package" class="w-3.5 h-3.5"></i>
+          <span>Produk</span>
         </button>
 
-        <button onclick="navigateTab('categories')" id="nav-categories" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
-          <i data-lucide="tag" class="w-4 h-4"></i>
-          <span>Manajemen Kategori</span>
+        <button onclick="navigateTab('submissions')" id="nav-submissions" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition relative">
+          <i data-lucide="inbox" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <span>Pengajuan Produk</span>
+          <span id="badge-pending-submissions" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white leading-tight">0</span>
         </button>
 
-        <button onclick="navigateTab('banners')" id="nav-banners" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
-          <i data-lucide="image" class="w-4 h-4"></i>
-          <span>Manajemen Banner</span>
+        <button onclick="navigateTab('categories')" id="nav-categories" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition">
+          <i data-lucide="tag" class="w-3.5 h-3.5"></i>
+          <span>Kategori</span>
         </button>
 
-        <button onclick="navigateTab('users')" id="nav-users" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
-          <i data-lucide="users" class="w-4 h-4"></i>
-          <span>Manajemen Pengguna</span>
+        <button onclick="navigateTab('banners')" id="nav-banners" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition">
+          <i data-lucide="image" class="w-3.5 h-3.5"></i>
+          <span>Banner</span>
         </button>
 
-        <button onclick="navigateTab('seo')" id="nav-seo" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
-          <i data-lucide="globe" class="w-4 h-4"></i>
-          <span>SEO & Pengaturan</span>
+        <button onclick="navigateTab('users')" id="nav-users" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition">
+          <i data-lucide="users" class="w-3.5 h-3.5"></i>
+          <span>Pengguna</span>
         </button>
 
-        <button onclick="navigateTab('tools')" id="nav-tools" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
-          <i data-lucide="database" class="w-4 h-4"></i>
-          <span>Import, Export & Backup</span>
+        <button onclick="navigateTab('seo')" id="nav-seo" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition">
+          <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+          <span>Pengaturan</span>
         </button>
 
-        <button onclick="navigateTab('logs')" id="nav-logs" class="tab-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 border border-slate-200/80 bg-white text-slate-700 hover:border-brand-500 transition shadow-sm">
-          <i data-lucide="history" class="w-4 h-4"></i>
-          <span>Audit Log Aktivitas</span>
+        <button onclick="navigateTab('lynkid')" id="nav-lynkid" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition">
+          <i data-lucide="link" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <span>LYNK ID Profil</span>
+        </button>
+
+        <button onclick="navigateTab('tools')" id="nav-tools" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition">
+          <i data-lucide="database" class="w-3.5 h-3.5"></i>
+          <span>Data & Backup</span>
+        </button>
+
+        <button onclick="navigateTab('logs')" id="nav-logs" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition">
+          <i data-lucide="history" class="w-3.5 h-3.5"></i>
+          <span>Log Audit</span>
         </button>
       </div>
 
-      <button onclick="slideAdminNav('next')" class="w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:text-slate-900 shadow-sm shrink-0 active:scale-90 transition hover:border-brand-500" title="Geser Kanan">
+      <button onclick="slideAdminNav('next')" class="w-7 h-7 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-50 shrink-0 transition" title="Geser Kanan">
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
       </button>
     </div>
@@ -240,85 +293,103 @@
         <!-- 1. OVERVIEW & ANALYTICS TAB -->
         <div id="tab-overview" class="space-y-6">
           <!-- Metric KPI Cards -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm admin-card relative overflow-hidden">
-              <div class="flex items-center justify-between text-slate-500 mb-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Produk</span>
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-brand-600/10 text-indigo-600 flex items-center justify-center">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+              <div class="flex items-center justify-between text-slate-500 mb-3">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Produk</span>
+                <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
                   <i data-lucide="package" class="w-4 h-4"></i>
                 </div>
               </div>
-              <div class="text-3xl font-extrabold tracking-tight" id="kpi-products">0</div>
-              <span class="text-[11px] text-emerald-600 font-semibold inline-flex items-center mt-1" id="kpi-products-sub">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
-                0 tayang publik
-              </span>
+              <div>
+                <div class="text-3xl font-extrabold tracking-tight text-slate-900" id="kpi-products">0</div>
+                <div class="text-xs text-slate-500 mt-1 font-medium flex items-center space-x-1.5" id="kpi-products-sub">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>0 produk aktif tayang</span>
+                </div>
+              </div>
             </div>
 
-            <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm admin-card relative overflow-hidden">
-              <div class="flex items-center justify-between text-slate-500 mb-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Klik Affiliate</span>
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500/20 to-pink-600/10 text-pink-600 flex items-center justify-center">
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+              <div class="flex items-center justify-between text-slate-500 mb-3">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Klik Link</span>
+                <div class="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center">
                   <i data-lucide="mouse-pointer-click" class="w-4 h-4"></i>
                 </div>
               </div>
-              <div class="text-3xl font-extrabold tracking-tight text-pink-600" id="kpi-clicks">0</div>
-              <span class="text-[11px] text-slate-400 font-medium inline-block mt-1">Akumulasi seluruh link affiliate</span>
+              <div>
+                <div class="text-3xl font-extrabold tracking-tight text-slate-900" id="kpi-clicks">0</div>
+                <div class="text-xs text-slate-500 mt-1 font-medium">Akumulasi klik Shopee & TikTok</div>
+              </div>
             </div>
 
-            <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm admin-card relative overflow-hidden">
-              <div class="flex items-center justify-between text-slate-500 mb-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Shopee vs TikTok</span>
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 text-orange-600 flex items-center justify-center">
-                  <i data-lucide="pie-chart" class="w-4 h-4"></i>
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+              <div class="flex items-center justify-between text-slate-500 mb-3">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Performa Marketplace</span>
+                <div class="w-9 h-9 rounded-xl bg-orange-50 text-[#ee4d2d] flex items-center justify-center">
+                  <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
                 </div>
               </div>
-              <div class="text-2xl font-black flex items-center space-x-2 mt-1">
-                <span class="text-orange-600" id="kpi-shopee">0</span>
-                <span class="text-slate-300">/</span>
-                <span class="text-pink-600" id="kpi-tiktok">0</span>
+              <div>
+                <div class="flex items-baseline space-x-2">
+                  <span class="text-2xl font-bold text-[#ee4d2d]" id="kpi-shopee">0</span>
+                  <span class="text-xs text-slate-400 font-semibold">Shopee</span>
+                  <span class="text-slate-300">/</span>
+                  <span class="text-2xl font-bold text-pink-600" id="kpi-tiktok">0</span>
+                  <span class="text-xs text-slate-400 font-semibold">TikTok</span>
+                </div>
+                <div class="text-xs text-slate-500 mt-1 font-medium">Perbandingan klik keluar</div>
               </div>
-              <span class="text-[11px] text-slate-400 font-medium inline-block mt-1">Perbandingan performa link</span>
             </div>
 
-            <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm admin-card relative overflow-hidden">
-              <div class="flex items-center justify-between text-slate-500 mb-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Pengunjung</span>
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 text-blue-600 flex items-center justify-center">
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+              <div class="flex items-center justify-between text-slate-500 mb-3">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Kunjungan Halaman</span>
+                <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
                   <i data-lucide="eye" class="w-4 h-4"></i>
                 </div>
               </div>
-              <div class="text-3xl font-extrabold tracking-tight text-blue-600" id="kpi-visitors">0</div>
-              <span class="text-[11px] text-slate-400 font-medium inline-block mt-1">Pengunjung halaman tercatat</span>
+              <div>
+                <div class="text-3xl font-extrabold tracking-tight text-slate-900" id="kpi-visitors">0</div>
+                <div class="text-xs text-slate-500 mt-1 font-medium">Total pengunjung web</div>
+              </div>
             </div>
           </div>
 
-          <!-- Charts Row -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Charts & Top Products Row -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
             <!-- Daily Click Chart -->
-            <div class="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm">
-              <h3 class="text-sm font-bold mb-4 flex items-center justify-between">
-                <span>Grafik Klik 7 Hari Terakhir</span>
-                <i data-lucide="trending-up" class="w-4 h-4 text-brand-500"></i>
-              </h3>
-              <div class="h-64">
+            <div class="lg:col-span-7 p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Aktivitas Klik 7 Hari Terakhir</h3>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Grafik total klik link affiliate</p>
+                </div>
+                <div class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 text-[10px] font-semibold">
+                  Harian
+                </div>
+              </div>
+              <div class="h-60">
                 <canvas id="dailyClicksChart"></canvas>
               </div>
             </div>
 
             <!-- Top Products Table -->
-            <div class="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm flex flex-col">
-              <h3 class="text-sm font-bold mb-4 flex items-center justify-between">
-                <span>Produk Paling Populer (Klik Terbanyak)</span>
-                <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
-              </h3>
+            <div class="lg:col-span-5 p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Produk Populer</h3>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Produk dengan klik terbanyak</p>
+                </div>
+                <span class="text-[10px] font-semibold text-slate-400">Top 6</span>
+              </div>
               <div class="flex-1 overflow-x-auto">
                 <table class="w-full text-left text-xs">
-                  <thead class="text-slate-400 border-b border-slate-100">
+                  <thead class="text-slate-400 border-b border-slate-100 text-[10px] uppercase font-bold tracking-wider">
                     <tr>
                       <th class="pb-2">Produk</th>
                       <th class="pb-2">Market</th>
-                      <th class="pb-2 text-right">Total Klik</th>
+                      <th class="pb-2 text-right">Klik</th>
                     </tr>
                   </thead>
                   <tbody id="top-products-tbody" class="divide-y divide-slate-100">
@@ -331,23 +402,23 @@
         </div>
 
         <!-- 2. PRODUCT MANAGEMENT TAB -->
-        <div id="tab-products" class="hidden space-y-6">
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div id="tab-products" class="hidden space-y-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div class="relative flex-1 max-w-sm w-full">
               <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-              <input type="text" id="admin-product-search" placeholder="Cari nama produk..." oninput="loadAdminProducts()" class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs">
+              <input type="text" id="admin-product-search" placeholder="Cari nama produk..." oninput="loadAdminProducts()" class="w-full pl-9 pr-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-slate-900 transition">
             </div>
-            <button onclick="openProductModal()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md shadow-brand-500/20 flex items-center space-x-2">
-              <i data-lucide="plus" class="w-4 h-4"></i>
-              <span>Tambah Produk Baru</span>
+            <button onclick="openProductModal()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs shadow-sm flex items-center space-x-2 transition">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span>Tambah Produk</span>
             </button>
           </div>
 
           <!-- Product Table -->
-          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
               <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+                <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200 text-[10px]">
                   <tr>
                     <th class="p-3.5">Produk</th>
                     <th class="p-3.5">Kategori</th>
@@ -370,8 +441,8 @@
         <div id="tab-categories" class="hidden space-y-6">
           <div class="flex items-center justify-between">
             <p class="text-xs text-slate-500">Kelola kategori untuk mengelompokkan produk affiliate.</p>
-            <button onclick="openCategoryModal()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md flex items-center space-x-1.5">
-              <i data-lucide="plus" class="w-4 h-4"></i>
+            <button onclick="openCategoryModal()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs shadow-sm flex items-center space-x-1.5 transition">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
               <span>Tambah Kategori</span>
             </button>
           </div>
@@ -384,9 +455,9 @@
         <!-- 4. BANNER MANAGEMENT TAB -->
         <div id="tab-banners" class="hidden space-y-6">
           <div class="flex items-center justify-between">
-            <p class="text-xs text-slate-500">Atur hero banner dan promo slider yang tampil di halaman beranda.</p>
-            <button onclick="openBannerModal()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md flex items-center space-x-1.5">
-              <i data-lucide="plus" class="w-4 h-4"></i>
+            <p class="text-xs text-slate-500">Banner promosi yang tampil di beranda.</p>
+            <button onclick="openBannerModal()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs shadow-sm flex items-center space-x-1.5 transition">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
               <span>Tambah Banner</span>
             </button>
           </div>
@@ -400,30 +471,33 @@
         <div id="tab-users" class="hidden space-y-6">
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-sm font-bold">Hak Akses & Pengguna</h3>
-              <p class="text-xs text-slate-500">Super Admin dapat membuat akun Admin dan Editor.</p>
+              <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Pengguna & Mitra Penjual</h3>
+              <p class="text-xs text-slate-500">Kelola akun Super Admin, Admin, serta persetujuan (approval) pendaftaran Mitra Penjual</p>
             </div>
-            <button onclick="openUserModal()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md flex items-center space-x-1.5">
-              <i data-lucide="user-plus" class="w-4 h-4"></i>
+            <button onclick="openUserModal()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs shadow-sm flex items-center space-x-1.5 transition">
+              <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
               <span>Tambah User</span>
             </button>
           </div>
 
           <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
-                <tr>
-                  <th class="p-3.5">Nama</th>
-                  <th class="p-3.5">Email</th>
-                  <th class="p-3.5">Peran (Role)</th>
-                  <th class="p-3.5">Dibuat</th>
-                  <th class="p-3.5 text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="users-table-body" class="divide-y divide-slate-100">
-                <!-- User rows injected -->
-              </tbody>
-            </table>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="p-3.5">Nama Asli</th>
+                    <th class="p-3.5">Email & Kontak</th>
+                    <th class="p-3.5">Peran (Role)</th>
+                    <th class="p-3.5">Status Akun</th>
+                    <th class="p-3.5">Dibuat</th>
+                    <th class="p-3.5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body" class="divide-y divide-slate-100">
+                  <!-- User rows injected -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -458,7 +532,7 @@
               </div>
 
               <div class="pt-2">
-                <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md">
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs shadow-sm transition">
                   Simpan Pengaturan
                 </button>
               </div>
@@ -468,51 +542,55 @@
 
         <!-- 7. TOOLS (IMPORT / EXPORT / BACKUP) TAB -->
         <div id="tab-tools" class="hidden space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             <!-- Export Excel -->
-            <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
               <div>
-                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-3">
-                  <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+                  <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
                 </div>
-                <h4 class="font-bold text-sm mb-1">Export Data ke Excel</h4>
-                <p class="text-xs text-slate-500 mb-4">Unduh seluruh produk, link affiliate, dan jumlah klik dalam file spreadsheet .xlsx</p>
+                <h4 class="font-bold text-xs uppercase tracking-wider text-slate-900 mb-1">Export ke Excel</h4>
+                <p class="text-xs text-slate-500 mb-4 leading-relaxed">Unduh seluruh produk, link affiliate, dan jumlah klik dalam file spreadsheet .xlsx</p>
               </div>
-              <button onclick="exportExcel()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center space-x-2">
-                <i data-lucide="download" class="w-4 h-4"></i>
-                <span>Download File Excel</span>
+              <button onclick="exportExcel()" class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center space-x-2 transition">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Download Excel</span>
               </button>
             </div>
 
             <!-- Import Excel -->
-            <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
               <div>
-                <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center mb-3">
-                  <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-3">
+                  <i data-lucide="upload-cloud" class="w-4 h-4"></i>
                 </div>
-                <h4 class="font-bold text-sm mb-1">Import Data dari Excel</h4>
-                <p class="text-xs text-slate-500 mb-4">Upload massal produk affiliate melalui template tabel Excel.</p>
+                <h4 class="font-bold text-xs uppercase tracking-wider text-slate-900 mb-1">Import dari Excel</h4>
+                <p class="text-xs text-slate-500 mb-4 leading-relaxed">Tambah banyak produk sekaligus menggunakan format template spreadsheet resmi.</p>
               </div>
-              <div>
-                <input type="file" id="excel-file-input" accept=".xlsx, .xls" class="hidden" onchange="handleExcelImport(event)">
-                <button onclick="document.getElementById('excel-file-input').click()" class="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center space-x-2">
-                  <i data-lucide="upload" class="w-4 h-4"></i>
+              <div class="space-y-2">
+                <a href="/api/tools/template-excel" class="w-full py-2 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium text-xs flex items-center justify-center space-x-1.5 transition">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5 text-slate-400"></i>
+                  <span>Download Template</span>
+                </a>
+                <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls" onchange="importExcelFile(this)">
+                <button onclick="document.getElementById('excel-file-input').click()" class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center space-x-2 transition">
+                  <i data-lucide="upload" class="w-3.5 h-3.5"></i>
                   <span>Pilih File Excel</span>
                 </button>
               </div>
             </div>
 
             <!-- Backup Database -->
-            <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
               <div>
-                <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center mb-3">
-                  <i data-lucide="hard-drive" class="w-5 h-5"></i>
+                <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-3">
+                  <i data-lucide="hard-drive" class="w-4 h-4"></i>
                 </div>
-                <h4 class="font-bold text-sm mb-1">Backup Database Utama</h4>
-                <p class="text-xs text-slate-500 mb-4">Download file salinan cadangan snapshot database SQLite (.db).</p>
+                <h4 class="font-bold text-xs uppercase tracking-wider text-slate-900 mb-1">Backup Database</h4>
+                <p class="text-xs text-slate-500 mb-4 leading-relaxed">Unduh salinan cadangan snapshot database SQLite (.db) untuk arsip aman.</p>
               </div>
-              <button onclick="backupDatabase()" class="w-full py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center justify-center space-x-2">
-                <i data-lucide="save" class="w-4 h-4"></i>
+              <button onclick="backupDatabase()" class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center space-x-2 transition">
+                <i data-lucide="save" class="w-3.5 h-3.5"></i>
                 <span>Download Backup</span>
               </button>
             </div>
@@ -536,6 +614,189 @@
                 <!-- Injected via JS -->
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- 9. PARTNER SUBMISSIONS TAB -->
+        <div id="tab-submissions" class="hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Antrean Pengajuan Produk Mitra</h3>
+              <p class="text-xs text-slate-500">Tinjau, setujui (approve), atau tolak produk yang diajukan oleh calon mitra/penjual sebelum tampil di katalog</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <select id="filter-submission-status" onchange="loadSubmissionsList()" class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 focus:outline-none">
+                <option value="">Semua Status</option>
+                <option value="Pending" selected>Menunggu Approval (Pending)</option>
+                <option value="Approved">Disetujui (Approved)</option>
+                <option value="Rejected">Ditolak (Rejected)</option>
+              </select>
+              <button onclick="loadSubmissionsList()" class="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition" title="Refresh Data">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Submissions Table Card -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                  <tr>
+                    <th class="p-3.5">Tanggal</th>
+                    <th class="p-3.5">Mitra / Toko</th>
+                    <th class="p-3.5">Produk</th>
+                    <th class="p-3.5">Marketplace</th>
+                    <th class="p-3.5">Harga / Komisi</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="submissions-tbody" class="divide-y divide-slate-100">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10. LYNK ID ADMIN TAB -->
+        <div id="tab-lynkid" class="hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Pengaturan LYNK ID & Profil Administrator</h3>
+              <p class="text-xs text-slate-500">Kelola tampilan profil etalase mini LYNK ID official admin PATCHWORK</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <a id="admin-preview-lynk-btn" href="#" target="_blank" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center space-x-2 transition">
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                <span>Lihat LYNK ID Admin</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left: Edit Form -->
+            <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-5">
+              <form id="admin-profile-form" onsubmit="handleSaveAdminProfile(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Brand / Admin *</label>
+                    <input type="text" id="adm-prof-name" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp Resmi *</label>
+                    <input type="tel" id="adm-prof-phone" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Custom Link ID / Subdomain Etalase</label>
+                  <div class="flex items-center rounded-xl border border-slate-200 bg-slate-50 overflow-hidden focus-within:border-slate-900 focus-within:bg-white transition">
+                    <span class="pl-3 pr-1 text-xs text-slate-400 font-mono select-none">https://</span>
+                    <input type="text" id="adm-prof-slug" placeholder="official" class="py-2.5 px-1 text-xs bg-transparent text-slate-900 font-bold focus:outline-none flex-1 min-w-0">
+                    <span class="pr-3 pl-1 text-xs text-emerald-600 font-bold font-mono select-none">.kheireditz.my.id</span>
+                  </div>
+                  <p class="text-[10px] text-slate-400 mt-1">Buat link ID sendiri. Etalase Anda akan bisa diakses via <strong>namapilihan.kheireditz.my.id</strong> atau <strong>kheireditz.my.id/lynk/namapilihan</strong></p>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">URL Foto Profil / Logo LYNK ID</label>
+                  <input type="url" id="adm-prof-avatar" placeholder="https://..." class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Bio Singkat / Tagline</label>
+                  <textarea id="adm-prof-bio" rows="3" placeholder="Katalog kurasi produk promo resmi PATCHWORK..." class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition"></textarea>
+                </div>
+
+                <div class="pt-2 border-t border-slate-100">
+                  <label class="block text-xs font-bold text-slate-900 mb-3">Tautan Akun Medsos & Marketplace Resmi</label>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                      <label class="block text-[11px] font-semibold text-slate-600 mb-1">TikTok Shop / Profil</label>
+                      <input type="url" id="adm-prof-tiktok" placeholder="https://tiktok.com/@patchwork" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+                    </div>
+                    <div>
+                      <label class="block text-[11px] font-semibold text-slate-600 mb-1">Instagram Resmi</label>
+                      <input type="url" id="adm-prof-instagram" placeholder="https://instagram.com/patchwork" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+                    </div>
+                    <div>
+                      <label class="block text-[11px] font-semibold text-slate-600 mb-1">Shopee Mall / Official</label>
+                      <input type="url" id="adm-prof-shopee" placeholder="https://shopee.co.id/patchwork" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+                    </div>
+                    <div>
+                      <label class="block text-[11px] font-semibold text-slate-600 mb-1">YouTube Channel</label>
+                      <input type="url" id="adm-prof-youtube" placeholder="https://youtube.com/@patchwork" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+                    </div>
+                  </div>
+                  <div class="mt-3.5">
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Website Utama</label>
+                    <input type="url" id="adm-prof-website" placeholder="https://..." class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+                  </div>
+                </div>
+
+                <!-- Template Picker -->
+                <div class="pt-3 border-t border-slate-100">
+                  <label class="block text-xs font-bold text-slate-900 mb-2">Desain Tema LYNK ID</label>
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-slate-900 cursor-pointer transition flex flex-col items-center space-y-1.5 text-center has-[:checked]:border-slate-900 has-[:checked]:bg-slate-50">
+                      <input type="radio" name="adm-prof-template" value="modern" checked>
+                      <div class="w-full h-8 rounded-lg bg-slate-950 flex items-center justify-center text-white text-[10px] font-bold">Dark Night</div>
+                      <span class="text-[11px] font-bold text-slate-800">Modern Dark</span>
+                    </label>
+
+                    <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-emerald-600 cursor-pointer transition flex flex-col items-center space-y-1.5 text-center has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/50">
+                      <input type="radio" name="adm-prof-template" value="emerald">
+                      <div class="w-full h-8 rounded-lg bg-emerald-800 flex items-center justify-center text-white text-[10px] font-bold">Emerald Glow</div>
+                      <span class="text-[11px] font-bold text-slate-800">Emerald Green</span>
+                    </label>
+
+                    <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-rose-600 cursor-pointer transition flex flex-col items-center space-y-1.5 text-center has-[:checked]:border-rose-600 has-[:checked]:bg-rose-50/50">
+                      <input type="radio" name="adm-prof-template" value="sunset">
+                      <div class="w-full h-8 rounded-lg bg-gradient-to-br from-rose-900 to-indigo-950 flex items-center justify-center text-white text-[10px] font-bold">Sunset</div>
+                      <span class="text-[11px] font-bold text-slate-800">Sunset Neon</span>
+                    </label>
+
+                    <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-blue-600 cursor-pointer transition flex flex-col items-center space-y-1.5 text-center has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
+                      <input type="radio" name="adm-prof-template" value="minimal">
+                      <div class="w-full h-8 rounded-lg bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-800 text-[10px] font-bold">Clean Light</div>
+                      <span class="text-[11px] font-bold text-slate-800">Minimalist Light</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-end">
+                  <button type="submit" id="btn-save-adm-profile" class="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition flex items-center space-x-2">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>Simpan Pengaturan LYNK ID</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Right: Preview -->
+            <div class="bg-slate-900 text-white rounded-3xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between space-y-5">
+              <div>
+                <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                  <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Preview LYNK ID Admin</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono">OFFICIAL</span>
+                </div>
+                <div class="text-center space-y-3">
+                  <div class="w-20 h-20 rounded-2xl bg-slate-800 border-2 border-white/20 mx-auto flex items-center justify-center overflow-hidden" id="adm-box-avatar">
+                    <span class="text-xl font-bold">SA</span>
+                  </div>
+                  <h4 class="text-base font-black" id="adm-preview-name">PATCHWORK Official</h4>
+                  <p class="text-xs text-slate-400 mt-1 line-clamp-2" id="adm-preview-bio">Bio profil official admin</p>
+                </div>
+              </div>
+              <div class="pt-4 border-t border-slate-800">
+                <button onclick="copyAdminLynkUrl()" class="w-full py-2.5 rounded-xl bg-white text-slate-950 font-bold text-xs hover:bg-slate-100 transition flex items-center justify-center space-x-2">
+                  <i data-lucide="copy" class="w-4 h-4"></i>
+                  <span>Salin Tautan LYNK ID Admin</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -683,34 +944,34 @@
           </div>
         </div>
 
-        <div class="pt-3 border-t flex justify-end space-x-2">
-          <button type="button" onclick="closeProductModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold">Batal</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md">Simpan Produk</button>
+        <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
+          <button type="button" onclick="closeProductModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">Batal</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs shadow-sm transition">Simpan Produk</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- CATEGORY MODAL -->
-  <div id="category-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 border border-slate-200 shadow-2xl">
-      <div class="flex items-center justify-between mb-4 border-b pb-3">
-        <h3 class="text-base font-bold" id="category-modal-title">Tambah Kategori</h3>
-        <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+  <div id="category-modal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 border border-slate-200 shadow-xl">
+      <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <h3 class="text-sm font-bold text-slate-900" id="category-modal-title">Tambah Kategori</h3>
+        <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-600 p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
       <form id="category-form" class="space-y-4">
         <input type="hidden" id="cat-id">
         <div>
-          <label class="block text-xs font-bold mb-1">Nama Kategori *</label>
-          <input type="text" id="cat-name" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+          <label class="block text-xs font-semibold mb-1">Nama Kategori *</label>
+          <input type="text" id="cat-name" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:outline-none focus:border-slate-900 focus:bg-white transition">
         </div>
         <div>
-          <label class="block text-xs font-bold mb-1">Deskripsi</label>
-          <input type="text" id="cat-desc" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+          <label class="block text-xs font-semibold mb-1">Deskripsi</label>
+          <input type="text" id="cat-desc" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:outline-none focus:border-slate-900 focus:bg-white transition">
         </div>
-        <div class="pt-3 border-t flex justify-end space-x-2">
-          <button type="button" onclick="closeCategoryModal()" class="px-4 py-2 rounded-xl border text-xs font-bold">Batal</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs">Simpan Kategori</button>
+        <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
+          <button type="button" onclick="closeCategoryModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">Batal</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs shadow-sm transition">Simpan Kategori</button>
         </div>
       </form>
     </div>
@@ -766,45 +1027,113 @@
             <option value="Draft">Draft</option>
           </select>
         </div>
-        <div class="pt-3 border-t flex justify-end space-x-2">
-          <button type="button" onclick="closeBannerModal()" class="px-4 py-2 rounded-xl border text-xs font-bold">Batal</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs">Simpan Banner</button>
+        <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
+          <button type="button" onclick="closeBannerModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">Batal</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition">Simpan Banner</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- USER MODAL -->
-  <div id="user-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 border border-slate-200 shadow-2xl">
-      <div class="flex items-center justify-between mb-4 border-b pb-3">
-        <h3 class="text-base font-bold">Tambah Pengguna Baru</h3>
-        <button onclick="closeUserModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+  <div id="user-modal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 border border-slate-200 shadow-xl">
+      <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <h3 class="text-sm font-bold text-slate-900">Tambah Pengguna Baru</h3>
+        <button onclick="closeUserModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
       <form id="user-form" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold mb-1">Nama Lengkap</label>
-          <input type="text" id="new-user-name" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Asli Lengkap *</label>
+          <input type="text" id="new-user-name" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-white focus:border-slate-900 focus:outline-none text-xs">
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Email *</label>
+            <input type="email" id="new-user-email" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-white focus:border-slate-900 focus:outline-none text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">No WhatsApp</label>
+            <input type="tel" id="new-user-phone" placeholder="08xxxxxxxxxx" class="w-full p-2.5 rounded-xl border border-slate-200 bg-white focus:border-slate-900 focus:outline-none text-xs">
+          </div>
         </div>
         <div>
-          <label class="block text-xs font-bold mb-1">Email</label>
-          <input type="email" id="new-user-email" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Password *</label>
+          <input type="password" id="new-user-pass" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-white focus:border-slate-900 focus:outline-none text-xs">
         </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Role / Peran</label>
+            <select id="new-user-role" class="w-full p-2.5 rounded-xl border border-slate-200 bg-white focus:border-slate-900 focus:outline-none text-xs">
+              <option value="Partner">Partner (Mitra Penjual)</option>
+              <option value="Admin">Admin</option>
+              <option value="Editor">Editor</option>
+              <option value="Super Admin">Super Admin</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Status Akun</label>
+            <select id="new-user-status" class="w-full p-2.5 rounded-xl border border-slate-200 bg-white focus:border-slate-900 focus:outline-none text-xs">
+              <option value="Approved">Approved (Aktif)</option>
+              <option value="Pending">Pending (Menunggu)</option>
+              <option value="Rejected">Rejected (Ditolak)</option>
+            </select>
+          </div>
+        </div>
+        <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
+          <button type="button" onclick="closeUserModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">Batal</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition">Simpan Pengguna</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- REGISTER MODAL FOR PARTNERS (CALON MITRA) -->
+  <div id="register-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 border border-slate-200 shadow-2xl relative">
+      <button onclick="closeRegisterModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="text-center mb-5">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto mb-2.5">
+          <i data-lucide="user-plus" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-base font-bold text-slate-900">Daftar Akun Mitra Baru</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Masukkan data asli untuk verifikasi admin sebelum menginput produk</p>
+      </div>
+
+      <div id="reg-feedback" class="hidden mb-4 p-3.5 rounded-2xl text-xs font-semibold"></div>
+
+      <form id="admin-reg-form" onsubmit="handlePartnerRegistration(event)" class="space-y-3.5">
         <div>
-          <label class="block text-xs font-bold mb-1">Password</label>
-          <input type="password" id="new-user-pass" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nama Asli Lengkap *</label>
+          <input type="text" id="admin-reg-name" required placeholder="Nama asli sesuai identitas" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
         </div>
+
         <div>
-          <label class="block text-xs font-bold mb-1">Role / Peran</label>
-          <select id="new-user-role" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
-            <option value="Admin">Admin</option>
-            <option value="Editor">Editor</option>
-            <option value="Super Admin">Super Admin</option>
-          </select>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp Asli *</label>
+          <input type="tel" id="admin-reg-phone" required placeholder="08xxxxxxxxxx" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
+          <span class="text-[10px] text-slate-400 mt-0.5 block">Admin akan menghubungi nomor ini saat akun disetujui</span>
         </div>
-        <div class="pt-3 border-t flex justify-end space-x-2">
-          <button type="button" onclick="closeUserModal()" class="px-4 py-2 rounded-xl border text-xs font-bold">Batal</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs">Simpan Pengguna</button>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Email *</label>
+          <input type="email" id="admin-reg-email" required placeholder="email@tokoanda.com" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Password *</label>
+          <input type="password" id="admin-reg-pass" required minlength="6" placeholder="Minimal 6 karakter" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
+        </div>
+
+        <button type="submit" id="btn-admin-reg-submit" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2 active:scale-95 mt-2">
+          <span>Kirim Pendaftaran Mitra</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </button>
+
+        <div class="text-center pt-2">
+          <button type="button" onclick="closeRegisterModal()" class="text-xs text-slate-500 hover:text-slate-900 font-medium">Sudah punya akun? Kembali ke Login</button>
         </div>
       </form>
     </div>
@@ -907,10 +1236,12 @@
         iconEl.setAttribute('data-lucide', s.iconName);
         
         modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
         lucide.createIcons({ nodes: [modal] });
 
         function cleanup() {
           modal.classList.add('hidden');
+          document.body.classList.remove('overflow-hidden');
           okBtn.removeEventListener('click', onOk);
           cancelBtn.removeEventListener('click', onCancel);
           overlay.removeEventListener('click', onCancel);
@@ -951,26 +1282,54 @@
     }
 
     function showLogin() {
-      document.getElementById('login-container').classList.remove('hidden');
-      document.getElementById('dashboard-container').classList.add('hidden');
-      document.getElementById('dashboard-container').style.display = '';
+      const loginBox = document.getElementById('login-container');
+      const dashBox = document.getElementById('dashboard-container');
+      if (loginBox) {
+        loginBox.classList.remove('hidden');
+        loginBox.style.display = 'flex';
+      }
+      if (dashBox) {
+        dashBox.classList.add('hidden');
+        dashBox.style.display = 'none';
+      }
       lucide.createIcons();
     }
 
     function showDashboard() {
-      document.getElementById('login-container').style.display = 'none';
-      document.getElementById('login-container').classList.add('hidden');
-      document.getElementById('dashboard-container').classList.remove('hidden');
-      document.getElementById('dashboard-container').style.display = 'flex';
+      const loginBox = document.getElementById('login-container');
+      const dashBox = document.getElementById('dashboard-container');
+      if (loginBox) {
+        loginBox.classList.add('hidden');
+        loginBox.style.display = 'none';
+      }
+      if (dashBox) {
+        dashBox.classList.remove('hidden');
+        dashBox.style.display = 'flex';
+      }
       
       if (currentUser) {
-        document.getElementById('user-display-name').innerText = currentUser.name || 'Admin';
-        document.getElementById('user-display-role').innerText = currentUser.role || 'Admin';
-        document.getElementById('user-avatar').innerText = (currentUser.name || 'A').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-      }
+        const nameEl = document.getElementById('user-display-name');
+        const roleEl = document.getElementById('user-display-role');
+        const avatarEl = document.getElementById('user-avatar');
+        if (nameEl) nameEl.innerText = currentUser.name || 'Admin';
+        if (roleEl) roleEl.innerText = currentUser.role || 'Admin';
+        if (avatarEl) avatarEl.innerText = (currentUser.name || 'A').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
-      navigateTab('overview');
-      lucide.createIcons();
+        // If user is Partner, redirect to separate Partner Portal
+        if (currentUser.role === 'Partner') {
+          window.location.href = '/partner';
+          return;
+        }
+      }
+      
+      try {
+        navigateTab('overview');
+      } catch (err) {
+        console.warn('Overview tab init error:', err);
+      }
+      try {
+        lucide.createIcons();
+      } catch (e) {}
     }
 
     function logout() {
@@ -980,17 +1339,30 @@
       showLogin();
     }
 
-    // Login Form Submit
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('login-email').value.trim();
-      const password = document.getElementById('login-password').value;
+    // Login Form Submit Function
+    async function submitAdminLogin(e) {
+      if (e) e.preventDefault();
+      const emailEl = document.getElementById('login-email');
+      const passEl = document.getElementById('login-password');
       const errEl = document.getElementById('login-error');
       const btnSubmit = document.getElementById('btn-login-submit');
 
+      const email = (emailEl?.value || '').trim();
+      const password = passEl?.value || '';
+
+      if (!email || !password) {
+        if (errEl) {
+          errEl.innerText = 'Email dan password wajib diisi!';
+          errEl.classList.remove('hidden');
+        }
+        return;
+      }
+
       // Disable button saat proses
-      btnSubmit.disabled = true;
-      btnSubmit.innerHTML = '<span>Memproses...</span>';
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<span class="inline-block animate-spin mr-1.5">⏳</span><span>Memproses...</span>';
+      }
 
       try {
         const res = await fetch('/api/auth/login', {
@@ -1005,27 +1377,34 @@
           localStorage.setItem('patchwork_token', data.token);
           token = data.token;
           currentUser = data.user;
-          errEl.classList.add('hidden');
+          if (errEl) errEl.classList.add('hidden');
           
-          // Langsung tampilkan dashboard tanpa memanggil checkAuth lagi
+          showToast(`Selamat datang kembali, ${currentUser.name || 'Admin'}!`, 'success');
+          // Tampilkan dashboard
           showDashboard();
         } else {
-          errEl.innerText = data.error || 'Email atau password salah!';
-          errEl.classList.remove('hidden');
+          if (errEl) {
+            errEl.innerText = data.error || 'Email atau password salah!';
+            errEl.classList.remove('hidden');
+          }
         }
       } catch (err) {
-        errEl.innerText = 'Koneksi ke server gagal. Pastikan server berjalan.';
-        errEl.classList.remove('hidden');
+        console.error('Admin login error:', err);
+        if (errEl) {
+          errEl.innerText = 'Koneksi ke server gagal. Pastikan server berjalan.';
+          errEl.classList.remove('hidden');
+        }
       } finally {
-        // Re-enable button
-        btnSubmit.disabled = false;
-        btnSubmit.innerHTML = '<span>Masuk ke Dashboard</span><i data-lucide="log-in" class="w-4 h-4"></i>';
-        lucide.createIcons();
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          btnSubmit.innerHTML = '<span>Masuk ke Dashboard</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>';
+          lucide.createIcons();
+        }
       }
-    });
+    }
 
     // Navigation Tab Switching
-    const tabs = ['overview', 'products', 'categories', 'banners', 'users', 'seo', 'tools', 'logs'];
+    const tabs = ['overview', 'products', 'submissions', 'categories', 'banners', 'users', 'seo', 'lynkid', 'tools', 'logs'];
     function navigateTab(tabName) {
       tabs.forEach(t => {
         const tabEl = document.getElementById(`tab-${t}`);
@@ -1049,10 +1428,12 @@
       const titleMap = {
         overview: 'Ringkasan & Analytics',
         products: 'Manajemen Produk Affiliate',
+        submissions: 'Pengajuan Produk Kemitraan',
         categories: 'Manajemen Kategori',
         banners: 'Manajemen Banner Promo',
         users: 'Manajemen Hak Akses Pengguna',
         seo: 'SEO & Pengaturan Sistem',
+        lynkid: 'Pengaturan LYNK ID Profil',
         tools: 'Import / Export & Database Backup',
         logs: 'Audit Log Aktivitas Admin'
       };
@@ -1062,10 +1443,12 @@
       try {
         if (tabName === 'overview') loadOverviewData();
         if (tabName === 'products') { loadAdminCategoriesDropdown(); loadAdminProducts(); }
+        if (tabName === 'submissions') loadSubmissionsList();
         if (tabName === 'categories') loadCategoriesList();
         if (tabName === 'banners') loadBannersList();
         if (tabName === 'users') loadUsersList();
         if (tabName === 'seo') loadSettings();
+        if (tabName === 'lynkid') loadAdminLynkProfile();
         if (tabName === 'logs') loadActivityLogs();
       } catch (err) {
         console.error('Error loading tab data:', err);
@@ -1280,11 +1663,13 @@
       updateThumbnailPreview('');
       toggleAffiliateChannel('Shopee');
       document.getElementById('product-modal').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
       lucide.createIcons();
     }
 
     function closeProductModal() {
       document.getElementById('product-modal').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
     }
 
     async function editProduct(id) {
@@ -1296,18 +1681,14 @@
         document.getElementById('product-modal-title').innerText = 'Edit Produk Affiliate';
         document.getElementById('prod-id').value = p.id;
         document.getElementById('prod-name').value = p.name;
-        document.getElementById('prod-category').value = p.category_id;
-        document.getElementById('prod-marketplace').value = p.marketplace;
-        document.getElementById('prod-price').value = p.price;
+        document.getElementById('prod-category').value = p.category_id || '';
+        document.getElementById('prod-price').value = p.price || 0;
         document.getElementById('prod-commission').value = p.commission_rate || '';
-        document.getElementById('prod-url-shopee').value = p.url_shopee || '';
-        document.getElementById('prod-url-tiktok').value = p.url_tiktok || '';
-        document.getElementById('prod-url-tokopedia').value = p.url_tokopedia || '';
+        document.getElementById('prod-desc').value = p.description || '';
         document.getElementById('prod-thumbnail').value = p.thumbnail || '';
         updateThumbnailPreview(p.thumbnail || '');
-        document.getElementById('prod-description').value = p.description || '';
         document.getElementById('prod-status').value = p.status;
-        document.getElementById('prod-featured').checked = p.is_featured === 1;
+        document.getElementById('prod-featured').checked = !!p.is_featured;
 
         // Determine active exclusive channel
         if (p.url_tiktok && !p.url_shopee) {
@@ -1317,6 +1698,7 @@
         }
 
         document.getElementById('product-modal').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
         lucide.createIcons();
       } catch (err) {
         showToast('Gagal memuat data produk', 'error');
@@ -1426,8 +1808,12 @@
     function openCategoryModal() {
       document.getElementById('category-form').reset();
       document.getElementById('category-modal').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
     }
-    function closeCategoryModal() { document.getElementById('category-modal').classList.add('hidden'); }
+    function closeCategoryModal() {
+      document.getElementById('category-modal').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
 
     document.getElementById('category-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1524,6 +1910,7 @@
         document.getElementById('banner-status-input').value = b.status || 'Published';
 
         document.getElementById('banner-modal').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
         lucide.createIcons();
       } catch (err) {
         showToast('Gagal memuat data banner', 'error');
@@ -1535,8 +1922,12 @@
       document.getElementById('banner-id').value = '';
       updateBannerPreview('');
       document.getElementById('banner-modal').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
     }
-    function closeBannerModal() { document.getElementById('banner-modal').classList.add('hidden'); }
+    function closeBannerModal() {
+      document.getElementById('banner-modal').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
 
     document.getElementById('banner-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1590,42 +1981,134 @@
         const json = await res.json();
         const tbody = document.getElementById('users-table-body');
 
-        tbody.innerHTML = (json.data || []).map(u => `
-          <tr class="hover:bg-slate-50">
-            <td class="p-3.5 font-bold">${u.name}</td>
-            <td class="p-3.5 text-slate-500">${u.email}</td>
-            <td class="p-3.5">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${u.role === 'Super Admin' ? 'bg-purple-500/10 text-purple-600' : (u.role === 'Admin' ? 'bg-brand-500/10 text-brand-600' : 'bg-slate-500/10 text-slate-500')}">
-                ${u.role}
-              </span>
-            </td>
-            <td class="p-3.5 text-slate-400">${new Date(u.created_at).toLocaleDateString('id-ID')}</td>
-            <td class="p-3.5 text-right">
-              ${currentUser && u.id !== currentUser.id ? `
-                <button onclick="deleteUser('${u.id}')" class="text-slate-400 hover:text-red-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-              ` : '<span class="text-slate-400 text-[10px] italic">Akun Anda</span>'}
-            </td>
-          </tr>
-        `).join('');
+        tbody.innerHTML = (json.data || []).map(u => {
+          const dateStr = u.created_at ? new Date(u.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+          const waClean = (u.phone || '').replace(/[^0-9]/g, '');
+          const waLink = waClean.startsWith('0') ? '62' + waClean.substring(1) : waClean;
+
+          let roleBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/10 text-slate-600">${u.role}</span>`;
+          if (u.role === 'Super Admin') roleBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-600">Super Admin</span>`;
+          if (u.role === 'Admin') roleBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-500/10 text-brand-600">Admin</span>`;
+          if (u.role === 'Partner') roleBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700">Mitra (Partner)</span>`;
+
+          let statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Approved</span>`;
+          if (u.status === 'Pending') statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Pending Approval</span>`;
+          if (u.status === 'Rejected') statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">Rejected</span>`;
+
+          return `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="p-3.5">
+                <div class="font-bold text-slate-900">${escapeHtml(u.name)}</div>
+                ${u.phone ? `
+                  <a href="https://wa.me/${waLink}?text=${encodeURIComponent('Halo ' + u.name + ', terkait pendaftaran akun kemitraan PATCHWORK Anda...')}" target="_blank" class="inline-flex items-center space-x-1 text-[11px] text-emerald-600 hover:text-emerald-700 font-medium mt-0.5" title="Chat WhatsApp">
+                    <i data-lucide="message-circle" class="w-3 h-3"></i>
+                    <span>${escapeHtml(u.phone)}</span>
+                  </a>
+                ` : '<span class="text-[10px] text-slate-400 italic">Tanpa No. WA</span>'}
+              </td>
+              <td class="p-3.5 text-slate-600 text-xs font-mono">${escapeHtml(u.email)}</td>
+              <td class="p-3.5 whitespace-nowrap">${roleBadge}</td>
+              <td class="p-3.5 whitespace-nowrap">${statusBadge}</td>
+              <td class="p-3.5 text-slate-400 whitespace-nowrap">${dateStr}</td>
+              <td class="p-3.5 text-right whitespace-nowrap">
+                <div class="flex items-center justify-end space-x-1.5">
+                  ${u.status === 'Pending' ? `
+                    <button onclick="approveUser('${u.id}', '${escapeHtml(u.name)}')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-sm transition flex items-center space-x-1" title="Setujui Akun">
+                      <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+                      <span>Approve</span>
+                    </button>
+                    <button onclick="rejectUser('${u.id}', '${escapeHtml(u.name)}')" class="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[11px] border border-rose-200 transition flex items-center space-x-1" title="Tolak Akun">
+                      <i data-lucide="user-x" class="w-3.5 h-3.5"></i>
+                      <span>Tolak</span>
+                    </button>
+                  ` : ''}
+                  ${currentUser && u.id !== currentUser.id ? `
+                    <button onclick="deleteUser('${u.id}')" class="p-1.5 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition" title="Hapus User">
+                      <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                  ` : '<span class="text-slate-400 text-[10px] italic">Akun Anda</span>'}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
         lucide.createIcons();
       } catch (err) {
         console.error('Error loading users:', err);
       }
     }
 
+    async function approveUser(id, name) {
+      const ok = await showConfirm({
+        title: 'Setujui Akun Mitra?',
+        message: `Setujui akun "${name}"? Pengguna akan dapat login ke dashboard dan mulai memasukkan produk ke katalog.`,
+        confirmText: 'Ya, Setujui Akun',
+        type: 'info'
+      });
+      if (!ok) return;
+
+      try {
+        const res = await fetch(`/api/users/${id}/approve`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const json = await res.json();
+        if (res.ok) {
+          showToast(json.message || 'Akun berhasil disetujui!', 'success');
+          loadUsersList();
+        } else {
+          showToast(json.error || 'Gagal menyetujui akun', 'error');
+        }
+      } catch (err) {
+        showToast('Kesalahan koneksi', 'error');
+      }
+    }
+
+    async function rejectUser(id, name) {
+      const ok = await showConfirm({
+        title: 'Tolak Pendaftaran Akun?',
+        message: `Tolak pendaftaran akun "${name}"? User tidak akan dapat login.`,
+        confirmText: 'Tolak Akun',
+        type: 'danger'
+      });
+      if (!ok) return;
+
+      try {
+        const res = await fetch(`/api/users/${id}/reject`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const json = await res.json();
+        if (res.ok) {
+          showToast(json.message || 'Akun ditolak', 'info');
+          loadUsersList();
+        } else {
+          showToast(json.error || 'Gagal menolak akun', 'error');
+        }
+      } catch (err) {
+        showToast('Kesalahan koneksi', 'error');
+      }
+    }
+
     function openUserModal() {
       document.getElementById('user-form').reset();
       document.getElementById('user-modal').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
     }
-    function closeUserModal() { document.getElementById('user-modal').classList.add('hidden'); }
+    function closeUserModal() {
+      document.getElementById('user-modal').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
 
     document.getElementById('user-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const payload = {
         name: document.getElementById('new-user-name').value,
         email: document.getElementById('new-user-email').value,
+        phone: document.getElementById('new-user-phone').value,
         password: document.getElementById('new-user-pass').value,
-        role: document.getElementById('new-user-role').value
+        role: document.getElementById('new-user-role').value,
+        status: document.getElementById('new-user-status').value
       };
 
       try {
@@ -1820,6 +2303,424 @@
       } finally {
         inputEl.value = '';
       }
+    }
+
+    // Quick Fill Admin Credentials Helper
+    function fillAdminCredentials(autoSubmit = false) {
+      const emailEl = document.getElementById('login-email');
+      const passEl = document.getElementById('login-password');
+      if (emailEl) emailEl.value = 'admin@patchwork.com';
+      if (passEl) passEl.value = 'admin123';
+      
+      if (autoSubmit) {
+        showToast('Memproses login otomatis dengan akun default...', 'info');
+        submitAdminLogin();
+      } else {
+        showToast('Kredensial default terisi. Silakan klik Masuk.', 'info');
+      }
+    }
+
+    // ==========================================
+    // PARTNER SUBMISSIONS MANAGEMENT
+    // ==========================================
+    let cachedSubmissions = [];
+
+    async function loadSubmissionsList() {
+      const tbody = document.getElementById('submissions-tbody');
+      if (!tbody) return;
+      
+      const statusFilter = document.getElementById('filter-submission-status')?.value || '';
+      tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Memuat data pengajuan...</td></tr>`;
+
+      try {
+        const query = statusFilter ? `?status=${encodeURIComponent(statusFilter)}` : '';
+        const res = await fetch(`/api/submissions${query}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const json = await res.json();
+        
+        if (res.ok) {
+          cachedSubmissions = json.data || [];
+          renderSubmissionsTable(cachedSubmissions);
+          
+          // Update badge pending count
+          const pendingCount = cachedSubmissions.filter(s => s.status === 'Pending').length;
+          const badge = document.getElementById('badge-pending-submissions');
+          if (badge) {
+            if (pendingCount > 0) {
+              badge.innerText = pendingCount;
+              badge.classList.remove('hidden');
+            } else {
+              badge.classList.add('hidden');
+            }
+          }
+        } else {
+          tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-rose-500">Gagal memuat: ${json.error || ''}</td></tr>`;
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-rose-500">Kesalahan jaringan saat memuat pengajuan.</td></tr>`;
+      }
+    }
+
+    function renderSubmissionsTable(items) {
+      const tbody = document.getElementById('submissions-tbody');
+      if (!tbody) return;
+
+      if (!items || items.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="p-8 text-center text-slate-400">
+              <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
+              <p class="font-medium text-xs">Belum ada pengajuan produk yang masuk.</p>
+            </td>
+          </tr>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      tbody.innerHTML = items.map(sub => {
+        const dateStr = sub.created_at ? new Date(sub.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+        const waClean = (sub.whatsapp || '').replace(/[^0-9]/g, '');
+        const waLink = waClean.startsWith('0') ? '62' + waClean.substring(1) : waClean;
+
+        let statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Pending</span>`;
+        if (sub.status === 'Approved') statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Disetujui</span>`;
+        if (sub.status === 'Rejected') statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">Ditolak</span>`;
+
+        const isShopee = sub.marketplace === 'Shopee';
+        const mktBadge = isShopee 
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-50 text-orange-600 border border-orange-200">Shopee</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-50 text-pink-600 border border-pink-200">TikTok Shop</span>`;
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition">
+            <td class="p-3.5 whitespace-nowrap text-slate-500 font-mono text-[11px]">${dateStr}</td>
+            <td class="p-3.5">
+              <div class="font-bold text-slate-900">${escapeHtml(sub.partner_name || '-')}</div>
+              <div class="flex items-center space-x-2 mt-0.5">
+                <a href="https://wa.me/${waLink}?text=${encodeURIComponent('Halo ' + sub.partner_name + ', terkait pengajuan produk Anda ' + sub.product_name + ' di PATCHWORK...')}" target="_blank" class="text-emerald-600 hover:text-emerald-700 font-medium text-[11px] flex items-center space-x-1" title="Chat WhatsApp">
+                  <i data-lucide="message-circle" class="w-3 h-3"></i>
+                  <span>${escapeHtml(sub.whatsapp || '-')}</span>
+                </a>
+              </div>
+            </td>
+            <td class="p-3.5 max-w-[220px]">
+              <div class="font-bold text-slate-900 truncate" title="${escapeHtml(sub.product_name)}">${escapeHtml(sub.product_name)}</div>
+              <div class="flex items-center space-x-1.5 mt-1">
+                <a href="${escapeHtml(sub.product_url)}" target="_blank" class="text-blue-600 hover:underline text-[11px] flex items-center space-x-1 truncate" title="Buka Link Produk">
+                  <i data-lucide="external-link" class="w-3 h-3 shrink-0"></i>
+                  <span class="truncate">Kunjungi Tautan Produk</span>
+                </a>
+              </div>
+              ${sub.description ? `<p class="text-[10px] text-slate-500 line-clamp-1 mt-0.5 italic">"${escapeHtml(sub.description)}"</p>` : ''}
+            </td>
+            <td class="p-3.5 whitespace-nowrap">${mktBadge}</td>
+            <td class="p-3.5 whitespace-nowrap">
+              <div class="font-bold text-slate-900">${formatRupiah(sub.product_price || 0)}</div>
+              <div class="text-[11px] text-emerald-600 font-medium">${escapeHtml(sub.commission_rate || '-')}</div>
+            </td>
+            <td class="p-3.5 whitespace-nowrap">${statusBadge}</td>
+            <td class="p-3.5 whitespace-nowrap text-right">
+              <div class="flex items-center justify-end space-x-1.5">
+                ${sub.status === 'Pending' ? `
+                  <button onclick="approveSubmission('${sub.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-sm transition flex items-center space-x-1" title="Setujui dan masukkan ke katalog">
+                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                    <span>Setujui</span>
+                  </button>
+                  <button onclick="rejectSubmission('${sub.id}')" class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[11px] border border-rose-200 transition flex items-center space-x-1" title="Tolak Pengajuan">
+                    <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
+                    <span>Tolak</span>
+                  </button>
+                ` : `
+                  <button onclick="deleteSubmission('${sub.id}')" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="Hapus Data">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                `}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    async function approveSubmission(id) {
+      const sub = cachedSubmissions.find(s => s.id === id);
+      if (!sub) return;
+
+      const ok = await showConfirm({
+        title: 'Setujui Pengajuan Produk?',
+        message: `Produk "${sub.product_name}" akan otomatis dibuatkan item baru di katalog PATCHWORK dengan status Published. Lanjutkan?`,
+        confirmText: 'Ya, Setujui & Tayangkan',
+        type: 'info'
+      });
+
+      if (!ok) return;
+
+      showToast('Memproses persetujuan...', 'info');
+
+      try {
+        const res = await fetch(`/api/submissions/${id}/approve`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ admin_notes: 'Disetujui oleh admin' })
+        });
+        const json = await res.json();
+
+        if (res.ok) {
+          showToast('Produk berhasil disetujui dan langsung tayang di katalog!', 'success');
+          loadSubmissionsList();
+          loadAdminProducts();
+          loadOverviewData();
+        } else {
+          showToast('Gagal menyetujui: ' + (json.error || ''), 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan jaringan saat menyetujui produk.', 'error');
+      }
+    }
+
+    async function rejectSubmission(id) {
+      const sub = cachedSubmissions.find(s => s.id === id);
+      if (!sub) return;
+
+      const reason = prompt(`Masukkan alasan penolakan untuk "${sub.product_name}" (opsional):`, 'Stok tidak mencukupi / format link tidak sesuai.');
+      if (reason === null) return;
+
+      showToast('Menolak pengajuan...', 'info');
+
+      try {
+        const res = await fetch(`/api/submissions/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            status: 'Rejected',
+            admin_notes: reason
+          })
+        });
+        const json = await res.json();
+
+        if (res.ok) {
+          showToast('Pengajuan telah ditolak.', 'info');
+          loadSubmissionsList();
+        } else {
+          showToast('Gagal mengubah status: ' + (json.error || ''), 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan koneksi.', 'error');
+      }
+    }
+
+    async function deleteSubmission(id) {
+      const ok = await showConfirm({
+        title: 'Hapus Riwayat Pengajuan',
+        message: 'Riwayat pengajuan ini akan dihapus permanen. Lanjutkan?',
+        confirmText: 'Hapus',
+        type: 'danger'
+      });
+      if (!ok) return;
+
+      try {
+        const res = await fetch(`/api/submissions/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          showToast('Data pengajuan dihapus.', 'success');
+          loadSubmissionsList();
+        } else {
+          showToast('Gagal menghapus pengajuan.', 'error');
+        }
+      } catch (err) {
+        showToast('Kesalahan koneksi.', 'error');
+      }
+    }
+
+    // Partner Registration Modal in Admin Panel
+    function showRegisterModal() {
+      const modal = document.getElementById('register-modal');
+      const feedback = document.getElementById('reg-feedback');
+      if (feedback) feedback.classList.add('hidden');
+      if (modal) {
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        lucide.createIcons();
+      }
+    }
+
+    function closeRegisterModal() {
+      const modal = document.getElementById('register-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    async function handlePartnerRegistration(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-admin-reg-submit');
+      const feedback = document.getElementById('reg-feedback');
+
+      const payload = {
+        name: document.getElementById('admin-reg-name').value.trim(),
+        whatsapp: document.getElementById('admin-reg-phone').value.trim(),
+        email: document.getElementById('admin-reg-email').value.trim(),
+        password: document.getElementById('admin-reg-pass').value
+      };
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>Mengirim Pendaftaran...</span>';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          feedback.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 block';
+          feedback.innerHTML = `
+            <strong>🎉 Pendaftaran Berhasil!</strong><br>
+            Akun Anda atas nama <strong>${escapeHtml(payload.name)}</strong> sedang menunggu verifikasi & approval dari Admin.
+            Setelah disetujui, Anda dapat langsung login menggunakan email & password ini untuk memasukkan produk.
+          `;
+          document.getElementById('admin-reg-form').reset();
+          setTimeout(() => {
+            closeRegisterModal();
+            feedback.classList.add('hidden');
+            // Auto fill login email for convenience
+            document.getElementById('login-email').value = payload.email;
+            showToast('Pendaftaran akun terkirim. Silakan tunggu persetujuan admin.', 'info');
+          }, 4000);
+        } else {
+          feedback.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 block';
+          feedback.innerText = data.error || 'Gagal mendaftar. Silakan periksa data Anda.';
+        }
+      } catch (err) {
+        feedback.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 block';
+        feedback.innerText = 'Koneksi ke server gagal.';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Kirim Pendaftaran Mitra</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>';
+        lucide.createIcons();
+      }
+    }
+
+    // ==========================================
+    // LYNK ID ADMIN PROFILE MANAGEMENT
+    // ==========================================
+    async function loadAdminLynkProfile() {
+      if (!currentUser) return;
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const json = await res.json();
+          currentUser = json.user;
+        }
+      } catch (e) {}
+
+      const u = currentUser || {};
+      document.getElementById('adm-prof-name').value = u.name || '';
+      document.getElementById('adm-prof-phone').value = u.phone || '';
+      document.getElementById('adm-prof-avatar').value = u.avatar || '';
+      document.getElementById('adm-prof-bio').value = u.bio || '';
+      document.getElementById('adm-prof-tiktok').value = u.tiktok || '';
+      document.getElementById('adm-prof-instagram').value = u.instagram || '';
+      document.getElementById('adm-prof-shopee').value = u.shopee || '';
+      document.getElementById('adm-prof-youtube').value = u.youtube || '';
+      document.getElementById('adm-prof-website').value = u.website || '';
+      const slugInput = document.getElementById('adm-prof-slug');
+      if (slugInput) slugInput.value = u.custom_slug || '';
+
+      const tmpl = u.template || 'modern';
+      const rad = document.querySelector(`input[name="adm-prof-template"][value="${tmpl}"]`);
+      if (rad) rad.checked = true;
+
+      // Update Preview
+      document.getElementById('adm-preview-name').innerText = u.name || 'PATCHWORK Official';
+      document.getElementById('adm-preview-bio').innerText = u.bio || 'Etalase rekomendasi resmi dari Admin PATCHWORK';
+      
+      const avBox = document.getElementById('adm-box-avatar');
+      if (u.avatar) {
+        avBox.innerHTML = `<img src="${u.avatar}" class="w-full h-full object-cover">`;
+      } else {
+        const init = (u.name || 'S A').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        avBox.innerHTML = `<span class="text-xl font-bold">${init}</span>`;
+      }
+
+      const lynkUrl = u.custom_slug ? `https://${u.custom_slug}.kheireditz.my.id` : `${window.location.origin}/lynk/${u.id}`;
+      document.getElementById('admin-preview-lynk-btn').href = lynkUrl;
+    }
+
+    async function handleSaveAdminProfile(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-adm-profile');
+      const slugVal = (document.getElementById('adm-prof-slug')?.value || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+
+      const payload = {
+        name: document.getElementById('adm-prof-name').value.trim(),
+        phone: document.getElementById('adm-prof-phone').value.trim(),
+        avatar: document.getElementById('adm-prof-avatar').value.trim(),
+        bio: document.getElementById('adm-prof-bio').value.trim(),
+        tiktok: document.getElementById('adm-prof-tiktok').value.trim(),
+        instagram: document.getElementById('adm-prof-instagram').value.trim(),
+        shopee: document.getElementById('adm-prof-shopee').value.trim(),
+        youtube: document.getElementById('adm-prof-youtube').value.trim(),
+        website: document.getElementById('adm-prof-website').value.trim(),
+        template: document.querySelector('input[name="adm-prof-template"]:checked')?.value || 'modern',
+        custom_slug: slugVal
+      };
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="inline-block animate-spin mr-1.5">⏳</span><span>Menyimpan...</span>';
+
+      try {
+        const res = await fetch('/api/auth/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+
+        if (res.ok) {
+          currentUser = json.user;
+          showToast('Pengaturan LYNK ID Admin berhasil disimpan!', 'success');
+          loadAdminLynkProfile();
+        } else {
+          showToast('Gagal menyimpan: ' + (json.error || ''), 'error');
+        }
+      } catch (err) {
+        showToast('Koneksi gagal saat menyimpan profil.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>Simpan Pengaturan LYNK ID</span>';
+        lucide.createIcons();
+      }
+    }
+
+    function copyAdminLynkUrl() {
+      if (!currentUser) return;
+      const url = currentUser.custom_slug ? `https://${currentUser.custom_slug}.kheireditz.my.id` : `${window.location.origin}/lynk/${currentUser.id}`;
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('Tautan LYNK ID Admin disalin ke clipboard!', 'success');
+      }).catch(() => {
+        prompt('Salin tautan LYNK ID Admin:', url);
+      });
     }
 
     // Run Auth check on page load

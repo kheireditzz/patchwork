@@ -1,137 +1,153 @@
--- =========================================================================
--- PATCHWORK SUPABASE POSTGRESQL SCHEMA & ROW LEVEL SECURITY (RLS)
--- =========================================================================
+-- ==========================================================
+-- PATCHWORK DATABASE SCHEMA FOR SUPABASE (POSTGRESQL)
+-- Project: https://qyfmyxgmntpqydgrmanv.supabase.co
+-- ==========================================================
 
--- Enable UUID extension
+-- Enable UUID extension if not enabled
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- USERS TABLE
+-- 1. USERS TABLE
 CREATE TABLE IF NOT EXISTS public.users (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    role TEXT CHECK (role IN ('Super Admin', 'Admin', 'Editor')) NOT NULL DEFAULT 'Admin',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  phone TEXT,
+  password TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'Admin' CHECK (role IN ('Super Admin', 'Admin', 'Editor', 'Partner')),
+  status TEXT NOT NULL DEFAULT 'Approved' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- CATEGORIES TABLE
+-- 2. CATEGORIES TABLE
 CREATE TABLE IF NOT EXISTS public.categories (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name TEXT NOT NULL,
-    slug TEXT UNIQUE NOT NULL,
-    icon TEXT DEFAULT 'tag',
-    description TEXT,
-    color TEXT DEFAULT '#3B82F6',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  icon TEXT DEFAULT 'tag',
+  description TEXT,
+  color TEXT DEFAULT '#3B82F6',
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- PRODUCTS TABLE
+-- 3. PRODUCTS TABLE
 CREATE TABLE IF NOT EXISTS public.products (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name TEXT NOT NULL,
-    slug TEXT UNIQUE NOT NULL,
-    category_id UUID REFERENCES public.categories(id) ON DELETE SET NULL,
-    description TEXT,
-    price NUMERIC(15,2) DEFAULT 0,
-    commission_rate TEXT,
-    marketplace TEXT DEFAULT 'Shopee',
-    url_shopee TEXT,
-    url_tiktok TEXT,
-    url_tokopedia TEXT,
-    thumbnail TEXT,
-    gallery JSONB DEFAULT '[]'::jsonb,
-    status TEXT CHECK (status IN ('Draft', 'Published')) NOT NULL DEFAULT 'Published',
-    is_featured BOOLEAN DEFAULT false,
-    total_clicks BIGINT DEFAULT 0,
-    shopee_clicks BIGINT DEFAULT 0,
-    tiktok_clicks BIGINT DEFAULT 0,
-    tokopedia_clicks BIGINT DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  category_id UUID REFERENCES public.categories(id) ON DELETE SET NULL,
+  description TEXT,
+  price NUMERIC DEFAULT 0,
+  commission_rate TEXT,
+  marketplace TEXT NOT NULL DEFAULT 'Shopee',
+  url_shopee TEXT,
+  url_tiktok TEXT,
+  url_tokopedia TEXT,
+  thumbnail TEXT,
+  gallery JSONB DEFAULT '[]'::jsonb,
+  status TEXT NOT NULL DEFAULT 'Published' CHECK (status IN ('Draft', 'Published')),
+  is_featured BOOLEAN DEFAULT FALSE,
+  total_clicks INTEGER DEFAULT 0,
+  shopee_clicks INTEGER DEFAULT 0,
+  tiktok_clicks INTEGER DEFAULT 0,
+  tokopedia_clicks INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- BANNERS TABLE
+-- 4. BANNERS TABLE
 CREATE TABLE IF NOT EXISTS public.banners (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    title TEXT NOT NULL,
-    subtitle TEXT,
-    image TEXT NOT NULL,
-    target_url TEXT,
-    status TEXT CHECK (status IN ('Draft', 'Published')) NOT NULL DEFAULT 'Published',
-    display_order INT DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  subtitle TEXT,
+  image TEXT NOT NULL,
+  target_url TEXT,
+  status TEXT NOT NULL DEFAULT 'Published' CHECK (status IN ('Draft', 'Published')),
+  display_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- CLICKS TABLE
+-- 5. CLICKS TABLE (ANALYTICS)
 CREATE TABLE IF NOT EXISTS public.clicks (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
-    marketplace TEXT NOT NULL,
-    visitor_ip TEXT,
-    user_agent TEXT,
-    referrer TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  marketplace TEXT NOT NULL,
+  visitor_ip TEXT,
+  user_agent TEXT,
+  referrer TEXT,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- VISITORS TABLE
+-- 6. VISITORS TABLE (PAGE VIEWS)
 CREATE TABLE IF NOT EXISTS public.visitors (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    visitor_ip TEXT,
-    user_agent TEXT,
-    page TEXT,
-    referrer TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  visitor_ip TEXT,
+  user_agent TEXT,
+  page TEXT,
+  referrer TEXT,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- SETTINGS TABLE
+-- 7. SETTINGS TABLE
 CREATE TABLE IF NOT EXISTS public.settings (
-    key TEXT PRIMARY KEY,
-    value TEXT,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  key TEXT PRIMARY KEY,
+  value TEXT,
+  updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- ACTIVITY LOGS TABLE
+-- 8. ACTIVITY LOGS TABLE
 CREATE TABLE IF NOT EXISTS public.activity_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID,
-    user_name TEXT,
-    action TEXT NOT NULL,
-    details JSONB,
-    ip_address TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID,
+  user_name TEXT,
+  action TEXT NOT NULL,
+  details TEXT,
+  ip_address TEXT,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- ROW LEVEL SECURITY (RLS) POLICIES
+-- 9. PARTNER SUBMISSIONS TABLE (PENGAJUAN PRODUK MITRA)
+CREATE TABLE IF NOT EXISTS public.partner_submissions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  partner_name TEXT NOT NULL,
+  whatsapp TEXT NOT NULL,
+  email TEXT,
+  product_name TEXT NOT NULL,
+  marketplace TEXT NOT NULL DEFAULT 'Shopee',
+  product_url TEXT NOT NULL,
+  product_price NUMERIC DEFAULT 0,
+  commission_rate TEXT,
+  description TEXT,
+  image_url TEXT,
+  status TEXT NOT NULL DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
+  admin_notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_products_category ON public.products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_status ON public.products(status);
+CREATE INDEX IF NOT EXISTS idx_products_featured ON public.products(is_featured);
+CREATE INDEX IF NOT EXISTS idx_clicks_product ON public.clicks(product_id);
+CREATE INDEX IF NOT EXISTS idx_partner_submissions_status ON public.partner_submissions(status);
+
+-- Enable RLS (Row Level Security) and Public Read
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.banners ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.clicks ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.visitors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.activity_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.partner_submissions ENABLE ROW LEVEL SECURITY;
 
--- Public can read published products, categories, banners, settings
-CREATE POLICY "Public products view" ON public.products FOR SELECT USING (status = 'Published');
-CREATE POLICY "Public categories view" ON public.categories FOR SELECT USING (true);
-CREATE POLICY "Public banners view" ON public.banners FOR SELECT USING (status = 'Published');
-CREATE POLICY "Public settings view" ON public.settings FOR SELECT USING (true);
-CREATE POLICY "Public can log clicks" ON public.clicks FOR INSERT WITH CHECK (true);
-CREATE POLICY "Public can log visitors" ON public.visitors FOR INSERT WITH CHECK (true);
+-- Allow public read access to active catalogue & banners
+CREATE POLICY "Public Read Products" ON public.products FOR SELECT USING (status = 'Published');
+CREATE POLICY "Public Read Categories" ON public.categories FOR SELECT USING (true);
+CREATE POLICY "Public Read Banners" ON public.banners FOR SELECT USING (status = 'Published');
+CREATE POLICY "Public Read Settings" ON public.settings FOR SELECT USING (true);
 
--- Authenticated admins have full management access
-CREATE POLICY "Admin manage products" ON public.products FOR ALL TO authenticated USING (true);
-CREATE POLICY "Admin manage categories" ON public.categories FOR ALL TO authenticated USING (true);
-CREATE POLICY "Admin manage banners" ON public.banners FOR ALL TO authenticated USING (true);
-CREATE POLICY "Admin manage settings" ON public.settings FOR ALL TO authenticated USING (true);
-CREATE POLICY "Admin view clicks" ON public.clicks FOR ALL TO authenticated USING (true);
-CREATE POLICY "Admin view visitors" ON public.visitors FOR ALL TO authenticated USING (true);
-CREATE POLICY "Admin view activity" ON public.activity_logs FOR ALL TO authenticated USING (true);
-CREATE POLICY "Admin manage users" ON public.users FOR ALL TO authenticated USING (true);
+-- Allow public to submit partner requests (INSERT only)
+CREATE POLICY "Public Insert Partner Submissions" ON public.partner_submissions FOR INSERT WITH CHECK (true);
 
--- Supabase Storage Bucket Creation SQL
-INSERT INTO storage.buckets (id, name, public) VALUES ('patchwork', 'patchwork', true) ON CONFLICT (id) DO NOTHING;
-CREATE POLICY "Public Access Storage" ON storage.objects FOR SELECT USING (bucket_id = 'patchwork');
-CREATE POLICY "Auth Upload Storage" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'patchwork');
+-- Allow Service Role full access
+CREATE POLICY "Service Role Products" ON public.products FOR ALL USING (auth.role() = 'service_role');
+CREATE POLICY "Service Role Partner Submissions" ON public.partner_submissions FOR ALL USING (auth.role() = 'service_role');

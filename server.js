@@ -121,6 +121,34 @@ export async function createApp() {
     res.sendFile(path.join(__dirname, 'public/admin.html'));
   });
 
+  app.get('/partner', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/partner.html'));
+  });
+
+  app.get('/partner/*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/partner.html'));
+  });
+
+  app.get('/lynk/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/lynk.html'));
+  });
+
+  app.get('/@:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/lynk.html'));
+  });
+
+  // Handle subdomain *.kheireditz.my.id (except www and app) serving lynk.html
+  app.use((req, res, next) => {
+    const host = (req.hostname || req.get('host') || '').toLowerCase();
+    if (host.includes('.kheireditz.my.id')) {
+      const sub = host.split('.kheireditz.my.id')[0];
+      if (sub && sub !== 'www' && sub !== 'app' && !req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+        return res.sendFile(path.join(__dirname, 'public/lynk.html'));
+      }
+    }
+    next();
+  });
+
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
   });

@@ -119,8 +119,10 @@ export async function initDatabase() {
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
+      phone TEXT,
       password TEXT NOT NULL,
-      role TEXT CHECK(role IN ('Super Admin', 'Admin', 'Editor')) NOT NULL DEFAULT 'Admin',
+      role TEXT CHECK(role IN ('Super Admin', 'Admin', 'Editor', 'Partner')) NOT NULL DEFAULT 'Admin',
+      status TEXT CHECK(status IN ('Pending', 'Approved', 'Rejected')) NOT NULL DEFAULT 'Approved',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -206,18 +208,83 @@ export async function initDatabase() {
       ip_address TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS partner_submissions (
+      id TEXT PRIMARY KEY,
+      partner_name TEXT NOT NULL,
+      whatsapp TEXT NOT NULL,
+      email TEXT,
+      product_name TEXT NOT NULL,
+      marketplace TEXT NOT NULL DEFAULT 'Shopee',
+      product_url TEXT NOT NULL,
+      product_price REAL DEFAULT 0,
+      commission_rate TEXT,
+      description TEXT,
+      image_url TEXT,
+      status TEXT CHECK(status IN ('Pending', 'Approved', 'Rejected')) NOT NULL DEFAULT 'Pending',
+      admin_notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
-  // Default super admin
+  // Migration for existing tables: add phone, status, bio, avatar, socials to users if not present
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN phone TEXT;`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN status TEXT DEFAULT 'Approved';`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN bio TEXT DEFAULT '';`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN avatar TEXT DEFAULT '';`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN tiktok TEXT DEFAULT '';`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN instagram TEXT DEFAULT '';`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN shopee TEXT DEFAULT '';`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN youtube TEXT DEFAULT '';`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN website TEXT DEFAULT '';`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN template TEXT DEFAULT 'modern';`); } catch (e) {}
+
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN custom_slug TEXT;`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE products ADD COLUMN created_by TEXT;`); } catch (e) {}
+
+  // Upgrade users table check constraint if it doesn't support 'Partner'
+  try {
+    const tableSql = rawDb.exec(`SELECT sql FROM sqlite_master WHERE type='table' AND name='users';`)[0]?.values[0]?.[0] || '';
+    if (tableSql && !tableSql.includes('Partner')) {
+      rawDb.exec(`
+        CREATE TABLE users_new (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          email TEXT UNIQUE NOT NULL,
+          phone TEXT,
+          password TEXT NOT NULL,
+          role TEXT CHECK(role IN ('Super Admin', 'Admin', 'Editor', 'Partner')) NOT NULL DEFAULT 'Admin',
+          status TEXT CHECK(status IN ('Pending', 'Approved', 'Rejected')) NOT NULL DEFAULT 'Approved',
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+        INSERT INTO users_new (id, name, email, phone, password, role, status, created_at, updated_at)
+        SELECT id, name, email, phone, password, role, COALESCE(status, 'Approved'), created_at, updated_at FROM users;
+        DROP TABLE users;
+        ALTER TABLE users_new RENAME TO users;
+      `);
+      console.log('🔄 Upgraded users table schema with Partner role support.');
+    }
+  } catch (e) {
+    console.warn('Users table migration notice:', e.message);
+  }
+
+  // Ensure default super admin exists and password is always valid: admin@patchwork.com / admin123
+  const passwordHash = bcrypt.hashSync('admin123', 10);
   const existingUser = sqlite.prepare('SELECT id FROM users WHERE email = ?').get('admin@patchwork.com');
   if (!existingUser) {
-    const passwordHash = bcrypt.hashSync('admin123', 10);
     const userId = 'usr_superadmin';
     sqlite.prepare(`
-      INSERT INTO users (id, name, email, password, role)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(userId, 'Super Administrator', 'admin@patchwork.com', passwordHash, 'Super Admin');
+      INSERT INTO users (id, name, email, phone, password, role, status)
+      VALUES (?, ?, ?, ?, ?, ?, 'Approved')
+    `).run(userId, 'Super Administrator', 'admin@patchwork.com', '0895321154498', passwordHash, 'Super Admin');
     console.log('👤 Default Super Admin created: admin@patchwork.com / admin123');
+  } else {
+    sqlite.prepare(`
+      UPDATE users SET password = ?, role = 'Super Admin', status = 'Approved' WHERE email = 'admin@patchwork.com'
+    `).run(passwordHash);
+    console.log('🔑 Super Admin password synchronized: admin@patchwork.com / admin123');
   }
 
   // Seed default categories

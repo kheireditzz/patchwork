@@ -75,6 +75,43 @@ function slugify(text) {
 // -------------------------------------------------------------
 // 1. AUTHENTICATION & PROFILE
 // -------------------------------------------------------------
+router.post('/auth/register', (req, res) => {
+  try {
+    const { name, whatsapp, email, password } = req.body;
+    if (!name || !whatsapp || !email || !password) {
+      return res.status(400).json({ error: 'Nama asli, nomor WhatsApp, email, dan password wajib diisi!' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPhone = whatsapp.trim();
+    const cleanName = name.trim();
+
+    // Check email uniqueness
+    const existing = sqlite.prepare('SELECT id FROM users WHERE LOWER(email) = ?').get(cleanEmail);
+    if (existing) {
+      return res.status(400).json({ error: 'Email tersebut sudah terdaftar. Silakan gunakan email lain atau login.' });
+    }
+
+    const id = 'usr_p_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+    const hash = bcrypt.hashSync(password, 10);
+
+    // New partner registers with status 'Pending'
+    sqlite.prepare(`
+      INSERT INTO users (id, name, email, phone, password, role, status)
+      VALUES (?, ?, ?, ?, ?, 'Partner', 'Pending')
+    `).run(id, cleanName, cleanEmail, cleanPhone, hash);
+
+    logActivity(id, cleanName, 'REGISTER_PARTNER', `Pendaftaran mitra baru: ${cleanName} (${cleanEmail}, WA: ${cleanPhone}) - Status: Pending`, req.ip);
+
+    res.status(201).json({
+      message: 'Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan (approval) dari admin. Setelah disetujui, Anda dapat login dan mulai memasukkan produk ke katalog.',
+      userId: id
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.post('/auth/login', (req, res) => {
   try {
     const { email, password } = req.body;
@@ -82,7 +119,8 @@ router.post('/auth/login', (req, res) => {
       return res.status(400).json({ error: 'Email dan password wajib diisi.' });
     }
 
-    const user = sqlite.prepare('SELECT * FROM users WHERE email = ?').get(email);
+    const cleanEmail = email.trim().toLowerCase();
+    const user = sqlite.prepare('SELECT * FROM users WHERE LOWER(email) = ?').get(cleanEmail);
     if (!user) {
       return res.status(401).json({ error: 'Email atau password salah.' });
     }
@@ -92,13 +130,28 @@ router.post('/auth/login', (req, res) => {
       return res.status(401).json({ error: 'Email atau password salah.' });
     }
 
+    // Check approval status
+    if (user.status === 'Pending') {
+      return res.status(403).json({
+        error: 'Akun Anda sedang menunggu persetujuan dari Admin. Anda baru bisa memasukkan produk setelah akun disetujui.',
+        status: 'Pending'
+      });
+    }
+
+    if (user.status === 'Rejected') {
+      return res.status(403).json({
+        error: 'Pendaftaran akun Anda ditolak oleh Admin. Hubungi kami via WhatsApp untuk informasi lebih lanjut.',
+        status: 'Rejected'
+      });
+    }
+
     const token = jwt.sign(
-      { id: user.id, name: user.name, email: user.email, role: user.role },
+      { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role, status: user.status },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
 
-    logActivity(user.id, user.name, 'LOGIN', 'Admin berhasil login', req.ip);
+    logActivity(user.id, user.name, 'LOGIN', `Pengguna (${user.role}) berhasil login`, req.ip);
 
     res.json({
       message: 'Login berhasil',
@@ -107,7 +160,9 @@ router.post('/auth/login', (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
+        phone: user.phone,
+        role: user.role,
+        status: user.status
       }
     });
   } catch (err) {
@@ -117,6 +172,104 @@ router.post('/auth/login', (req, res) => {
 
 router.get('/auth/me', authenticateToken, (req, res) => {
   res.json({ user: req.user });
+});
+
+// Update Profile & Bio / Social Links / Template / Custom Slug
+router.put('/auth/profile', authenticateToken, (req, res) => {
+  try {
+    const { name, phone, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug } = req.body;
+    const userId = req.user.id;
+
+    let cleanSlug = null;
+    if (custom_slug !== undefined) {
+      cleanSlug = custom_slug.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+      if (cleanSlug) {
+        // Check uniqueness of custom_slug
+        const conflict = sqlite.prepare('SELECT id FROM users WHERE LOWER(custom_slug) = ? AND id != ?').get(cleanSlug, userId);
+        if (conflict) {
+          return res.status(400).json({ error: `Link ID "${cleanSlug}" sudah dipakai oleh pengguna lain. Silakan gunakan nama lain.` });
+        }
+      }
+    }
+
+    sqlite.prepare(`
+      UPDATE users 
+      SET name = COALESCE(?, name),
+          phone = COALESCE(?, phone),
+          bio = COALESCE(?, bio),
+          avatar = COALESCE(?, avatar),
+          tiktok = COALESCE(?, tiktok),
+          instagram = COALESCE(?, instagram),
+          shopee = COALESCE(?, shopee),
+          youtube = COALESCE(?, youtube),
+          website = COALESCE(?, website),
+          template = COALESCE(?, template),
+          custom_slug = COALESCE(?, custom_slug),
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(
+      name || null,
+      phone || null,
+      bio !== undefined ? bio : null,
+      avatar !== undefined ? avatar : null,
+      tiktok !== undefined ? tiktok : null,
+      instagram !== undefined ? instagram : null,
+      shopee !== undefined ? shopee : null,
+      youtube !== undefined ? youtube : null,
+      website !== undefined ? website : null,
+      template !== undefined ? template : null,
+      cleanSlug !== undefined ? cleanSlug : null,
+      userId
+    );
+
+    const updatedUser = sqlite.prepare('SELECT id, name, email, phone, role, status, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug FROM users WHERE id = ?').get(userId);
+    logActivity(userId, updatedUser.name, 'UPDATE_PROFILE', `Memperbarui profil / Lynk ID`, req.ip);
+
+    res.json({ message: 'Profil dan pengaturan Link ID berhasil diperbarui.', user: updatedUser });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Public Lynk.id Profile Endpoint by User ID or custom_slug
+router.get('/profile/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const lowerParam = id.toLowerCase();
+    const user = sqlite.prepare(`
+      SELECT id, name, bio, avatar, tiktok, instagram, shopee, youtube, website, template, role, custom_slug
+      FROM users WHERE id = ? OR email = ? OR LOWER(custom_slug) = ?
+    `).get(id, id, lowerParam);
+
+    if (!user) {
+      return res.status(404).json({ error: 'Profil tidak ditemukan' });
+    }
+
+    // Get user products for this Lynk
+    const products = sqlite.prepare(`
+      SELECT p.*, c.name as category_name, c.slug as category_slug
+      FROM products p
+      LEFT JOIN categories c ON p.category_id = c.id
+      WHERE p.created_by = ? AND p.status = 'Published'
+      ORDER BY p.is_featured DESC, p.created_at DESC
+    `).all(user.id);
+
+    // Get categories associated with these products
+    const catMap = {};
+    products.forEach(p => {
+      if (p.category_id && p.category_name) {
+        catMap[p.category_id] = { id: p.category_id, name: p.category_name, slug: p.category_slug };
+      }
+    });
+
+    res.json({
+      user,
+      categories: Object.values(catMap),
+      products
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // -------------------------------------------------------------
@@ -215,6 +368,12 @@ router.get('/products', (req, res) => {
       params.push(parseInt(is_featured));
     }
 
+    // Filter by created_by (e.g. for partner portal)
+    if (req.query.created_by) {
+      whereClauses.push('p.created_by = ?');
+      params.push(req.query.created_by);
+    }
+
     const whereSql = whereClauses.length > 0 ? 'WHERE ' + whereClauses.join(' AND ') : '';
 
     // Sorting
@@ -298,7 +457,7 @@ router.get('/products/:idOrSlug', (req, res) => {
 });
 
 // POST /api/products
-router.post('/products', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Editor']), (req, res) => {
+router.post('/products', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Editor', 'Partner']), (req, res) => {
   try {
     const {
       name,
@@ -334,12 +493,12 @@ router.post('/products', authenticateToken, authorizeRole(['Super Admin', 'Admin
       INSERT INTO products (
         id, name, slug, category_id, description, price, commission_rate,
         marketplace, url_shopee, url_tiktok, url_tokopedia, thumbnail, gallery,
-        status, is_featured
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        status, is_featured, created_by
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       id, name, slug, category_id || null, description, price, commission_rate,
       marketplace, url_shopee, url_tiktok, url_tokopedia, thumbnail, galleryJson,
-      status, is_featured ? 1 : 0
+      status, is_featured ? 1 : 0, req.user.id
     );
 
     logActivity(req.user.id, req.user.name, 'CREATE_PRODUCT', `Menambahkan produk "${name}"`, req.ip);
@@ -352,12 +511,17 @@ router.post('/products', authenticateToken, authorizeRole(['Super Admin', 'Admin
 });
 
 // PUT /api/products/:id
-router.put('/products/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Editor']), (req, res) => {
+router.put('/products/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Editor', 'Partner']), (req, res) => {
   try {
     const { id } = req.params;
     const existing = sqlite.prepare('SELECT * FROM products WHERE id = ?').get(id);
     if (!existing) {
       return res.status(404).json({ error: 'Produk tidak ditemukan.' });
+    }
+
+    // Partner can only edit their own products unless admin
+    if (req.user.role === 'Partner' && existing.created_by && existing.created_by !== req.user.id) {
+      return res.status(403).json({ error: 'Anda hanya dapat mengubah produk yang Anda buat sendiri.' });
     }
 
     const {
@@ -436,12 +600,16 @@ router.put('/products/:id', authenticateToken, authorizeRole(['Super Admin', 'Ad
 });
 
 // DELETE /api/products/:id
-router.delete('/products/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.delete('/products/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Partner']), (req, res) => {
   try {
     const { id } = req.params;
     const existing = sqlite.prepare('SELECT * FROM products WHERE id = ?').get(id);
     if (!existing) {
       return res.status(404).json({ error: 'Produk tidak ditemukan.' });
+    }
+
+    if (req.user.role === 'Partner' && existing.created_by && existing.created_by !== req.user.id) {
+      return res.status(403).json({ error: 'Anda hanya dapat menghapus produk milik Anda sendiri.' });
     }
 
     sqlite.prepare('DELETE FROM products WHERE id = ?').run(id);
@@ -669,30 +837,49 @@ router.delete('/banners/:id', authenticateToken, authorizeRole(['Super Admin', '
 });
 
 // -------------------------------------------------------------
-// 7. USER MANAGEMENT (Role Based: Super Admin, Admin, Editor)
+// 7. USER MANAGEMENT (Role Based: Super Admin, Admin, Editor, Partner)
 // -------------------------------------------------------------
-router.get('/users', authenticateToken, authorizeRole(['Super Admin']), (req, res) => {
+router.get('/users', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
   try {
-    const users = sqlite.prepare('SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC').all();
+    const { role, status } = req.query;
+    let sql = 'SELECT id, name, email, phone, role, status, created_at FROM users';
+    const params = [];
+    const where = [];
+
+    if (role) {
+      where.push('role = ?');
+      params.push(role);
+    }
+    if (status) {
+      where.push('status = ?');
+      params.push(status);
+    }
+
+    if (where.length > 0) {
+      sql += ' WHERE ' + where.join(' AND ');
+    }
+    sql += ' ORDER BY created_at DESC';
+
+    const users = sqlite.prepare(sql).all(...params);
     res.json({ data: users });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.post('/users', authenticateToken, authorizeRole(['Super Admin']), (req, res) => {
+router.post('/users', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, phone = '', password, role = 'Partner', status = 'Approved' } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Nama, email, dan password wajib diisi.' });
     }
 
-    const allowed = ['Super Admin', 'Admin', 'Editor'];
+    const allowed = ['Super Admin', 'Admin', 'Editor', 'Partner'];
     if (role && !allowed.includes(role)) {
       return res.status(400).json({ error: 'Role tidak valid.' });
     }
 
-    const conflict = sqlite.prepare('SELECT id FROM users WHERE email = ?').get(email);
+    const conflict = sqlite.prepare('SELECT id FROM users WHERE LOWER(email) = ?').get(email.trim().toLowerCase());
     if (conflict) {
       return res.status(400).json({ error: 'Email sudah terdaftar.' });
     }
@@ -700,11 +887,11 @@ router.post('/users', authenticateToken, authorizeRole(['Super Admin']), (req, r
     const id = 'usr_' + Date.now();
     const hash = bcrypt.hashSync(password, 10);
     sqlite.prepare(`
-      INSERT INTO users (id, name, email, password, role)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(id, name, email, hash, role || 'Admin');
+      INSERT INTO users (id, name, email, phone, password, role, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(id, name.trim(), email.trim().toLowerCase(), phone.trim(), hash, role, status);
 
-    logActivity(req.user.id, req.user.name, 'CREATE_USER', `Membuat user baru: ${email} (${role})`, req.ip);
+    logActivity(req.user.id, req.user.name, 'CREATE_USER', `Membuat user baru: ${email} (${role}, ${status})`, req.ip);
 
     res.status(201).json({ message: 'Pengguna berhasil dibuat.' });
   } catch (err) {
@@ -712,10 +899,10 @@ router.post('/users', authenticateToken, authorizeRole(['Super Admin']), (req, r
   }
 });
 
-router.put('/users/:id', authenticateToken, authorizeRole(['Super Admin']), (req, res) => {
+router.put('/users/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, password, role } = req.body;
+    const { name, email, phone, password, role, status } = req.body;
 
     let hash = null;
     if (password) {
@@ -726,15 +913,55 @@ router.put('/users/:id', authenticateToken, authorizeRole(['Super Admin']), (req
       UPDATE users SET
         name = coalesce(?, name),
         email = coalesce(?, email),
+        phone = coalesce(?, phone),
         password = coalesce(?, password),
         role = coalesce(?, role),
+        status = coalesce(?, status),
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
-    `).run(name, email, hash, role, id);
+    `).run(name, email ? email.trim().toLowerCase() : null, phone, hash, role, status, id);
 
     logActivity(req.user.id, req.user.name, 'UPDATE_USER', `Memperbarui user ID: ${id}`, req.ip);
 
     res.json({ message: 'Pengguna berhasil diperbarui.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Approve Partner Account
+router.post('/users/:id/approve', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = sqlite.prepare('SELECT id, name, email, phone, role, status FROM users WHERE id = ?').get(id);
+    if (!user) {
+      return res.status(404).json({ error: 'Pengguna tidak ditemukan.' });
+    }
+
+    sqlite.prepare(`UPDATE users SET status = 'Approved', updated_at = CURRENT_TIMESTAMP WHERE id = ?`).run(id);
+
+    logActivity(req.user.id, req.user.name, 'APPROVE_USER', `Menyetujui pendaftaran akun mitra: ${user.name} (${user.email})`, req.ip);
+
+    res.json({ message: `Akun mitra "${user.name}" berhasil disetujui! User sekarang dapat login dan memasukkan produk.` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Reject Partner Account
+router.post('/users/:id/reject', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = sqlite.prepare('SELECT id, name, email, phone, role, status FROM users WHERE id = ?').get(id);
+    if (!user) {
+      return res.status(404).json({ error: 'Pengguna tidak ditemukan.' });
+    }
+
+    sqlite.prepare(`UPDATE users SET status = 'Rejected', updated_at = CURRENT_TIMESTAMP WHERE id = ?`).run(id);
+
+    logActivity(req.user.id, req.user.name, 'REJECT_USER', `Menolak pendaftaran akun mitra: ${user.name} (${user.email})`, req.ip);
+
+    res.json({ message: `Pendaftaran akun "${user.name}" telah ditolak.` });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -979,11 +1206,151 @@ router.get('/backup/download', authenticateToken, authorizeRole(['Super Admin'])
   }
 });
 
-// Activity logs endpoint
-router.get('/activity-logs', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+// -------------------------------------------------------------
+// 12. PARTNER PRODUCT SUBMISSION & APPROVAL WORKFLOW
+// -------------------------------------------------------------
+// Public endpoint for submitting a product into catalog queue
+router.post('/submissions', (req, res) => {
   try {
-    const logs = sqlite.prepare('SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 100').all();
-    res.json({ data: logs });
+    const {
+      partner_name,
+      whatsapp,
+      email = '',
+      product_name,
+      marketplace = 'Shopee',
+      product_url,
+      product_price = 0,
+      commission_rate = '',
+      description = '',
+      image_url = ''
+    } = req.body;
+
+    if (!partner_name || !whatsapp || !product_name || !product_url) {
+      return res.status(400).json({ error: 'Nama, No WhatsApp, Nama Produk, dan Link Produk wajib diisi!' });
+    }
+
+    const id = 'sub_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+    sqlite.prepare(`
+      INSERT INTO partner_submissions (
+        id, partner_name, whatsapp, email, product_name, marketplace,
+        product_url, product_price, commission_rate, description, image_url, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')
+    `).run(
+      id, partner_name.trim(), whatsapp.trim(), email ? email.trim() : '',
+      product_name.trim(), marketplace, product_url.trim(),
+      parseFloat(product_price || 0), commission_rate ? commission_rate.trim() : '',
+      description ? description.trim() : '', image_url ? image_url.trim() : ''
+    );
+
+    res.status(201).json({
+      message: 'Pengajuan produk berhasil dikirim! Tim kami akan meninjau produk Anda dalam 1x24 jam.',
+      submissionId: id
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin endpoint: List submissions
+router.get('/submissions', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Editor']), (req, res) => {
+  try {
+    const { status } = req.query;
+    let sql = 'SELECT * FROM partner_submissions';
+    const params = [];
+    if (status) {
+      sql += ' WHERE status = ?';
+      params.push(status);
+    }
+    sql += ' ORDER BY created_at DESC';
+
+    const list = sqlite.prepare(sql).all(...params);
+    res.json({ data: list });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin endpoint: Update status or notes
+router.put('/submissions/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, admin_notes } = req.body;
+
+    sqlite.prepare(`
+      UPDATE partner_submissions SET
+        status = coalesce(?, status),
+        admin_notes = coalesce(?, admin_notes),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(status, admin_notes, id);
+
+    logActivity(req.user.id, req.user.name, 'UPDATE_SUBMISSION', `Memperbarui pengajuan produk ID: ${id} ke ${status}`, req.ip);
+
+    res.json({ message: 'Status pengajuan berhasil diperbarui.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin endpoint: Approve and automatically publish to products catalog
+router.post('/submissions/:id/approve', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+  try {
+    const { id } = req.params;
+    const sub = sqlite.prepare('SELECT * FROM partner_submissions WHERE id = ?').get(id);
+    if (!sub) {
+      return res.status(404).json({ error: 'Data pengajuan tidak ditemukan.' });
+    }
+
+    const { category_id, is_featured = 0 } = req.body;
+
+    // Generate unique slug
+    let baseSlug = slugify(sub.product_name);
+    let slug = baseSlug;
+    let count = 1;
+    while (sqlite.prepare('SELECT id FROM products WHERE slug = ?').get(slug)) {
+      slug = `${baseSlug}-${count++}`;
+    }
+
+    const prodId = 'prod_' + Date.now();
+    const isTikTok = (sub.marketplace || '').toLowerCase().includes('tiktok');
+    const url_shopee = isTikTok ? '' : sub.product_url;
+    const url_tiktok = isTikTok ? sub.product_url : '';
+
+    sqlite.prepare(`
+      INSERT INTO products (
+        id, name, slug, category_id, description, price, commission_rate,
+        marketplace, url_shopee, url_tiktok, url_tokopedia, thumbnail, gallery,
+        status, is_featured
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Published', ?)
+    `).run(
+      prodId, sub.product_name, slug, category_id || null, sub.description || '',
+      sub.product_price || 0, sub.commission_rate || '', sub.marketplace || 'Shopee',
+      url_shopee, url_tiktok, '', sub.image_url || '', '[]', is_featured ? 1 : 0
+    );
+
+    // Update submission status to Approved
+    sqlite.prepare(`
+      UPDATE partner_submissions SET status = 'Approved', updated_at = CURRENT_TIMESTAMP WHERE id = ?
+    `).run(id);
+
+    logActivity(req.user.id, req.user.name, 'APPROVE_SUBMISSION', `Menyetujui & mempublikasikan produk "${sub.product_name}" (ID: ${prodId})`, req.ip);
+
+    res.json({
+      message: 'Produk berhasil disetujui dan langsung tayang di katalog publik!',
+      productId: prodId
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin endpoint: Delete submission
+router.delete('/submissions/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+  try {
+    const { id } = req.params;
+    sqlite.prepare('DELETE FROM partner_submissions WHERE id = ?').run(id);
+    logActivity(req.user.id, req.user.name, 'DELETE_SUBMISSION', `Menghapus data pengajuan ID: ${id}`, req.ip);
+    res.json({ message: 'Pengajuan produk berhasil dihapus.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

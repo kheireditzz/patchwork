@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Mitra Penjual - PATCHWORK Affiliate</title>
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { 
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; 
+      letter-spacing: -0.012em; 
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-emerald-600 selection:text-white">
+
+  <!-- ================= AUTH CONTAINER (LOGIN & REGISTER) ================= -->
+  <div id="auth-container" class="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-slate-950 relative overflow-hidden selection:bg-emerald-500 selection:text-white">
+    <!-- Ambient Lighting & Subtle Grid Background -->
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none"></div>
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-emerald-600/20 rounded-full blur-[128px] pointer-events-none"></div>
+    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-teal-600/20 rounded-full blur-[128px] pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-emerald-950/20 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <div class="max-w-md w-full bg-white/95 backdrop-blur-xl rounded-3xl p-7 sm:p-9 border border-white/40 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.45)] relative z-10">
+      
+      <!-- Brand Header -->
+      <div class="text-center mb-6">
+        <div class="flex justify-center items-center w-full mb-4">
+          <a href="/" class="inline-flex items-center justify-center p-2 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 transition-transform active:scale-95 shadow-sm" title="Kembali ke Beranda">
+            <img 
+              src="/images/logo.png" 
+              onerror="this.onerror=null; this.src='https://i.ibb.co.com/mwpHfGn/263941-removebg-preview.png';" 
+              alt="PATCHWORK" 
+              class="h-10 w-auto max-w-[160px] object-contain drop-shadow-sm"
+            >
+          </a>
+        </div>
+        <div class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[11px] font-bold mb-2">
+          <i data-lucide="store" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <span>Portal Mitra Penjual</span>
+        </div>
+        <h1 class="text-xl font-black text-slate-900 tracking-tight">Kemitraan & Penjual</h1>
+        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Kelola dan daftarkan produk Anda ke dalam katalog kurasi resmi PATCHWORK</p>
+      </div>
+
+      <!-- Tab Switch: Masuk vs Daftar Baru -->
+      <div class="flex p-1 bg-slate-100 rounded-xl mb-5 text-xs font-bold">
+        <button type="button" id="tab-auth-login" onclick="switchAuthTab('login')" class="flex-1 py-2 rounded-lg bg-white shadow-sm text-slate-900 transition text-center">
+          Masuk Akun
+        </button>
+        <button type="button" id="tab-auth-register" onclick="switchAuthTab('register')" class="flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition text-center">
+          Daftar Akun Mitra
+        </button>
+      </div>
+
+      <!-- Feedback Alert -->
+      <div id="auth-error" class="hidden mb-4 p-3.5 rounded-2xl text-xs font-semibold"></div>
+
+      <!-- 1. FORM LOGIN MITRA -->
+      <form id="partner-login-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Email Mitra</label>
+          <div class="relative">
+            <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input type="email" id="login-email" placeholder="nama@tokoanda.com" required class="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-emerald-600 focus:bg-white transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Password</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input type="password" id="login-password" placeholder="••••••••" required class="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-emerald-600 focus:bg-white transition">
+          </div>
+        </div>
+
+        <button type="submit" id="btn-partner-login" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2">
+          <span>Masuk ke Portal Mitra</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </button>
+
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 flex items-start space-x-2">
+          <i data-lucide="shield-check" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+          <span>Akun Anda harus <strong>disetujui (Approved) oleh Admin</strong> sebelum dapat masuk dan memasukkan produk.</span>
+        </div>
+      </form>
+
+      <!-- 2. FORM PENDAFTARAN AKUN MITRA -->
+      <form id="partner-reg-form" onsubmit="handlePartnerRegistration(event)" class="space-y-3.5 hidden">
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-700 flex items-start space-x-2">
+          <i data-lucide="info" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+          <span>Wajib mengisi <strong>Nama Asli</strong> dan <strong>Nomor WhatsApp Asli</strong>. Admin akan memverifikasi sebelum menyetujui akun Anda.</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nama Asli Lengkap *</label>
+          <input type="text" id="reg-name" required placeholder="Nama asli Anda sesuai KTP/identitas" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp Asli (Aktif) *</label>
+          <input type="tel" id="reg-whatsapp" required placeholder="08xxxxxxxxxx atau 628xxxxxxxxxx" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+          <span class="text-[10px] text-slate-400 mt-0.5 block">Digunakan admin untuk konfirmasi dan notifikasi persetujuan akun</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Email Aktif *</label>
+          <input type="email" id="reg-email" required placeholder="email@tokoanda.com" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Password Baru *</label>
+          <input type="password" id="reg-password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+        </div>
+
+        <button type="submit" id="btn-partner-reg" onclick="if(!this.form.checkValidity()) { this.form.reportValidity(); return false; } handlePartnerRegistration(event);" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2 active:scale-95 mt-2 cursor-pointer">
+          <span>Kirim Pendaftaran Mitra</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </button>
+      </form>
+
+      <!-- Bottom Nav Links -->
+      <div class="pt-4 mt-5 border-t border-slate-100 flex items-center justify-center text-xs text-slate-500">
+        <a href="/" class="hover:text-slate-900 transition flex items-center space-x-1.5 font-medium">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+          <span>Kembali ke Beranda</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= DASHBOARD MITRA CONTAINER ================= -->
+  <div id="partner-dashboard-container" class="hidden flex-1 flex flex-col h-screen overflow-hidden">
+    
+    <!-- TOP HEADER -->
+    <header class="h-14 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
+      <!-- Left: Logo & Title -->
+      <div class="flex items-center space-x-3">
+        <a href="/" class="flex items-center group py-1" title="Ke Beranda Publik">
+          <img 
+            src="/images/logo.png" 
+            onerror="this.onerror=null; this.src='https://i.ibb.co.com/mwpHfGn/263941-removebg-preview.png';" 
+            alt="Logo" 
+            class="h-8 w-auto max-w-[120px] object-contain transition-opacity group-hover:opacity-80"
+          >
+        </a>
+        <span class="text-slate-300">/</span>
+        <div class="flex items-center space-x-2">
+          <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-black uppercase tracking-wide">Portal Mitra</span>
+          <h2 class="text-xs sm:text-sm font-bold text-slate-800 hidden sm:inline" id="partner-page-title">
+            Manajemen Produk Saya
+          </h2>
+        </div>
+      </div>
+
+      <!-- Right: User Info & Actions -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <a id="header-btn-lynk" href="#" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold hover:bg-emerald-100 flex items-center space-x-1.5 transition" title="Lihat LYNK ID Saya">
+          <i data-lucide="link" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <span>LYNK ID Saya</span>
+        </a>
+        <a href="/" target="_blank" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 flex items-center space-x-1.5 transition" title="Lihat Katalog Publik">
+          <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span class="hidden md:inline">Katalog Publik</span>
+        </a>
+
+        <!-- Partner User Pill -->
+        <div class="flex items-center space-x-2 pl-2 border-l border-slate-200">
+          <div class="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-sm" id="partner-avatar">
+            MP
+          </div>
+          <div class="hidden sm:block text-left">
+            <div class="text-xs font-bold text-slate-800 truncate max-w-[120px]" id="partner-display-name">Mitra Penjual</div>
+            <div class="text-[10px] font-semibold text-emerald-600 flex items-center space-x-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span id="partner-display-status">Terverifikasi</span>
+            </div>
+          </div>
+          <button onclick="logoutPartner()" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition ml-1" title="Keluar dari Akun">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT BODY -->
+    <div class="flex-1 flex flex-col overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full">
+      
+      <!-- WELCOME HERO BANNER -->
+      <div class="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-900 via-slate-900 to-slate-950 text-white shadow-xl relative overflow-hidden border border-emerald-950/40">
+        <div class="relative z-10 max-w-2xl">
+          <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-extrabold uppercase tracking-wider inline-flex items-center space-x-1.5 mb-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Akun Mitra Terverifikasi</span>
+          </span>
+          <h1 class="text-xl sm:text-2xl font-black tracking-tight mb-1" id="partner-welcome-heading">Selamat Datang di Portal Mitra!</h1>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Anda dapat menambahkan produk langsung ke katalog resmi PATCHWORK. Pastikan tautan marketplace Shopee atau TikTok Shop aktif dan memiliki penawaran menarik.
+          </p>
+        </div>
+      </div>
+
+      <!-- KPI METRICS -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <i data-lucide="package" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-lg font-black text-slate-900" id="stat-my-products">0</div>
+            <div class="text-[11px] text-slate-500">Produk Saya</div>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <i data-lucide="mouse-pointer-click" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-lg font-black text-slate-900" id="stat-my-clicks">0</div>
+            <div class="text-[11px] text-slate-500">Total Klik Pengunjung</div>
+          </div>
+        </div>
+
+        <div class="col-span-2 sm:col-span-1 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-sm font-bold text-emerald-600">Disetujui Admin</div>
+            <div class="text-[11px] text-slate-500">Status Akun Aktif</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NAVIGATION TABS: PRODUK & LYNK ID PROFIL -->
+      <div class="flex items-center space-x-2 border-b border-slate-200 pb-2">
+        <button onclick="switchPartnerTab('products')" id="partner-tab-btn-products" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm transition flex items-center space-x-2">
+          <i data-lucide="package" class="w-3.5 h-3.5"></i>
+          <span>Katalog Produk Saya</span>
+        </button>
+        <button onclick="switchPartnerTab('profile')" id="partner-tab-btn-profile" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center space-x-2">
+          <i data-lucide="link" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <span>Pengaturan LYNK ID & Profil</span>
+        </button>
+      </div>
+
+      <!-- SECTION 1: PRODUCTS MANAGEMENT -->
+      <div id="partner-section-products" class="space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Daftar Produk Saya di Katalog</h3>
+            <p class="text-xs text-slate-500">Kelola produk affiliate yang Anda pasang di katalog PATCHWORK</p>
+          </div>
+          <button onclick="openAddProductModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center space-x-2 transition">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Tambah Produk Baru</span>
+          </button>
+        </div>
+
+        <!-- Table Card -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200 text-[10px]">
+                <tr>
+                  <th class="p-3.5">Produk</th>
+                  <th class="p-3.5">Kategori</th>
+                  <th class="p-3.5">Marketplace</th>
+                  <th class="p-3.5">Harga</th>
+                  <th class="p-3.5">Komisi</th>
+                  <th class="p-3.5">Klik</th>
+                  <th class="p-3.5 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="partner-products-table" class="divide-y divide-slate-100">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: LYNK ID & PROFILE SETTINGS -->
+      <div id="partner-section-profile" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Pengaturan LYNK ID & Profil Saya</h3>
+            <p class="text-xs text-slate-500">Kelola tampilan etalase mini Anda (seperti LYNK.id), tautan media sosial, bio, dan tema kartu produk</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <a id="btn-preview-lynk" href="#" target="_blank" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center space-x-2 transition">
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              <span>Lihat Halaman LYNK Saya</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left: Form Edit Profile -->
+          <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-5">
+            <form id="partner-profile-form" onsubmit="handleSavePartnerProfile(event)" class="space-y-4">
+              
+              <!-- Avatar & Name -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Nama Toko / Mitra *</label>
+                  <input type="text" id="prof-name" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp *</label>
+                  <input type="tel" id="prof-phone" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+                </div>
+              </div>
+
+              <!-- Custom Link ID / Subdomain kheireditz.my.id -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Link ID / Subdomain Etalase Anda</label>
+                <div class="flex items-center rounded-xl border border-slate-200 bg-slate-50 overflow-hidden focus-within:border-emerald-600 focus-within:bg-white transition">
+                  <span class="pl-3 pr-1 text-xs text-slate-400 font-mono select-none">https://</span>
+                  <input type="text" id="prof-slug" placeholder="namatoko" class="py-2.5 px-1 text-xs bg-transparent text-slate-900 font-bold focus:outline-none flex-1 min-w-0" oninput="updateSlugLivePreview(this.value)">
+                  <span class="pr-3 pl-1 text-xs text-emerald-600 font-bold font-mono select-none">.kheireditz.my.id</span>
+                </div>
+                <div class="flex items-center justify-between text-[11px] mt-1 text-slate-500">
+                  <span>Dapat diakses di: <strong class="text-emerald-700 font-mono" id="prof-slug-preview-text">kheireditz.my.id/lynk/...</strong></span>
+                  <span class="text-[10px] text-slate-400">Huruf kecil, angka & minus</span>
+                </div>
+              </div>
+
+              <!-- Foto Profil / Avatar URL -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">URL Foto Profil / Logo Toko</label>
+                <input type="url" id="prof-avatar" placeholder="https://... (link gambar logo/foto profil)" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+              </div>
+
+              <!-- Bio Singkat -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Bio Singkat / Deskripsi Etalase</label>
+                <textarea id="prof-bio" rows="3" placeholder="Contoh: Pusat fashion vintage & thrift terpercaya. Belanja promo Shopee & TikTok termurah di sini!" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition"></textarea>
+              </div>
+
+              <!-- Social Media Links (TikTok, IG, Shopee, YouTube, Website) -->
+              <div class="pt-2 border-t border-slate-100">
+                <label class="block text-xs font-bold text-slate-900 mb-3">Tautan Akun Media Sosial & Marketplace (Sumber LYNK ID)</label>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Link Akun TikTok</label>
+                    <div class="relative">
+                      <input type="url" id="prof-tiktok" placeholder="https://tiktok.com/@tokokamu" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Link Akun Instagram</label>
+                    <div class="relative">
+                      <input type="url" id="prof-instagram" placeholder="https://instagram.com/tokokamu" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Link Toko Shopee</label>
+                    <div class="relative">
+                      <input type="url" id="prof-shopee" placeholder="https://shopee.co.id/tokokamu" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Link YouTube Channel</label>
+                    <div class="relative">
+                      <input type="url" id="prof-youtube" placeholder="https://youtube.com/@channelkamu" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-3.5">
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Website Pribadi / Portofolio Lainnya</label>
+                  <input type="url" id="prof-website" placeholder="https://tokoanda.com" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+                </div>
+              </div>
+
+              <!-- Pilihan Desain Template LYNK ID -->
+              <div class="pt-3 border-t border-slate-100">
+                <label class="block text-xs font-bold text-slate-900 mb-2">Pilihan Desain Template LYNK ID</label>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-slate-900 cursor-pointer transition flex flex-col items-center space-y-1.5 text-center has-[:checked]:border-slate-900 has-[:checked]:bg-slate-50">
+                    <input type="radio" name="prof-template" value="modern" checked class="text-slate-900">
+                    <div class="w-full h-8 rounded-lg bg-slate-950 flex items-center justify-center text-white text-[10px] font-bold">Dark Night</div>
+                    <span class="text-[11px] font-bold text-slate-800">Modern Dark</span>
+                  </label>
+
+                  <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-emerald-600 cursor-pointer transition flex flex-col items-center space-y-1.5 text-center has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/50">
+                    <input type="radio" name="prof-template" value="emerald" class="text-emerald-600">
+                    <div class="w-full h-8 rounded-lg bg-emerald-800 flex items-center justify-center text-white text-[10px] font-bold">Emerald Glow</div>
+                    <span class="text-[11px] font-bold text-slate-800">Emerald Green</span>
+                  </label>
+
+                  <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-rose-600 cursor-pointer transition flex flex-col items-center space-y-1.5 text-center has-[:checked]:border-rose-600 has-[:checked]:bg-rose-50/50">
+                    <input type="radio" name="prof-template" value="sunset" class="text-rose-600">
+                    <div class="w-full h-8 rounded-lg bg-gradient-to-br from-rose-900 to-indigo-950 flex items-center justify-center text-white text-[10px] font-bold">Sunset</div>
+                    <span class="text-[11px] font-bold text-slate-800">Sunset Neon</span>
+                  </label>
+
+                  <label class="p-3 rounded-2xl border-2 border-slate-200 hover:border-blue-600 cursor-pointer transition flex flex-col items-center space-y-1.5 text-center has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
+                    <input type="radio" name="prof-template" value="minimal" class="text-blue-600">
+                    <div class="w-full h-8 rounded-lg bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-800 text-[10px] font-bold">Clean Light</div>
+                    <span class="text-[11px] font-bold text-slate-800">Minimalist Light</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-end space-x-2">
+                <button type="submit" id="btn-save-partner-profile" class="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs shadow-md transition flex items-center space-x-2">
+                  <i data-lucide="check" class="w-4 h-4"></i>
+                  <span>Simpan Perubahan LYNK ID</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Right: Live Preview Box -->
+          <div class="bg-slate-900 text-white rounded-3xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between space-y-5">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Preview Tampilan LYNK ID</span>
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono">LIVE PREVIEW</span>
+              </div>
+              
+              <div class="text-center space-y-3">
+                <div class="w-20 h-20 rounded-2xl bg-slate-800 border-2 border-white/20 mx-auto flex items-center justify-center overflow-hidden shadow-lg" id="preview-box-avatar">
+                  <span class="text-xl font-bold" id="preview-avatar-text">MP</span>
+                </div>
+                <div>
+                  <h4 class="text-base font-black" id="preview-name">Mitra Penjual</h4>
+                  <p class="text-xs text-slate-400 mt-1 line-clamp-2" id="preview-bio">Bio profil Anda akan muncul di sini</p>
+                </div>
+                
+                <div class="p-3 rounded-2xl bg-white/5 border border-white/10 text-left space-y-2">
+                  <div class="text-[11px] text-slate-400 font-semibold flex items-center justify-between">
+                    <span>Produk Terhubung Otomatis:</span>
+                    <span class="text-emerald-400 font-bold" id="preview-prod-count">0 Produk</span>
+                  </div>
+                  <p class="text-[10px] text-slate-500 leading-relaxed">
+                    Semua produk yang Anda masukkan ke katalog PATCHWORK secara otomatis akan tampil di halaman LYNK ID Anda dengan tautan belanja langsung.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-800">
+              <button onclick="copyLynkUrl()" class="w-full py-2.5 rounded-xl bg-white text-slate-950 font-bold text-xs hover:bg-slate-100 transition flex items-center justify-center space-x-2">
+                <i data-lucide="copy" class="w-4 h-4"></i>
+                <span id="copy-lynk-text">Salin Tautan LYNK ID Saya</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= MODAL TAMBAH / EDIT PRODUK MITRA ================= -->
+  <div id="partner-prod-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-7 border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+      
+      <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+            <i data-lucide="package-plus" class="w-4 h-4"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-900" id="prod-modal-title">Tambah Produk ke Katalog</h3>
+        </div>
+        <button onclick="closeProductModal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form id="partner-prod-form" onsubmit="handleSaveProduct(event)" class="space-y-4">
+        <input type="hidden" id="prod-id">
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nama Produk *</label>
+          <input type="text" id="prod-name" required placeholder="Contoh: Kemeja Flannel Vintage Oversize" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Kategori Produk</label>
+            <select id="prod-category" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+              <!-- Injected -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Harga Produk (Rp) *</label>
+            <input type="number" id="prod-price" required placeholder="149000" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+          </div>
+        </div>
+
+        <!-- Marketplace Channel Selection (Shopee atau TikTok Shop) -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+          <label class="block text-xs font-bold text-slate-800">Platform Marketplace Penjualan *</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="cursor-pointer border-2 rounded-xl p-2.5 flex items-center space-x-2.5 transition border-slate-200 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/50">
+              <input type="radio" name="prod_channel" id="channel-shopee" value="Shopee" checked onchange="toggleChannel('Shopee')" class="text-orange-600 focus:ring-orange-500">
+              <span class="text-xs font-bold text-slate-800">Shopee</span>
+            </label>
+            <label class="cursor-pointer border-2 rounded-xl p-2.5 flex items-center space-x-2.5 transition border-slate-200 has-[:checked]:border-pink-500 has-[:checked]:bg-pink-50/50">
+              <input type="radio" name="prod_channel" id="channel-tiktok" value="TikTok Shop" onchange="toggleChannel('TikTok Shop')" class="text-pink-600 focus:ring-pink-500">
+              <span class="text-xs font-bold text-slate-800">TikTok Shop</span>
+            </label>
+          </div>
+
+          <!-- Shopee URL Input -->
+          <div id="block-shopee-url">
+            <label class="block text-xs font-bold text-orange-600 mb-1">Tautan Produk Shopee *</label>
+            <input type="url" id="prod-url-shopee" placeholder="https://shopee.co.id/... atau https://s.shopee.co.id/..." class="w-full p-2.5 rounded-xl border border-orange-300 bg-white text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
+          </div>
+
+          <!-- TikTok URL Input -->
+          <div id="block-tiktok-url" class="hidden">
+            <label class="block text-xs font-bold text-pink-600 mb-1">Tautan Produk TikTok Shop *</label>
+            <input type="url" id="prod-url-tiktok" placeholder="https://vt.tiktok.com/... atau https://shop.tiktok.com/..." class="w-full p-2.5 rounded-xl border border-pink-300 bg-white text-xs focus:ring-2 focus:ring-pink-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Tawaran Komisi Afiliasi (Opsional)</label>
+            <input type="text" id="prod-commission" placeholder="Contoh: 10% atau Rp 15.000" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Foto / Thumbnail Produk</label>
+            <div class="flex gap-2">
+              <input type="text" id="prod-thumbnail" oninput="updateThumbPreview(this.value)" placeholder="https://... atau upload" class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+              <label class="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold cursor-pointer shrink-0 flex items-center space-x-1 transition active:scale-95">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                <span class="hidden sm:inline">Pilih Foto</span>
+                <input type="file" class="hidden" accept="image/*" onchange="uploadProductImage(this)">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thumbnail Preview -->
+        <div id="thumb-preview-box" class="hidden items-center space-x-3 p-2 rounded-xl bg-slate-50 border border-slate-200/80">
+          <img id="thumb-preview-img" src="" class="w-12 h-12 rounded-lg object-cover border border-slate-200 shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80'">
+          <span class="text-[11px] text-slate-500">Preview foto produk</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Deskripsi Singkat / Keunggulan</label>
+          <textarea id="prod-desc" rows="3" placeholder="Tuliskan keunggulan produk Anda..." class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition"></textarea>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end space-x-2">
+          <button type="button" onclick="closeProductModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+            Batal
+          </button>
+          <button type="submit" id="btn-save-prod" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition flex items-center space-x-1.5 active:scale-95">
+            <span>Simpan Produk</span>
+            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST & CONFIRM MODAL -->
+  <div id="toast-container" class="fixed top-5 right-5 z-[999] flex flex-col gap-3 pointer-events-none" style="max-width:380px;"></div>
+
+  <div id="confirm-modal" class="fixed inset-0 z-[998] hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="confirm-overlay"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 relative" id="confirm-box" style="animation: fadeInUp 0.25s ease-out;">
+        <div class="flex items-center space-x-3 mb-4">
+          <div class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0" id="confirm-icon-bg">
+            <i id="confirm-icon" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-900" id="confirm-title">Konfirmasi</h3>
+            <p class="text-xs text-slate-500 mt-0.5" id="confirm-message">Apakah Anda yakin?</p>
+          </div>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button id="confirm-cancel-btn" class="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition active:scale-95">
+            Batal
+          </button>
+          <button id="confirm-ok-btn" class="px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-lg transition active:scale-95">
+            Ya, Lanjutkan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    let partnerToken = localStorage.getItem('patchwork_partner_token') || localStorage.getItem('patchwork_token') || '';
+    let currentPartner = null;
+    let cachedCategories = [];
+    let cachedMyProducts = [];
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const colors = {
+        success: { bg: 'bg-emerald-600 text-white', icon: 'check-circle' },
+        error:   { bg: 'bg-rose-600 text-white', icon: 'alert-circle' },
+        info:    { bg: 'bg-slate-900 text-white', icon: 'info' }
+      };
+      const c = colors[type] || colors.info;
+      toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl ${c.bg} text-xs font-semibold animate-bounce-subtle`;
+      toast.innerHTML = `
+        <i data-lucide="${c.icon}" class="w-4 h-4 shrink-0"></i>
+        <span class="flex-1">${message}</span>
+        <button onclick="this.parentElement.remove()" class="p-1 opacity-70 hover:opacity-100"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+      `;
+      container.appendChild(toast);
+      lucide.createIcons();
+      setTimeout(() => { toast.remove(); }, 3500);
+    }
+
+    // =================== CUSTOM CONFIRM ===================
+    function showConfirm({ title, message, type = 'danger', confirmText = 'Ya, Lanjutkan', cancelText = 'Batal' }) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('confirm-modal');
+        const titleEl = document.getElementById('confirm-title');
+        const msgEl = document.getElementById('confirm-message');
+        const okBtn = document.getElementById('confirm-ok-btn');
+        const cancelBtn = document.getElementById('confirm-cancel-btn');
+        const iconBg = document.getElementById('confirm-icon-bg');
+        const iconEl = document.getElementById('confirm-icon');
+        const overlay = document.getElementById('confirm-overlay');
+
+        const styles = {
+          danger:  { bg: 'bg-red-100', iconColor: 'text-red-600', btn: 'bg-red-600 hover:bg-red-700 shadow-red-500/25', iconName: 'trash-2' },
+          warning: { bg: 'bg-amber-100', iconColor: 'text-amber-600', btn: 'bg-amber-600 hover:bg-amber-700 shadow-amber-500/25', iconName: 'alert-triangle' },
+          info:    { bg: 'bg-blue-100', iconColor: 'text-blue-600', btn: 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/25', iconName: 'help-circle' },
+        };
+        const s = styles[type] || styles.danger;
+
+        titleEl.innerText = title || 'Konfirmasi';
+        msgEl.innerText = message || 'Apakah Anda yakin?';
+        okBtn.innerText = confirmText;
+        cancelBtn.innerText = cancelText;
+        okBtn.className = `px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-lg transition active:scale-95 ${s.btn}`;
+        iconBg.className = `w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${s.bg}`;
+        iconEl.className = `w-5 h-5 ${s.iconColor}`;
+        iconEl.setAttribute('data-lucide', s.iconName);
+        lucide.createIcons({ nodes: [iconEl] });
+
+        modal.classList.remove('hidden');
+
+        function cleanup(result) {
+          modal.classList.add('hidden');
+          okBtn.removeEventListener('click', onOk);
+          cancelBtn.removeEventListener('click', onCancel);
+          overlay.removeEventListener('click', onCancel);
+          resolve(result);
+        }
+        function onOk() { cleanup(true); }
+        function onCancel() { cleanup(false); }
+
+        okBtn.addEventListener('click', onOk);
+        cancelBtn.addEventListener('click', onCancel);
+        overlay.addEventListener('click', onCancel);
+      });
+    }
+
+    // =================== SLUG LIVE PREVIEW ===================
+    function updateSlugLivePreview(val) {
+      const clean = (val || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+      const el = document.getElementById('prof-slug-preview-text');
+      if (el) {
+        el.textContent = clean ? `${clean}.kheireditz.my.id` : 'kheireditz.my.id/lynk/...';
+      }
+    }
+    function switchAuthTab(tab) {
+      const loginForm = document.getElementById('partner-login-form');
+      const regForm = document.getElementById('partner-reg-form');
+      const btnLogin = document.getElementById('tab-auth-login');
+      const btnReg = document.getElementById('tab-auth-register');
+      const errEl = document.getElementById('auth-error');
+      if (errEl) errEl.classList.add('hidden');
+
+      if (tab === 'login') {
+        loginForm.classList.remove('hidden');
+        regForm.classList.add('hidden');
+        btnLogin.className = 'flex-1 py-2 rounded-lg bg-white shadow-sm text-slate-900 transition text-center font-bold';
+        btnReg.className = 'flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition text-center font-bold';
+      } else {
+        loginForm.classList.add('hidden');
+        regForm.classList.remove('hidden');
+        btnReg.className = 'flex-1 py-2 rounded-lg bg-white shadow-sm text-slate-900 transition text-center font-bold';
+        btnLogin.className = 'flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition text-center font-bold';
+      }
+      lucide.createIcons();
+    }
+
+    // CHECK AUTH STATUS
+    async function checkPartnerAuth() {
+      if (!partnerToken) {
+        showAuthScreen();
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${partnerToken}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          currentPartner = data.user;
+
+          // Cek status persetujuan
+          if (currentPartner.status === 'Pending') {
+            partnerToken = '';
+            localStorage.removeItem('patchwork_partner_token');
+            showAuthScreen();
+            showAuthError('Akun Anda masih berstatus PENDING. Tunggu persetujuan admin sebelum login dan memasukkan produk.');
+            return;
+          }
+
+          if (currentPartner.status === 'Rejected') {
+            partnerToken = '';
+            localStorage.removeItem('patchwork_partner_token');
+            showAuthScreen();
+            showAuthError('Pendaftaran akun Anda telah ditolak oleh Admin.');
+            return;
+          }
+
+          showDashboardScreen();
+        } else {
+          partnerToken = '';
+          localStorage.removeItem('patchwork_partner_token');
+          showAuthScreen();
+        }
+      } catch (err) {
+        showAuthScreen();
+      }
+    }
+
+    function showAuthScreen() {
+      document.getElementById('auth-container').classList.remove('hidden');
+      document.getElementById('partner-dashboard-container').classList.add('hidden');
+      lucide.createIcons();
+    }
+
+    function showAuthError(msg, isSuccess = false) {
+      const errEl = document.getElementById('auth-error');
+      if (!errEl) return;
+      if (isSuccess) {
+        errEl.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 block';
+      } else {
+        errEl.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 block';
+      }
+      errEl.innerHTML = msg;
+      errEl.classList.remove('hidden');
+    }
+
+    function showDashboardScreen() {
+      document.getElementById('auth-container').classList.add('hidden');
+      document.getElementById('partner-dashboard-container').classList.remove('hidden');
+
+      if (currentPartner) {
+        document.getElementById('partner-display-name').innerText = currentPartner.name || 'Mitra Penjual';
+        document.getElementById('partner-welcome-heading').innerText = `Halo, ${currentPartner.name || 'Mitra'}!`;
+        const initials = (currentPartner.name || 'M P').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+        document.getElementById('partner-avatar').innerText = initials;
+      }
+
+      loadCategoriesDropdown();
+      loadMyProducts();
+      populateProfileFields();
+      lucide.createIcons();
+    }
+
+    function switchPartnerTab(tab) {
+      const secProd = document.getElementById('partner-section-products');
+      const secProf = document.getElementById('partner-section-profile');
+      const btnProd = document.getElementById('partner-tab-btn-products');
+      const btnProf = document.getElementById('partner-tab-btn-profile');
+
+      if (tab === 'products') {
+        secProd.classList.remove('hidden');
+        secProf.classList.add('hidden');
+        btnProd.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm transition flex items-center space-x-2';
+        btnProf.className = 'px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center space-x-2';
+        loadMyProducts();
+      } else {
+        secProd.classList.add('hidden');
+        secProf.classList.remove('hidden');
+        btnProf.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm transition flex items-center space-x-2';
+        btnProd.className = 'px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center space-x-2';
+        populateProfileFields();
+      }
+      lucide.createIcons();
+    }
+
+    function populateProfileFields() {
+      if (!currentPartner) return;
+      const p = currentPartner;
+
+      document.getElementById('prof-name').value = p.name || '';
+      document.getElementById('prof-phone').value = p.phone || '';
+      document.getElementById('prof-avatar').value = p.avatar || '';
+      document.getElementById('prof-bio').value = p.bio || '';
+      document.getElementById('prof-tiktok').value = p.tiktok || '';
+      document.getElementById('prof-instagram').value = p.instagram || '';
+      document.getElementById('prof-shopee').value = p.shopee || '';
+      document.getElementById('prof-youtube').value = p.youtube || '';
+      document.getElementById('prof-website').value = p.website || '';
+
+      // Custom slug
+      const slugInput = document.getElementById('prof-slug');
+      if (slugInput) {
+        slugInput.value = p.custom_slug || '';
+        updateSlugLivePreview(p.custom_slug || '');
+      }
+
+      const tmpl = p.template || 'modern';
+      const rad = document.querySelector(`input[name="prof-template"][value="${tmpl}"]`);
+      if (rad) rad.checked = true;
+
+      // Update Preview Box
+      document.getElementById('preview-name').innerText = p.name || 'Mitra Penjual';
+      document.getElementById('preview-bio').innerText = p.bio || 'Bio profil Anda akan muncul di sini';
+      document.getElementById('preview-prod-count').innerText = `${cachedMyProducts.length} Produk`;
+
+      const previewBox = document.getElementById('preview-box-avatar');
+      if (p.avatar) {
+        previewBox.innerHTML = `<img src="${p.avatar}" class="w-full h-full object-cover">`;
+      } else {
+        const initials = (p.name || 'M P').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+        previewBox.innerHTML = `<span class="text-xl font-bold">${initials}</span>`;
+      }
+
+      // Update link preview — prioritize custom_slug domain
+      const slug = p.custom_slug || p.id;
+      const lynkUrl = p.custom_slug
+        ? `https://${p.custom_slug}.kheireditz.my.id`
+        : `${window.location.origin}/lynk/${p.id}`;
+      const prevBtn = document.getElementById('btn-preview-lynk');
+      const hdrBtn = document.getElementById('header-btn-lynk');
+      if (prevBtn) prevBtn.href = lynkUrl;
+      if (hdrBtn) hdrBtn.href = lynkUrl;
+    }
+
+    async function handleSavePartnerProfile(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-partner-profile');
+      const payload = {
+        name: document.getElementById('prof-name').value.trim(),
+        phone: document.getElementById('prof-phone').value.trim(),
+        avatar: document.getElementById('prof-avatar').value.trim(),
+        bio: document.getElementById('prof-bio').value.trim(),
+        tiktok: document.getElementById('prof-tiktok').value.trim(),
+        instagram: document.getElementById('prof-instagram').value.trim(),
+        shopee: document.getElementById('prof-shopee').value.trim(),
+        youtube: document.getElementById('prof-youtube').value.trim(),
+        website: document.getElementById('prof-website').value.trim(),
+        template: document.querySelector('input[name="prof-template"]:checked')?.value || 'modern',
+        custom_slug: (document.getElementById('prof-slug')?.value || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '')
+      };
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="inline-block animate-spin mr-1.5">⏳</span><span>Menyimpan...</span>';
+
+      try {
+        const res = await fetch('/api/auth/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${partnerToken}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+
+        if (res.ok) {
+          currentPartner = json.user;
+          showToast('Profil & LYNK ID berhasil disimpan!', 'success');
+          populateProfileFields();
+        } else {
+          showToast('Gagal menyimpan: ' + (json.error || ''), 'error');
+        }
+      } catch (err) {
+        showToast('Koneksi gagal saat menyimpan profil.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>Simpan Perubahan LYNK ID</span>';
+        lucide.createIcons();
+      }
+    }
+
+    function copyLynkUrl() {
+      if (!currentPartner) return;
+      const url = currentPartner.custom_slug
+        ? `https://${currentPartner.custom_slug}.kheireditz.my.id`
+        : `https://kheireditz.my.id/lynk/${currentPartner.id}`;
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('Tautan LYNK ID berhasil disalin ke clipboard!', 'success');
+        const txt = document.getElementById('copy-lynk-text');
+        if (txt) {
+          txt.innerText = 'Tersalin!';
+          setTimeout(() => { txt.innerText = 'Salin Tautan LYNK ID Saya'; }, 2000);
+        }
+      }).catch(() => {
+        prompt('Salin tautan LYNK ID Anda:', url);
+      });
+    }
+
+    function logoutPartner() {
+      localStorage.removeItem('patchwork_partner_token');
+      partnerToken = '';
+      currentPartner = null;
+      showAuthScreen();
+      showToast('Berhasil keluar dari Portal Mitra', 'info');
+    }
+
+    // LOGIN HANDLER
+    document.getElementById('partner-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const btn = document.getElementById('btn-partner-login');
+      const errEl = document.getElementById('auth-error');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>Memverifikasi...</span>';
+      if (errEl) errEl.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.token) {
+          partnerToken = data.token;
+          localStorage.setItem('patchwork_partner_token', data.token);
+          currentPartner = data.user;
+
+          showDashboardScreen();
+          showToast('Login berhasil! Selamat datang di Portal Mitra.', 'success');
+        } else {
+          showAuthError(data.error || 'Email atau password salah.');
+        }
+      } catch (err) {
+        showAuthError('Gagal terhubung ke server. Silakan coba lagi.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Masuk ke Portal Mitra</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>';
+        lucide.createIcons();
+      }
+    });
+
+    // REGISTRATION HANDLER
+    async function handlePartnerRegistration(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-partner-reg');
+      const payload = {
+        name: document.getElementById('reg-name').value.trim(),
+        whatsapp: document.getElementById('reg-whatsapp').value.trim(),
+        email: document.getElementById('reg-email').value.trim(),
+        password: document.getElementById('reg-password').value
+      };
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>Mendaftarkan...</span>';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          showAuthError(`
+            <strong>🎉 Pendaftaran Berhasil!</strong><br>
+            Akun Anda atas nama <strong>${payload.name}</strong> berhasil didaftarkan.
+            <div class="mt-2 p-2 rounded-xl bg-white/70 border border-emerald-200 text-[11px] text-emerald-950">
+              ⏳ <strong>Menunggu Persetujuan:</strong> Admin PATCHWORK akan memeriksa data dan nomor WhatsApp Anda. Anda <strong>baru bisa memasukkan produk setelah akun disetujui (Approved)</strong>.
+            </div>
+          `, true);
+          document.getElementById('partner-reg-form').reset();
+          // Pindah ke tab login otomatis
+          setTimeout(() => {
+            switchAuthTab('login');
+            document.getElementById('login-email').value = payload.email;
+          }, 4500);
+        } else {
+          showAuthError(data.error || 'Gagal mendaftar. Periksa kembali isian Anda.');
+        }
+      } catch (err) {
+        showAuthError('Koneksi ke server gagal.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Kirim Pendaftaran Mitra</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>';
+        lucide.createIcons();
+      }
+    }
+
+    // CATEGORIES DROPDOWN
+    async function loadCategoriesDropdown() {
+      try {
+        const res = await fetch('/api/categories');
+        const json = await res.json();
+        cachedCategories = json.data || [];
+        const select = document.getElementById('prod-category');
+        select.innerHTML = cachedCategories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      } catch (err) {
+        console.error('Error categories:', err);
+      }
+    }
+
+    // LOAD MY PRODUCTS
+    async function loadMyProducts() {
+      if (!currentPartner) return;
+      const tbody = document.getElementById('partner-products-table');
+      try {
+        // Query produk yang dibuat oleh user partner ini
+        const res = await fetch(`/api/products?limit=100&created_by=${currentPartner.id}`);
+        const json = await res.json();
+        cachedMyProducts = json.data || [];
+
+        // Hitung total produk & klik
+        const totalClicks = cachedMyProducts.reduce((sum, p) => sum + (p.total_clicks || 0), 0);
+        document.getElementById('stat-my-products').innerText = cachedMyProducts.length;
+        document.getElementById('stat-my-clicks').innerText = totalClicks.toLocaleString('id-ID');
+
+        if (cachedMyProducts.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="p-10 text-center text-slate-400">
+                <i data-lucide="package-search" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                <p class="font-semibold text-slate-600">Belum ada produk yang Anda tambahkan</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">Klik tombol "Tambah Produk Baru" untuk mulai memajang produk Anda di katalog PATCHWORK.</p>
+              </td>
+            </tr>
+          `;
+          lucide.createIcons();
+          return;
+        }
+
+        tbody.innerHTML = cachedMyProducts.map(p => `
+          <tr class="hover:bg-slate-50 transition border-b border-slate-100 last:border-b-0">
+            <td class="p-3.5 flex items-center space-x-3">
+              <img src="${p.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80'}" class="w-10 h-10 rounded-xl object-cover border border-slate-200">
+              <div>
+                <div class="font-bold text-slate-900 truncate max-w-xs">${p.name}</div>
+                <a href="/product/${p.slug}" target="_blank" class="text-[10px] text-emerald-600 hover:underline flex items-center space-x-1">
+                  <span>Lihat di web</span>
+                  <i data-lucide="external-link" class="w-2.5 h-2.5"></i>
+                </a>
+              </div>
+            </td>
+            <td class="p-3.5 text-slate-600 font-medium">${p.category_name || 'Umum'}</td>
+            <td class="p-3.5">
+              <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold ${p.marketplace === 'Shopee' ? 'bg-orange-50 text-orange-600 border border-orange-200' : 'bg-pink-50 text-pink-600 border border-pink-200'}">
+                ${p.marketplace}
+              </span>
+            </td>
+            <td class="p-3.5 font-bold text-slate-900">Rp ${Number(p.price).toLocaleString('id-ID')}</td>
+            <td class="p-3.5 font-semibold text-emerald-600">${p.commission_rate || '-'}</td>
+            <td class="p-3.5 font-bold text-slate-700">
+              <div class="flex items-center space-x-1">
+                <i data-lucide="mouse-pointer" class="w-3 h-3 text-slate-400"></i>
+                <span>${p.total_clicks || 0}</span>
+              </div>
+            </td>
+            <td class="p-3.5 text-right space-x-1">
+              <button onclick="editMyProduct('${p.id}')" class="p-1.5 rounded-lg text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition" title="Edit Produk">
+                <i data-lucide="edit-3" class="w-4 h-4"></i>
+              </button>
+              <button onclick="deleteMyProduct('${p.id}')" class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition" title="Hapus Produk">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+
+        lucide.createIcons();
+      } catch (err) {
+        console.error('Error load products:', err);
+      }
+    }
+
+    function toggleChannel(channel) {
+      const shopeeBlock = document.getElementById('block-shopee-url');
+      const tiktokBlock = document.getElementById('block-tiktok-url');
+      if (channel === 'Shopee') {
+        shopeeBlock.classList.remove('hidden');
+        tiktokBlock.classList.add('hidden');
+        document.getElementById('channel-shopee').checked = true;
+      } else {
+        shopeeBlock.classList.add('hidden');
+        tiktokBlock.classList.remove('hidden');
+        document.getElementById('channel-tiktok').checked = true;
+      }
+    }
+
+    function updateThumbPreview(url) {
+      const box = document.getElementById('thumb-preview-box');
+      const img = document.getElementById('thumb-preview-img');
+      if (url && url.trim().length > 5) {
+        img.src = url.trim();
+        box.classList.remove('hidden');
+        box.classList.add('flex');
+      } else {
+        box.classList.add('hidden');
+        box.classList.remove('flex');
+      }
+    }
+
+    async function uploadProductImage(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      showToast('Mengunggah gambar...', 'info');
+
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${partnerToken}` },
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok && data.url) {
+          document.getElementById('prod-thumbnail').value = data.url;
+          updateThumbPreview(data.url);
+          showToast('Gambar berhasil diunggah!', 'success');
+        } else {
+          showToast('Gagal upload: ' + (data.error || ''), 'error');
+        }
+      } catch (e) {
+        showToast('Kesalahan unggah gambar.', 'error');
+      }
+    }
+
+    function openAddProductModal() {
+      document.getElementById('prod-modal-title').innerText = 'Tambah Produk ke Katalog';
+      document.getElementById('partner-prod-form').reset();
+      document.getElementById('prod-id').value = '';
+      toggleChannel('Shopee');
+      updateThumbPreview('');
+      document.getElementById('partner-prod-modal').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+      lucide.createIcons();
+    }
+
+    function closeProductModal() {
+      document.getElementById('partner-prod-modal').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeProductModal();
+    });
+
+    function editMyProduct(id) {
+      const p = cachedMyProducts.find(item => item.id === id);
+      if (!p) return;
+
+      document.getElementById('prod-modal-title').innerText = 'Edit Produk Saya';
+      document.getElementById('prod-id').value = p.id;
+      document.getElementById('prod-name').value = p.name;
+      document.getElementById('prod-category').value = p.category_id || '';
+      document.getElementById('prod-price').value = p.price || 0;
+      document.getElementById('prod-commission').value = p.commission_rate || '';
+      document.getElementById('prod-thumbnail').value = p.thumbnail || '';
+      updateThumbPreview(p.thumbnail || '');
+      document.getElementById('prod-desc').value = p.description || '';
+
+      if (p.url_tiktok && !p.url_shopee) {
+        toggleChannel('TikTok Shop');
+        document.getElementById('prod-url-tiktok').value = p.url_tiktok;
+        document.getElementById('prod-url-shopee').value = '';
+      } else {
+        toggleChannel('Shopee');
+        document.getElementById('prod-url-shopee').value = p.url_shopee || '';
+        document.getElementById('prod-url-tiktok').value = '';
+      }
+
+      document.getElementById('partner-prod-modal').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+      lucide.createIcons();
+    }
+
+    async function handleSaveProduct(e) {
+      e.preventDefault();
+      const id = document.getElementById('prod-id').value;
+      const channel = document.querySelector('input[name="prod_channel"]:checked')?.value || 'Shopee';
+      const btn = document.getElementById('btn-save-prod');
+
+      let shopeeUrl = '';
+      let tiktokUrl = '';
+      if (channel === 'Shopee') {
+        shopeeUrl = document.getElementById('prod-url-shopee').value.trim();
+        if (!shopeeUrl) {
+          showToast('Tautan produk Shopee wajib diisi!', 'error');
+          return;
+        }
+      } else {
+        tiktokUrl = document.getElementById('prod-url-tiktok').value.trim();
+        if (!tiktokUrl) {
+          showToast('Tautan produk TikTok Shop wajib diisi!', 'error');
+          return;
+        }
+      }
+
+      const payload = {
+        name: document.getElementById('prod-name').value.trim(),
+        category_id: document.getElementById('prod-category').value,
+        marketplace: channel,
+        price: parseFloat(document.getElementById('prod-price').value || 0),
+        commission_rate: document.getElementById('prod-commission').value.trim(),
+        url_shopee: shopeeUrl,
+        url_tiktok: tiktokUrl,
+        thumbnail: document.getElementById('prod-thumbnail').value.trim(),
+        description: document.getElementById('prod-desc').value.trim(),
+        status: 'Published'
+      };
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>Menyimpan...</span>';
+
+      const url = id ? `/api/products/${id}` : '/api/products';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${partnerToken}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+
+        if (res.ok) {
+          closeProductModal();
+          showToast('Produk berhasil disimpan ke katalog!', 'success');
+          loadMyProducts();
+        } else {
+          showToast('Gagal: ' + (json.error || ''), 'error');
+        }
+      } catch (err) {
+        showToast('Koneksi gagal saat menyimpan produk.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Simpan Produk</span><i data-lucide="check" class="w-3.5 h-3.5"></i>';
+        lucide.createIcons();
+      }
+    }
+
+    async function deleteMyProduct(id) {
+      const confirmed = await showConfirm({
+        title: 'Hapus Produk',
+        message: 'Apakah Anda yakin ingin menghapus produk ini dari katalog?',
+        type: 'danger',
+        confirmText: 'Ya, Hapus',
+        cancelText: 'Batal'
+      });
+      if (!confirmed) return;
+      try {
+        const res = await fetch(`/api/products/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${partnerToken}` }
+        });
+        if (res.ok) {
+          showToast('Produk berhasil dihapus.', 'success');
+          loadMyProducts();
+        } else {
+          const json = await res.json();
+          showToast('Gagal menghapus: ' + (json.error || ''), 'error');
+        }
+      } catch (err) {
+        showToast('Gagal terhubung ke server.', 'error');
+      }
+    }
+
+    // Init Auth on Load
+    checkPartnerAuth();
+  </script>
+</body>
+</html>

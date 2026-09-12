@@ -328,10 +328,18 @@
       qrEl.innerHTML = '';
       new QRCode(qrEl, { text: window.location.href, width: 160, height: 160, colorDark: "#0f172a", colorLight: "#ffffff" });
       document.getElementById('qr-modal').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
       lucide.createIcons();
     }
 
-    function closeQRModal() { document.getElementById('qr-modal').classList.add('hidden'); }
+    function closeQRModal() {
+      document.getElementById('qr-modal').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeQRModal();
+    });
 
     loadProductDetail();
     lucide.createIcons();
