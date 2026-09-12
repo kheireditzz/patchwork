@@ -364,8 +364,21 @@
 
               <!-- Foto Profil / Avatar URL -->
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">URL Foto Profil / Logo Toko</label>
-                <input type="url" id="prof-avatar" placeholder="https://... (link gambar logo/foto profil)" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Foto Profil / Logo Toko</label>
+                <div class="flex gap-2">
+                  <input type="url" id="prof-avatar" placeholder="https://... (link gambar logo/foto profil)" class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-emerald-600 focus:bg-white focus:outline-none transition">
+                  <label class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold cursor-pointer shrink-0 flex items-center space-x-1.5 transition active:scale-95">
+                    <i data-lucide="images" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">Dari Galeri</span>
+                    <input type="file" class="hidden" accept="image/*" onchange="uploadAvatarFile(this)">
+                  </label>
+                  <label class="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold cursor-pointer shrink-0 flex items-center space-x-1.5 transition active:scale-95">
+                    <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">Kamera</span>
+                    <input type="file" class="hidden" accept="image/*" capture="environment" onchange="uploadAvatarFile(this)">
+                  </label>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1">Pilih langsung dari galeri HP atau ambil pakai kamera.</p>
               </div>
 
               <!-- Bio Singkat -->
@@ -581,6 +594,29 @@
         <div id="thumb-preview-box" class="hidden items-center space-x-3 p-2 rounded-xl bg-slate-50 border border-slate-200/80">
           <img id="thumb-preview-img" src="" class="w-12 h-12 rounded-lg object-cover border border-slate-200 shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80'">
           <span class="text-[11px] text-slate-500">Preview foto produk</span>
+        </div>
+
+        <!-- Album Foto Produk (Galeri) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Album Foto Produk (Galeri)</label>
+          <input type="hidden" id="prod-gallery" value="[]">
+          <div class="flex flex-wrap gap-2">
+            <label class="w-24 h-24 rounded-2xl border-2 border-dashed border-slate-300 hover:border-emerald-400 bg-slate-50 flex flex-col items-center justify-center gap-1 cursor-pointer transition active:scale-95">
+              <i data-lucide="plus" class="w-5 h-5 text-slate-400"></i>
+              <span class="text-[10px] text-slate-500 font-semibold">Galeri</span>
+              <input type="file" class="hidden" accept="image/*" multiple onchange="uploadGalleryImages(this)">
+            </label>
+            <label class="w-24 h-24 rounded-2xl border-2 border-dashed border-slate-300 hover:border-emerald-400 bg-emerald-50/50 flex flex-col items-center justify-center gap-1 cursor-pointer transition active:scale-95">
+              <i data-lucide="camera" class="w-5 h-5 text-emerald-500"></i>
+              <span class="text-[10px] text-emerald-600 font-semibold">Kamera</span>
+              <input type="file" class="hidden" accept="image/*" capture="environment" onchange="uploadGalleryImages(this)">
+            </label>
+          </div>
+          <div id="gallery-preview-box" class="hidden items-start space-x-2 p-2 mt-2 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div id="gallery-images" class="flex flex-wrap gap-2"></div>
+            <span class="text-[11px] text-slate-500">Foto album produk</span>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-1">Boleh tambah beberapa foto. Foto pertama yang tampil = thumbnail.</p>
         </div>
 
         <div>
@@ -1181,10 +1217,95 @@
       }
     }
 
+    async function uploadAvatarFile(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      showToast('Mengunggah foto...', 'info');
+
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${partnerToken}` },
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok && data.url) {
+          document.getElementById('prof-avatar').value = data.url;
+          showToast('Foto profil berhasil diunggah!', 'success');
+        } else {
+          showToast('Gagal upload: ' + (data.error || ''), 'error');
+        }
+      } catch (e) {
+        showToast('Kesalahan unggah foto.', 'error');
+      }
+    }
+
+    // Gallery (multiple photos) helpers
+    let prodGalleryList = [];
+    function updateGalleryPreview() {
+      const box = document.getElementById('gallery-preview-box');
+      const wrap = document.getElementById('gallery-images');
+      if (!box || !wrap) return;
+      wrap.innerHTML = '';
+      prodGalleryList.forEach((url, i) => {
+        const div = document.createElement('div');
+        div.className = 'relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 bg-slate-100';
+        div.innerHTML = `
+          <img src="${url}" class="w-full h-full object-cover" onerror="this.style.visibility='hidden'">
+          <button type="button" onclick="removeGalleryImage(${i})" class="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-slate-900/70 text-white text-[10px] flex items-center justify-center hover:bg-red-600 transition">✕</button>
+        `;
+        wrap.appendChild(div);
+      });
+      if (prodGalleryList.length > 0) {
+        box.classList.remove('hidden');
+        box.classList.add('flex');
+      } else {
+        box.classList.add('hidden');
+        box.classList.remove('flex');
+      }
+      document.getElementById('prod-gallery').value = JSON.stringify(prodGalleryList);
+    }
+    function removeGalleryImage(index) {
+      prodGalleryList.splice(index, 1);
+      updateGalleryPreview();
+    }
+    async function uploadGalleryImages(input) {
+      const files = Array.from(input.files || []);
+      if (!files.length) return;
+      showToast(`Mengunggah ${files.length} foto...`, 'info');
+      const uploaded = [];
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${partnerToken}` },
+            body: formData
+          });
+          const data = await res.json();
+          if (res.ok && data.url) uploaded.push(data.url);
+        } catch (e) {}
+      }
+      if (uploaded.length) {
+        prodGalleryList.push(...uploaded);
+        updateGalleryPreview();
+        showToast(`${uploaded.length} foto ditambahkan ke galeri!`, 'success');
+      } else {
+        showToast('Gagal mengunggah foto.', 'error');
+      }
+      input.value = '';
+    }
+
     function openAddProductModal() {
       document.getElementById('prod-modal-title').innerText = 'Tambah Produk ke Katalog';
       document.getElementById('partner-prod-form').reset();
       document.getElementById('prod-id').value = '';
+      prodGalleryList = [];
+      updateGalleryPreview();
       toggleChannel('Shopee');
       updateThumbPreview('');
       document.getElementById('partner-prod-modal').classList.remove('hidden');
@@ -1214,6 +1335,14 @@
       document.getElementById('prod-thumbnail').value = p.thumbnail || '';
       updateThumbPreview(p.thumbnail || '');
       document.getElementById('prod-desc').value = p.description || '';
+
+      let galleryArr = [];
+      if (p.gallery) {
+        try { galleryArr = typeof p.gallery === 'string' ? JSON.parse(p.gallery) : (Array.isArray(p.gallery) ? p.gallery : []); } catch (e) { galleryArr = []; }
+      }
+      if (p.thumbnail && !galleryArr.includes(p.thumbnail)) galleryArr.unshift(p.thumbnail);
+      prodGalleryList = galleryArr.filter(Boolean);
+      updateGalleryPreview();
 
       if (p.url_tiktok && !p.url_shopee) {
         toggleChannel('TikTok Shop');
@@ -1261,6 +1390,7 @@
         url_shopee: shopeeUrl,
         url_tiktok: tiktokUrl,
         thumbnail: document.getElementById('prod-thumbnail').value.trim(),
+        gallery: prodGalleryList.length ? prodGalleryList : [],
         description: document.getElementById('prod-desc').value.trim(),
         status: 'Published'
       };
