@@ -23,10 +23,17 @@ export function authenticateToken(req, res, next) {
     }
     if (!user && decoded.role) {
       // If user was created in previous container instance, allow valid decoded token payload
-      user = { id: decoded.id, name: decoded.name, email: decoded.email, phone: decoded.phone, role: decoded.role, status: decoded.status || 'Approved' };
+      user = { id: decoded.id, name: decoded.name, email: decoded.email, phone: decoded.phone, role: decoded.role, status: decoded.status || 'Pending' };
     }
     if (!user) {
       return res.status(403).json({ error: 'Pengguna tidak ditemukan.' });
+    }
+
+    if (user.role === 'Partner' && user.status !== 'Approved') {
+      if (user.status === 'Rejected') {
+        return res.status(403).json({ error: 'Pendaftaran akun Anda ditolak oleh Admin. Silakan hubungi admin.' });
+      }
+      return res.status(403).json({ error: 'Akun Anda masih menunggu persetujuan (approval) dari Admin. Harap tunggu hingga akun di-approve.' });
     }
 
     if (user.status === 'Pending') {

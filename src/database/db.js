@@ -109,6 +109,14 @@ export async function initDatabase() {
   if (fs.existsSync(dbFilePath)) {
     const filebuffer = fs.readFileSync(dbFilePath);
     rawDb = new SQL.Database(filebuffer);
+  } else if (isVercel && fs.existsSync(projectDbPath)) {
+    try {
+      const filebuffer = fs.readFileSync(projectDbPath);
+      fs.writeFileSync(tmpDbPath, filebuffer);
+      rawDb = new SQL.Database(filebuffer);
+    } catch (e) {
+      rawDb = new SQL.Database();
+    }
   } else {
     rawDb = new SQL.Database();
   }
@@ -121,8 +129,8 @@ export async function initDatabase() {
       email TEXT UNIQUE NOT NULL,
       phone TEXT,
       password TEXT NOT NULL,
-      role TEXT CHECK(role IN ('Super Admin', 'Admin', 'Editor', 'Partner')) NOT NULL DEFAULT 'Admin',
-      status TEXT CHECK(status IN ('Pending', 'Approved', 'Rejected')) NOT NULL DEFAULT 'Approved',
+      role TEXT CHECK(role IN ('Super Admin', 'Admin', 'Editor', 'Partner')) NOT NULL DEFAULT 'Partner',
+      status TEXT CHECK(status IN ('Pending', 'Approved', 'Rejected')) NOT NULL DEFAULT 'Pending',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );

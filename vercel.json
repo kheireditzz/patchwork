@@ -8,6 +8,7 @@
         "includeFiles": [
           "src/**",
           "public/**",
+          "patchwork.db",
           "node_modules/sql.js/dist/sql-wasm.wasm"
         ]
       }

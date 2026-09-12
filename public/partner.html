@@ -46,7 +46,11 @@
       --pw-shadow-md: 0 8px 24px -12px rgba(11, 18, 32, .28);
     }
 
-    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    html {
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+      zoom: 85%;
+    }
 
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -984,6 +988,34 @@
       }
       errEl.innerHTML = msg;
       errEl.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function showAuthPendingAlert(msg, email = '') {
+      const errEl = document.getElementById('auth-error');
+      if (!errEl) return;
+      const cleanEmail = escapeHtml(email);
+      const waMsg = encodeURIComponent(`Halo Admin PATCHWORK, saya sudah mendaftar sebagai mitra dengan email: ${email}. Mohon bantu untuk verifikasi & persetujuan akun saya.`);
+      errEl.className = 'mb-4 p-4 rounded-2xl text-xs bg-amber-50/95 text-amber-950 border border-amber-200 block shadow-sm';
+      errEl.innerHTML = `
+        <div class="space-y-2.5 text-left">
+          <div class="flex items-center gap-2 font-bold text-amber-900 text-xs">
+            <i data-lucide="clock-3" class="w-4 h-4 text-amber-600 shrink-0"></i>
+            <span>Akun Menunggu Persetujuan Admin</span>
+          </div>
+          <p class="text-[11px] leading-relaxed text-amber-900/90">
+            ${escapeHtml(msg || 'Akun Anda sedang menunggu persetujuan dari Admin. Anda baru bisa masuk setelah akun disetujui (Approved).')}
+          </p>
+          <div class="pt-1 flex items-center gap-2">
+            <a href="https://wa.me/6281234567890?text=${waMsg}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-sm transition">
+              <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+              <span>Hubungi Admin via WhatsApp</span>
+            </a>
+          </div>
+        </div>
+      `;
+      errEl.classList.remove('hidden');
+      lucide.createIcons();
     }
 
     function showDashboardScreen() {
@@ -1195,7 +1227,11 @@
           showDashboardScreen();
           showToast('Login berhasil! Selamat datang di Portal Mitra.', 'success');
         } else {
-          showAuthError(data.error || 'Email atau password salah.');
+          if (data.status === 'Pending') {
+            showAuthPendingAlert(data.error, email);
+          } else {
+            showAuthError(data.error || 'Email atau password salah.');
+          }
         }
       } catch (err) {
         showAuthError('Gagal terhubung ke server. Silakan coba lagi.');
@@ -1230,14 +1266,21 @@
 
         if (res.ok) {
           showAuthError(`
-            <strong>🎉 Pendaftaran Berhasil!</strong><br>
-            Akun Anda atas nama <strong>${payload.name}</strong> berhasil didaftarkan.
-            <div class="mt-2 p-2 rounded-xl bg-white/70 border border-emerald-200 text-[11px] text-emerald-950">
-              ⏳ <strong>Menunggu Persetujuan:</strong> Admin PATCHWORK akan memeriksa data dan nomor WhatsApp Anda. Anda <strong>baru bisa memasukkan produk setelah akun disetujui (Approved)</strong>.
+            <div class="space-y-2 text-left">
+              <div class="flex items-center gap-2 text-emerald-800 font-bold text-xs">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+                <span>Pendaftaran Mitra Berhasil Dikirim!</span>
+              </div>
+              <p class="text-[11px] text-emerald-950 leading-relaxed">
+                Akun atas nama <strong>${escapeHtml(payload.name)}</strong> telah tersimpan dan saat ini <strong>menunggu persetujuan Admin</strong>.
+              </p>
+              <div class="p-2.5 rounded-xl bg-white/90 border border-emerald-200 text-[11px] text-emerald-950 leading-relaxed">
+                ⏳ <strong>Wajib Disetujui Admin:</strong> Anda <strong>belum bisa masuk</strong> sampai admin memeriksa nomor WhatsApp dan menyetujui akun Anda.
+              </div>
             </div>
           `, true);
           document.getElementById('partner-reg-form').reset();
-          // Pindah ke tab login otomatis
+          lucide.createIcons();
           setTimeout(() => {
             switchAuthTab('login');
             document.getElementById('login-email').value = payload.email;

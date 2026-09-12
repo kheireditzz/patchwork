@@ -40,6 +40,11 @@
   </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    html {
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+      zoom: 85%;
+    }
     body { 
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; 
       letter-spacing: -0.012em; 
@@ -240,9 +245,10 @@
           <span>Banner</span>
         </button>
 
-        <button onclick="navigateTab('users')" id="nav-users" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition">
+        <button onclick="navigateTab('users')" id="nav-users" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition relative">
           <i data-lucide="users" class="w-3.5 h-3.5"></i>
-          <span>Pengguna</span>
+          <span>Pengguna & Mitra</span>
+          <span id="badge-pending-users" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-500 text-white leading-tight">0</span>
         </button>
 
         <button onclick="navigateTab('seo')" id="nav-seo" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition">
@@ -455,15 +461,45 @@
 
         <!-- 5. USERS MANAGEMENT TAB -->
         <div id="tab-users" class="hidden space-y-6">
-          <div class="flex items-center justify-between">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Pengguna & Mitra Penjual</h3>
-              <p class="text-xs text-slate-500">Kelola akun Super Admin, Admin, serta persetujuan (approval) pendaftaran Mitra Penjual</p>
+              <p class="text-xs text-slate-500">Kelola verifikasi pendaftaran mitra, persetujuan akun, dan hak akses staf</p>
             </div>
-            <button onclick="openUserModal()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs shadow-sm flex items-center space-x-1.5 transition">
-              <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-              <span>Tambah User</span>
-            </button>
+            <div class="flex items-center gap-2">
+              <button onclick="openUserModal()" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs shadow-sm flex items-center space-x-1.5 transition">
+                <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                <span>Tambah User</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Toolbar for Users -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+              <button type="button" onclick="setUserFilterStatus('')" id="btn-ufilter-all" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white transition shrink-0">
+                Semua (<span id="count-users-all">0</span>)
+              </button>
+              <button type="button" onclick="setUserFilterStatus('Pending')" id="btn-ufilter-pending" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-amber-100 text-slate-600 hover:text-amber-800 transition flex items-center gap-1.5 shrink-0">
+                <span>⏳ Menunggu Approval</span>
+                <span id="count-users-pending" class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500 text-white font-black">0</span>
+              </button>
+              <button type="button" onclick="setUserFilterStatus('Approved')" id="btn-ufilter-approved" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-emerald-100 text-slate-600 hover:text-emerald-800 transition shrink-0">
+                ✓ Disetujui (<span id="count-users-approved">0</span>)
+              </button>
+              <button type="button" onclick="setUserFilterStatus('Rejected')" id="btn-ufilter-rejected" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-800 transition shrink-0">
+                ✕ Ditolak (<span id="count-users-rejected">0</span>)
+              </button>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="relative w-full sm:w-60">
+                <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="search-users-input" oninput="filterUsersList()" placeholder="Cari nama, email, WA..." class="w-full pl-9 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:border-slate-900 transition">
+              </div>
+              <button onclick="loadUsersList()" class="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition" title="Refresh Data">
+                <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
           </div>
 
           <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -1961,74 +1997,194 @@
     }
 
     // ----------------- USERS TAB -----------------
+    let cachedUsersList = [];
+    let currentUsersStatusFilter = '';
+
+    function setUserFilterStatus(status) {
+      currentUsersStatusFilter = status;
+      const btns = {
+        '': document.getElementById('btn-ufilter-all'),
+        'Pending': document.getElementById('btn-ufilter-pending'),
+        'Approved': document.getElementById('btn-ufilter-approved'),
+        'Rejected': document.getElementById('btn-ufilter-rejected')
+      };
+
+      Object.keys(btns).forEach(k => {
+        const b = btns[k];
+        if (!b) return;
+        if (k === status) {
+          b.className = k === 'Pending' 
+            ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-white shadow-sm transition flex items-center gap-1.5 shrink-0'
+            : (k === 'Approved'
+              ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm transition shrink-0'
+              : (k === 'Rejected'
+                ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-600 text-white shadow-sm transition shrink-0'
+                : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm transition shrink-0'));
+        } else {
+          b.className = k === 'Pending'
+            ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-amber-100 text-slate-600 hover:text-amber-800 transition flex items-center gap-1.5 shrink-0'
+            : (k === 'Approved'
+              ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-emerald-100 text-slate-600 hover:text-emerald-800 transition shrink-0'
+              : (k === 'Rejected'
+                ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-800 transition shrink-0'
+                : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:text-slate-900 transition shrink-0'));
+        }
+      });
+
+      renderUsersTable();
+    }
+
+    function filterUsersList() {
+      renderUsersTable();
+    }
+
     async function loadUsersList() {
       try {
         const res = await fetch('/api/users', { headers: { 'Authorization': `Bearer ${token}` } });
         if (!res.ok) return;
         const json = await res.json();
-        const tbody = document.getElementById('users-table-body');
+        cachedUsersList = json.data || [];
 
-        tbody.innerHTML = (json.data || []).map(u => {
-          const dateStr = u.created_at ? new Date(u.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
-          const waClean = (u.phone || '').replace(/[^0-9]/g, '');
-          const waLink = waClean.startsWith('0') ? '62' + waClean.substring(1) : waClean;
+        // Calculate and update counters
+        const total = cachedUsersList.length;
+        const pending = cachedUsersList.filter(u => u.status === 'Pending').length;
+        const approved = cachedUsersList.filter(u => u.status === 'Approved').length;
+        const rejected = cachedUsersList.filter(u => u.status === 'Rejected').length;
 
-          let roleBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/10 text-slate-600">${u.role}</span>`;
-          if (u.role === 'Super Admin') roleBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-600">Super Admin</span>`;
-          if (u.role === 'Admin') roleBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-500/10 text-brand-600">Admin</span>`;
-          if (u.role === 'Partner') roleBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700">Mitra (Partner)</span>`;
+        const countAll = document.getElementById('count-users-all');
+        const countPending = document.getElementById('count-users-pending');
+        const countApproved = document.getElementById('count-users-approved');
+        const countRejected = document.getElementById('count-users-rejected');
+        const navBadge = document.getElementById('badge-pending-users');
 
-          let statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Approved</span>`;
-          if (u.status === 'Pending') statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Pending Approval</span>`;
-          if (u.status === 'Rejected') statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">Rejected</span>`;
+        if (countAll) countAll.innerText = total;
+        if (countPending) countPending.innerText = pending;
+        if (countApproved) countApproved.innerText = approved;
+        if (countRejected) countRejected.innerText = rejected;
 
-          return `
-            <tr class="hover:bg-slate-50 transition">
-              <td class="p-3.5">
-                <div class="font-bold text-slate-900">${escapeHtml(u.name)}</div>
-                ${u.phone ? `
-                  <a href="https://wa.me/${waLink}?text=${encodeURIComponent('Halo ' + u.name + ', terkait pendaftaran akun kemitraan PATCHWORK Anda...')}" target="_blank" class="inline-flex items-center space-x-1 text-[11px] text-emerald-600 hover:text-emerald-700 font-medium mt-0.5" title="Chat WhatsApp">
-                    <i data-lucide="message-circle" class="w-3 h-3"></i>
-                    <span>${escapeHtml(u.phone)}</span>
-                  </a>
-                ` : '<span class="text-[10px] text-slate-400 italic">Tanpa No. WA</span>'}
-              </td>
-              <td class="p-3.5 text-slate-600 text-xs font-mono">${escapeHtml(u.email)}</td>
-              <td class="p-3.5 whitespace-nowrap">${roleBadge}</td>
-              <td class="p-3.5 whitespace-nowrap">${statusBadge}</td>
-              <td class="p-3.5 text-slate-400 whitespace-nowrap">${dateStr}</td>
-              <td class="p-3.5 text-right whitespace-nowrap">
-                <div class="flex items-center justify-end space-x-1.5">
-                  ${u.status === 'Pending' ? `
-                    <button onclick="approveUser('${u.id}', '${escapeHtml(u.name)}')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-sm transition flex items-center space-x-1" title="Setujui Akun">
-                      <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
-                      <span>Approve</span>
-                    </button>
-                    <button onclick="rejectUser('${u.id}', '${escapeHtml(u.name)}')" class="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[11px] border border-rose-200 transition flex items-center space-x-1" title="Tolak Akun">
-                      <i data-lucide="user-x" class="w-3.5 h-3.5"></i>
-                      <span>Tolak</span>
-                    </button>
-                  ` : ''}
-                  ${currentUser && u.id !== currentUser.id ? `
-                    <button onclick="deleteUser('${u.id}')" class="p-1.5 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition" title="Hapus User">
-                      <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
-                  ` : '<span class="text-slate-400 text-[10px] italic">Akun Anda</span>'}
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
-        lucide.createIcons();
+        if (navBadge) {
+          if (pending > 0) {
+            navBadge.innerText = pending;
+            navBadge.classList.remove('hidden');
+          } else {
+            navBadge.classList.add('hidden');
+          }
+        }
+
+        renderUsersTable();
       } catch (err) {
         console.error('Error loading users:', err);
       }
     }
 
-    async function approveUser(id, name) {
+    function renderUsersTable() {
+      const tbody = document.getElementById('users-table-body');
+      if (!tbody) return;
+
+      const q = (document.getElementById('search-users-input')?.value || '').trim().toLowerCase();
+
+      let list = cachedUsersList;
+      if (currentUsersStatusFilter) {
+        list = list.filter(u => u.status === currentUsersStatusFilter);
+      }
+      if (q) {
+        list = list.filter(u => 
+          (u.name && u.name.toLowerCase().includes(q)) ||
+          (u.email && u.email.toLowerCase().includes(q)) ||
+          (u.phone && u.phone.toLowerCase().includes(q)) ||
+          (u.role && u.role.toLowerCase().includes(q))
+        );
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="p-8 text-center text-slate-400">
+              <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
+              <div class="font-bold text-slate-700 text-sm">Tidak ada data pengguna</div>
+              <p class="text-xs text-slate-400 mt-1">Coba ganti filter status atau kata kunci pencarian</p>
+            </td>
+          </tr>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      tbody.innerHTML = list.map(u => {
+        const dateStr = u.created_at ? new Date(u.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+        const waClean = (u.phone || '').replace(/[^0-9]/g, '');
+        const waLink = waClean.startsWith('0') ? '62' + waClean.substring(1) : waClean;
+
+        let roleBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/10 text-slate-600">${escapeHtml(u.role)}</span>`;
+        if (u.role === 'Super Admin') roleBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-700">Super Admin</span>`;
+        if (u.role === 'Admin') roleBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-500/10 text-brand-700">Admin</span>`;
+        if (u.role === 'Partner') roleBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700">Mitra (Partner)</span>`;
+
+        let statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Disetujui</span>`;
+        if (u.status === 'Pending') {
+          statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 animate-pulse"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Menunggu Approval</span>`;
+        }
+        if (u.status === 'Rejected') {
+          statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>Ditolak</span>`;
+        }
+
+        const notifyWaText = encodeURIComponent(`Halo ${u.name}, selamat! Pendaftaran akun kemitraan PATCHWORK Anda telah disetujui oleh Admin. Anda sekarang dapat login di https://patchwork.kheireditz.my.id/partner untuk mulai memajang produk affiliate Anda.`);
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition ${u.status === 'Pending' ? 'bg-amber-50/30' : ''}">
+            <td class="p-3.5">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                  ${escapeHtml((u.name || 'U').substring(0, 1).toUpperCase())}
+                </div>
+                <div>
+                  <div class="font-bold text-slate-900">${escapeHtml(u.name)}</div>
+                  ${u.phone ? `
+                    <a href="https://wa.me/${waLink}?text=${encodeURIComponent('Halo ' + u.name + ', terkait pendaftaran akun kemitraan PATCHWORK Anda...')}" target="_blank" class="inline-flex items-center space-x-1 text-[11px] text-emerald-600 hover:text-emerald-700 font-medium mt-0.5" title="Chat WhatsApp">
+                      <i data-lucide="message-circle" class="w-3 h-3"></i>
+                      <span>${escapeHtml(u.phone)}</span>
+                    </a>
+                  ` : '<span class="text-[10px] text-slate-400 italic">Tanpa No. WA</span>'}
+                </div>
+              </div>
+            </td>
+            <td class="p-3.5 text-slate-600 text-xs font-mono">${escapeHtml(u.email)}</td>
+            <td class="p-3.5 whitespace-nowrap">${roleBadge}</td>
+            <td class="p-3.5 whitespace-nowrap">${statusBadge}</td>
+            <td class="p-3.5 text-slate-400 whitespace-nowrap">${dateStr}</td>
+            <td class="p-3.5 text-right whitespace-nowrap">
+              <div class="flex items-center justify-end gap-1.5">
+                ${u.status === 'Pending' ? `
+                  <button onclick="approveUser('${u.id}', '${escapeHtml(u.name)}', '${waLink}')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition flex items-center space-x-1.5 active:scale-95" title="Setujui Akun">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <span>Setujui</span>
+                  </button>
+                  <button onclick="rejectUser('${u.id}', '${escapeHtml(u.name)}')" class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition flex items-center space-x-1 active:scale-95" title="Tolak Akun">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    <span>Tolak</span>
+                  </button>
+                ` : (u.status === 'Approved' && u.phone ? `
+                  <a href="https://wa.me/${waLink}?text=${notifyWaText}" target="_blank" class="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition" title="Kirim Konfirmasi WhatsApp">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                  </a>
+                ` : '')}
+                ${currentUser && u.id !== currentUser.id ? `
+                  <button onclick="deleteUser('${u.id}')" class="p-1.5 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition" title="Hapus User">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                ` : '<span class="text-slate-400 text-[10px] italic">Akun Anda</span>'}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    async function approveUser(id, name, waLink = '') {
       const ok = await showConfirm({
         title: 'Setujui Akun Mitra?',
-        message: `Setujui akun "${name}"? Pengguna akan dapat login ke dashboard dan mulai memasukkan produk ke katalog.`,
+        message: `Setujui akun mitra "${name}"? Pengguna akan langsung dapat login ke Portal Mitra dan mulai menambahkan produk ke katalog.`,
         confirmText: 'Ya, Setujui Akun',
         type: 'info'
       });
@@ -2041,8 +2197,15 @@
         });
         const json = await res.json();
         if (res.ok) {
-          showToast(json.message || 'Akun berhasil disetujui!', 'success');
+          showToast(json.message || 'Akun mitra berhasil disetujui!', 'success');
           loadUsersList();
+          if (waLink) {
+            const openWa = confirm(`Apakah Anda ingin membuka WhatsApp untuk mengabari ${name} bahwa akunnya telah disetujui?`);
+            if (openWa) {
+              const text = encodeURIComponent(`Halo ${name}, pendaftaran kemitraan Anda di PATCHWORK telah disetujui! Anda sekarang dapat login di https://patchwork.kheireditz.my.id/partner untuk memasukkan produk ke katalog.`);
+              window.open(`https://wa.me/${waLink}?text=${text}`, '_blank');
+            }
+          }
         } else {
           showToast(json.error || 'Gagal menyetujui akun', 'error');
         }
@@ -2054,7 +2217,7 @@
     async function rejectUser(id, name) {
       const ok = await showConfirm({
         title: 'Tolak Pendaftaran Akun?',
-        message: `Tolak pendaftaran akun "${name}"? User tidak akan dapat login.`,
+        message: `Tolak pendaftaran akun "${name}"? Pengguna tidak akan dapat masuk ke Portal Mitra.`,
         confirmText: 'Tolak Akun',
         type: 'danger'
       });
@@ -2067,7 +2230,7 @@
         });
         const json = await res.json();
         if (res.ok) {
-          showToast(json.message || 'Akun ditolak', 'info');
+          showToast(json.message || 'Pendaftaran akun ditolak', 'info');
           loadUsersList();
         } else {
           showToast(json.error || 'Gagal menolak akun', 'error');

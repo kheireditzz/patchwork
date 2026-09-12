@@ -131,16 +131,29 @@ router.post('/auth/login', (req, res) => {
     }
 
     // Check approval status
+    if (user.role === 'Partner' && user.status !== 'Approved') {
+      if (user.status === 'Rejected') {
+        return res.status(403).json({
+          error: 'Pendaftaran akun Anda ditolak oleh Admin. Hubungi admin via WhatsApp untuk informasi lebih lanjut.',
+          status: 'Rejected'
+        });
+      }
+      return res.status(403).json({
+        error: 'Akun Anda sedang menunggu persetujuan (approval) dari Admin. Anda baru bisa masuk dan memasukkan produk setelah disetujui.',
+        status: 'Pending'
+      });
+    }
+
     if (user.status === 'Pending') {
       return res.status(403).json({
-        error: 'Akun Anda sedang menunggu persetujuan dari Admin. Anda baru bisa memasukkan produk setelah akun disetujui.',
+        error: 'Akun Anda sedang menunggu persetujuan dari Admin.',
         status: 'Pending'
       });
     }
 
     if (user.status === 'Rejected') {
       return res.status(403).json({
-        error: 'Pendaftaran akun Anda ditolak oleh Admin. Hubungi kami via WhatsApp untuk informasi lebih lanjut.',
+        error: 'Akun Anda berstatus nonaktif/ditolak.',
         status: 'Rejected'
       });
     }
