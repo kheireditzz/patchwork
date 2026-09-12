@@ -337,9 +337,32 @@ export async function initDatabase() {
     }
   }
 
-  // Seed default categories
+  // Synchronize categories from Supabase PostgreSQL if connected
+  let syncedCats = false;
+  if (supabase) {
+    try {
+      const { data: sbCats, error: cErr } = await supabase.from('categories').select('*');
+      if (!cErr && sbCats && sbCats.length > 0) {
+        const insC = sqlite.prepare(`
+          INSERT OR REPLACE INTO categories (id, name, slug, icon, description, color, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `);
+        sbCats.forEach(c => {
+          try {
+            insC.run(c.id, c.name, c.slug, c.icon || 'tag', c.description || '', c.color || '#3B82F6', c.created_at || new Date().toISOString());
+          } catch (e) {}
+        });
+        syncedCats = true;
+        console.log(`✅ Synced ${sbCats.length} category(ies) from Supabase.`);
+      }
+    } catch (err) {
+      console.warn('⚠️ Supabase categories sync warning:', err.message);
+    }
+  }
+
+  // Seed default categories if none exist
   const catCount = sqlite.prepare('SELECT count(*) as count FROM categories').get().count;
-  if (catCount === 0) {
+  if (catCount === 0 && !syncedCats) {
     const cats = [
       { id: 'cat_1', name: 'Fashion & Pakaian', slug: 'fashion-pakaian', icon: 'shirt', color: '#EC4899', description: 'Koleksi busana hits viral TikTok dan Shopee' },
       { id: 'cat_2', name: 'Gadget & Elektronik', slug: 'gadget-elektronik', icon: 'smartphone', color: '#3B82F6', description: 'Aksesoris gadget, charger, TWS terlaris' },
@@ -351,9 +374,32 @@ export async function initDatabase() {
     cats.forEach(c => insertCat.run(c.id, c.name, c.slug, c.icon, c.color, c.description));
   }
 
-  // Seed default banners
+  // Synchronize banners from Supabase PostgreSQL if connected
+  let syncedBanners = false;
+  if (supabase) {
+    try {
+      const { data: sbBanners, error: bErr } = await supabase.from('banners').select('*');
+      if (!bErr && sbBanners && sbBanners.length > 0) {
+        const insB = sqlite.prepare(`
+          INSERT OR REPLACE INTO banners (id, title, subtitle, image, target_url, status, display_order, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+        sbBanners.forEach(b => {
+          try {
+            insB.run(b.id, b.title, b.subtitle || '', b.image, b.target_url || '#', b.status || 'Published', b.display_order || 0, b.created_at || new Date().toISOString());
+          } catch (e) {}
+        });
+        syncedBanners = true;
+        console.log(`✅ Synced ${sbBanners.length} banner(s) from Supabase.`);
+      }
+    } catch (err) {
+      console.warn('⚠️ Supabase banners sync warning:', err.message);
+    }
+  }
+
+  // Seed default banners if none exist
   const bannerCount = sqlite.prepare('SELECT count(*) as count FROM banners').get().count;
-  if (bannerCount === 0) {
+  if (bannerCount === 0 && !syncedBanners) {
     const defaultBanners = [
       {
         id: 'ban_1',
@@ -376,9 +422,44 @@ export async function initDatabase() {
     defaultBanners.forEach((b, idx) => insertBan.run(b.id, b.title, b.subtitle, b.image, b.target_url, b.status, idx));
   }
 
-  // Seed initial products
+  // Synchronize products from Supabase PostgreSQL if connected
+  let syncedProducts = false;
+  if (supabase) {
+    try {
+      const { data: sbProds, error: pErr } = await supabase.from('products').select('*');
+      if (!pErr && sbProds && sbProds.length > 0) {
+        const insP = sqlite.prepare(`
+          INSERT OR REPLACE INTO products (
+            id, name, slug, category_id, description, price, commission_rate,
+            marketplace, url_shopee, url_tiktok, url_tokopedia, thumbnail, gallery,
+            status, is_featured, total_clicks, shopee_clicks, tiktok_clicks, tokopedia_clicks,
+            created_by, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+        sbProds.forEach(p => {
+          try {
+            const gal = typeof p.gallery === 'string' ? p.gallery : JSON.stringify(p.gallery || []);
+            insP.run(
+              p.id, p.name, p.slug, p.category_id || null, p.description || '',
+              p.price || 0, p.commission_rate || '', p.marketplace || 'Shopee',
+              p.url_shopee || '', p.url_tiktok || '', p.url_tokopedia || '',
+              p.thumbnail || '', gal, p.status || 'Published', p.is_featured ? 1 : 0,
+              p.total_clicks || 0, p.shopee_clicks || 0, p.tiktok_clicks || 0, p.tokopedia_clicks || 0,
+              p.created_by || null, p.created_at || new Date().toISOString(), p.updated_at || new Date().toISOString()
+            );
+          } catch (e) {}
+        });
+        syncedProducts = true;
+        console.log(`✅ Synced ${sbProds.length} product(s) from Supabase.`);
+      }
+    } catch (err) {
+      console.warn('⚠️ Supabase products sync warning:', err.message);
+    }
+  }
+
+  // Seed initial products if none exist
   const prodCount = sqlite.prepare('SELECT count(*) as count FROM products').get().count;
-  if (prodCount === 0) {
+  if (prodCount === 0 && !syncedProducts) {
     const products = [
       {
         id: 'prod_1',
@@ -482,6 +563,24 @@ export async function initDatabase() {
     });
   }
 
+  // Synchronize settings from Supabase
+  if (supabase) {
+    try {
+      const { data: sbSettings, error: sErr } = await supabase.from('settings').select('*');
+      if (!sErr && sbSettings && sbSettings.length > 0) {
+        const insS = sqlite.prepare(`
+          INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES (?, ?, ?)
+        `);
+        sbSettings.forEach(s => {
+          try { insS.run(s.key, s.value, s.updated_at || new Date().toISOString()); } catch (e) {}
+        });
+        console.log(`✅ Synced ${sbSettings.length} setting(s) from Supabase.`);
+      }
+    } catch (err) {
+      console.warn('⚠️ Supabase settings sync warning:', err.message);
+    }
+  }
+
   // Seed default settings (SEO, etc)
   const defaultSettings = [
     { key: 'meta_title', value: 'PATCHWORK - Kurasi Link Affiliate TikTok, Shopee & Marketplace Terpercaya' },
@@ -495,6 +594,35 @@ export async function initDatabase() {
 
   const insSetting = sqlite.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');
   defaultSettings.forEach(s => insSetting.run(s.key, s.value));
+
+  // Synchronize partner_submissions from Supabase
+  if (supabase) {
+    try {
+      const { data: sbSubs, error: subErr } = await supabase.from('partner_submissions').select('*');
+      if (!subErr && sbSubs && sbSubs.length > 0) {
+        const insSub = sqlite.prepare(`
+          INSERT OR REPLACE INTO partner_submissions (
+            id, partner_name, whatsapp, email, product_name, marketplace, product_url,
+            product_price, commission_rate, description, image_url, status, admin_notes,
+            created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+        sbSubs.forEach(s => {
+          try {
+            insSub.run(
+              s.id, s.partner_name, s.whatsapp, s.email || '', s.product_name, s.marketplace || 'Shopee',
+              s.product_url, s.product_price || 0, s.commission_rate || '', s.description || '',
+              s.image_url || '', s.status || 'Pending', s.admin_notes || null,
+              s.created_at || new Date().toISOString(), s.updated_at || new Date().toISOString()
+            );
+          } catch (e) {}
+        });
+        console.log(`✅ Synced ${sbSubs.length} partner submission(s) from Supabase.`);
+      }
+    } catch (err) {
+      console.warn('⚠️ Supabase submissions sync warning:', err.message);
+    }
+  }
 
   saveDbToFile();
   console.log('✅ Local SQLite (sql.js WASM) and schema initialized successfully.');

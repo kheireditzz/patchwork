@@ -236,7 +236,7 @@ router.get('/auth/me', authenticateToken, (req, res) => {
 });
 
 // Update Profile & Bio / Social Links / Template / Custom Slug
-router.put('/auth/profile', authenticateToken, (req, res) => {
+router.put('/auth/profile', authenticateToken, async (req, res) => {
   try {
     const { name, phone, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug } = req.body;
     const userId = req.user.id;
@@ -245,11 +245,39 @@ router.put('/auth/profile', authenticateToken, (req, res) => {
     if (custom_slug !== undefined) {
       cleanSlug = custom_slug.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
       if (cleanSlug) {
-        // Check uniqueness of custom_slug
+        // Check uniqueness of custom_slug locally and in Supabase
         const conflict = sqlite.prepare('SELECT id FROM users WHERE LOWER(custom_slug) = ? AND id != ?').get(cleanSlug, userId);
         if (conflict) {
           return res.status(400).json({ error: `Link ID "${cleanSlug}" sudah dipakai oleh pengguna lain. Silakan gunakan nama lain.` });
         }
+        if (supabase) {
+          try {
+            const { data: sbSlug } = await supabase.from('users').select('id').ilike('custom_slug', cleanSlug).neq('id', userId).limit(1);
+            if (sbSlug && sbSlug.length > 0) {
+              return res.status(400).json({ error: `Link ID "${cleanSlug}" sudah dipakai oleh pengguna lain. Silakan gunakan nama lain.` });
+            }
+          } catch (e) {}
+        }
+      }
+    }
+
+    if (supabase) {
+      try {
+        const payload = { updated_at: new Date().toISOString() };
+        if (name) payload.name = name;
+        if (phone !== undefined) payload.phone = phone;
+        if (bio !== undefined) payload.bio = bio;
+        if (avatar !== undefined) payload.avatar = avatar;
+        if (tiktok !== undefined) payload.tiktok = tiktok;
+        if (instagram !== undefined) payload.instagram = instagram;
+        if (shopee !== undefined) payload.shopee = shopee;
+        if (youtube !== undefined) payload.youtube = youtube;
+        if (website !== undefined) payload.website = website;
+        if (template !== undefined) payload.template = template;
+        if (cleanSlug !== undefined) payload.custom_slug = cleanSlug || null;
+        await supabase.from('users').update(payload).eq('id', userId);
+      } catch (err) {
+        console.warn('Supabase profile update err:', err.message);
       }
     }
 
@@ -293,27 +321,56 @@ router.put('/auth/profile', authenticateToken, (req, res) => {
 });
 
 // Public Lynk.id Profile Endpoint by User ID or custom_slug
-router.get('/profile/:id', (req, res) => {
+router.get('/profile/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const lowerParam = id.toLowerCase();
-    const user = sqlite.prepare(`
+    let user = sqlite.prepare(`
       SELECT id, name, bio, avatar, tiktok, instagram, shopee, youtube, website, template, role, custom_slug
-      FROM users WHERE id = ? OR email = ? OR LOWER(custom_slug) = ?
-    `).get(id, id, lowerParam);
+      FROM users WHERE id = ? OR LOWER(email) = ? OR LOWER(custom_slug) = ?
+    `).get(id, lowerParam, lowerParam);
+
+    if (!user && supabase) {
+      try {
+        const { data: sbUser } = await supabase
+          .from('users')
+          .select('id, name, bio, avatar, tiktok, instagram, shopee, youtube, website, template, role, custom_slug')
+          .or(`id.eq.${id},email.ilike.${lowerParam},custom_slug.ilike.${lowerParam}`)
+          .single();
+        if (sbUser) user = sbUser;
+      } catch (e) {}
+    }
 
     if (!user) {
       return res.status(404).json({ error: 'Profil tidak ditemukan' });
     }
 
     // Get user products for this Lynk
-    const products = sqlite.prepare(`
+    let products = sqlite.prepare(`
       SELECT p.*, c.name as category_name, c.slug as category_slug
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
       WHERE p.created_by = ? AND p.status = 'Published'
       ORDER BY p.is_featured DESC, p.created_at DESC
     `).all(user.id);
+
+    if (products.length === 0 && supabase) {
+      try {
+        const { data: sbProds } = await supabase
+          .from('products')
+          .select('*, categories(name, slug)')
+          .eq('created_by', user.id)
+          .eq('status', 'Published')
+          .order('is_featured', { ascending: false });
+        if (sbProds && sbProds.length > 0) {
+          products = sbProds.map(p => ({
+            ...p,
+            category_name: p.categories?.name || '',
+            category_slug: p.categories?.slug || ''
+          }));
+        }
+      } catch (e) {}
+    }
 
     // Get categories associated with these products
     const catMap = {};
@@ -518,7 +575,8 @@ router.get('/products/:idOrSlug', (req, res) => {
 });
 
 // POST /api/products
-router.post('/products', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Editor', 'Partner']), (req, res) => {
+// POST /api/products
+router.post('/products', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Editor', 'Partner']), async (req, res) => {
   try {
     const {
       name,
@@ -540,7 +598,7 @@ router.post('/products', authenticateToken, authorizeRole(['Super Admin', 'Admin
       return res.status(400).json({ error: 'Nama produk wajib diisi.' });
     }
 
-    const id = 'prod_' + Date.now();
+    let id = 'prod_' + Date.now();
     let baseSlug = slugify(name);
     let slug = baseSlug;
     let count = 1;
@@ -549,9 +607,40 @@ router.post('/products', authenticateToken, authorizeRole(['Super Admin', 'Admin
     }
 
     const galleryJson = typeof gallery === 'string' ? gallery : JSON.stringify(gallery);
+    const parsedGalleryArray = Array.isArray(gallery) ? gallery : (typeof gallery === 'string' ? JSON.parse(gallery || '[]') : []);
+
+    // Sync to Supabase if connected
+    if (supabase) {
+      try {
+        const { data: sbProd, error: sbErr } = await supabase.from('products').insert({
+          name,
+          slug,
+          category_id: category_id || null,
+          description,
+          price: parseFloat(price) || 0,
+          commission_rate,
+          marketplace,
+          url_shopee,
+          url_tiktok,
+          url_tokopedia,
+          thumbnail,
+          gallery: parsedGalleryArray,
+          status,
+          is_featured: !!is_featured,
+          created_by: req.user.id
+        }).select('id').single();
+
+        if (sbProd && sbProd.id) {
+          id = sbProd.id;
+        }
+        if (sbErr) console.warn('Supabase product insert notice:', sbErr.message);
+      } catch (err) {
+        console.warn('Supabase product insert err:', err.message);
+      }
+    }
 
     sqlite.prepare(`
-      INSERT INTO products (
+      INSERT OR REPLACE INTO products (
         id, name, slug, category_id, description, price, commission_rate,
         marketplace, url_shopee, url_tiktok, url_tokopedia, thumbnail, gallery,
         status, is_featured, created_by
@@ -572,10 +661,18 @@ router.post('/products', authenticateToken, authorizeRole(['Super Admin', 'Admin
 });
 
 // PUT /api/products/:id
-router.put('/products/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Editor', 'Partner']), (req, res) => {
+router.put('/products/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Editor', 'Partner']), async (req, res) => {
   try {
     const { id } = req.params;
-    const existing = sqlite.prepare('SELECT * FROM products WHERE id = ?').get(id);
+    let existing = sqlite.prepare('SELECT * FROM products WHERE id = ?').get(id);
+    
+    if (!existing && supabase) {
+      try {
+        const { data: sbP } = await supabase.from('products').select('*').eq('id', id).single();
+        if (sbP) existing = sbP;
+      } catch (e) {}
+    }
+
     if (!existing) {
       return res.status(404).json({ error: 'Produk tidak ditemukan.' });
     }
@@ -614,6 +711,34 @@ router.put('/products/:id', authenticateToken, authorizeRole(['Super Admin', 'Ad
     }
 
     const galleryJson = gallery !== undefined ? (typeof gallery === 'string' ? gallery : JSON.stringify(gallery)) : existing.gallery;
+    const parsedGalleryArray = gallery !== undefined 
+      ? (Array.isArray(gallery) ? gallery : (typeof gallery === 'string' ? JSON.parse(gallery || '[]') : []))
+      : (Array.isArray(existing.gallery) ? existing.gallery : (typeof existing.gallery === 'string' ? JSON.parse(existing.gallery || '[]') : []));
+
+    // Update in Supabase
+    if (supabase) {
+      try {
+        const updatePayload = { updated_at: new Date().toISOString() };
+        if (name) updatePayload.name = name;
+        if (finalSlug) updatePayload.slug = finalSlug;
+        if (category_id !== undefined) updatePayload.category_id = category_id || null;
+        if (description !== undefined) updatePayload.description = description;
+        if (price !== undefined) updatePayload.price = parseFloat(price) || 0;
+        if (commission_rate !== undefined) updatePayload.commission_rate = commission_rate;
+        if (marketplace !== undefined) updatePayload.marketplace = marketplace;
+        if (url_shopee !== undefined) updatePayload.url_shopee = url_shopee;
+        if (url_tiktok !== undefined) updatePayload.url_tiktok = url_tiktok;
+        if (url_tokopedia !== undefined) updatePayload.url_tokopedia = url_tokopedia;
+        if (thumbnail !== undefined) updatePayload.thumbnail = thumbnail;
+        if (gallery !== undefined) updatePayload.gallery = parsedGalleryArray;
+        if (status !== undefined) updatePayload.status = status;
+        if (is_featured !== undefined) updatePayload.is_featured = !!is_featured;
+
+        await supabase.from('products').update(updatePayload).eq('id', id);
+      } catch (err) {
+        console.warn('Supabase product update err:', err.message);
+      }
+    }
 
     sqlite.prepare(`
       UPDATE products SET
@@ -661,16 +786,32 @@ router.put('/products/:id', authenticateToken, authorizeRole(['Super Admin', 'Ad
 });
 
 // DELETE /api/products/:id
-router.delete('/products/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Partner']), (req, res) => {
+router.delete('/products/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Partner']), async (req, res) => {
   try {
     const { id } = req.params;
-    const existing = sqlite.prepare('SELECT * FROM products WHERE id = ?').get(id);
+    let existing = sqlite.prepare('SELECT * FROM products WHERE id = ?').get(id);
+    
+    if (!existing && supabase) {
+      try {
+        const { data: sbP } = await supabase.from('products').select('*').eq('id', id).single();
+        if (sbP) existing = sbP;
+      } catch (e) {}
+    }
+
     if (!existing) {
       return res.status(404).json({ error: 'Produk tidak ditemukan.' });
     }
 
     if (req.user.role === 'Partner' && existing.created_by && existing.created_by !== req.user.id) {
       return res.status(403).json({ error: 'Anda hanya dapat menghapus produk milik Anda sendiri.' });
+    }
+
+    if (supabase) {
+      try {
+        await supabase.from('products').delete().eq('id', id);
+      } catch (err) {
+        console.warn('Supabase product delete err:', err.message);
+      }
     }
 
     sqlite.prepare('DELETE FROM products WHERE id = ?').run(id);
@@ -744,8 +885,23 @@ router.post('/visitors/track', (req, res) => {
 // -------------------------------------------------------------
 // 5. CATEGORIES (REST API CRUD)
 // -------------------------------------------------------------
-router.get('/categories', (req, res) => {
+router.get('/categories', async (req, res) => {
   try {
+    if (supabase) {
+      try {
+        const { data: sbCats, error: sbErr } = await supabase.from('categories').select('*').order('name', { ascending: true });
+        if (!sbErr && sbCats && sbCats.length > 0) {
+          const insC = sqlite.prepare(`
+            INSERT OR REPLACE INTO categories (id, name, slug, icon, description, color)
+            VALUES (?, ?, ?, ?, ?, ?)
+          `);
+          sbCats.forEach(c => {
+            try { insC.run(c.id, c.name, c.slug, c.icon || 'tag', c.description || '', c.color || '#3B82F6'); } catch (e) {}
+          });
+        }
+      } catch (err) {}
+    }
+
     const items = sqlite.prepare(`
       SELECT c.*, COUNT(p.id) as product_count 
       FROM categories c
@@ -759,12 +915,12 @@ router.get('/categories', (req, res) => {
   }
 });
 
-router.post('/categories', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.post('/categories', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { name, icon = 'tag', description = '', color = '#3B82F6' } = req.body;
     if (!name) return res.status(400).json({ error: 'Nama kategori wajib diisi.' });
 
-    const id = 'cat_' + Date.now();
+    let id = 'cat_' + Date.now();
     let baseSlug = slugify(name);
     let slug = baseSlug;
     let count = 1;
@@ -772,8 +928,23 @@ router.post('/categories', authenticateToken, authorizeRole(['Super Admin', 'Adm
       slug = `${baseSlug}-${count++}`;
     }
 
+    if (supabase) {
+      try {
+        const { data: sbCat, error: sbErr } = await supabase.from('categories').insert({
+          name,
+          slug,
+          icon,
+          description,
+          color
+        }).select('id').single();
+        if (sbCat && sbCat.id) id = sbCat.id;
+      } catch (err) {
+        console.warn('Supabase category insert err:', err.message);
+      }
+    }
+
     sqlite.prepare(`
-      INSERT INTO categories (id, name, slug, icon, description, color)
+      INSERT OR REPLACE INTO categories (id, name, slug, icon, description, color)
       VALUES (?, ?, ?, ?, ?, ?)
     `).run(id, name, slug, icon, description, color);
 
@@ -786,11 +957,24 @@ router.post('/categories', authenticateToken, authorizeRole(['Super Admin', 'Adm
   }
 });
 
-router.put('/categories/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.put('/categories/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { id } = req.params;
     const { name, icon, description, color } = req.body;
     
+    if (supabase) {
+      try {
+        const payload = {};
+        if (name !== undefined) payload.name = name;
+        if (icon !== undefined) payload.icon = icon;
+        if (description !== undefined) payload.description = description;
+        if (color !== undefined) payload.color = color;
+        await supabase.from('categories').update(payload).eq('id', id);
+      } catch (err) {
+        console.warn('Supabase category update err:', err.message);
+      }
+    }
+
     sqlite.prepare(`
       UPDATE categories SET
         name = coalesce(?, name),
@@ -809,9 +993,18 @@ router.put('/categories/:id', authenticateToken, authorizeRole(['Super Admin', '
   }
 });
 
-router.delete('/categories/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.delete('/categories/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (supabase) {
+      try {
+        await supabase.from('categories').delete().eq('id', id);
+      } catch (err) {
+        console.warn('Supabase category delete err:', err.message);
+      }
+    }
+
     sqlite.prepare('DELETE FROM categories WHERE id = ?').run(id);
     logActivity(req.user.id, req.user.name, 'DELETE_CATEGORY', `Menghapus kategori ID: ${id}`, req.ip);
     res.json({ message: 'Kategori berhasil dihapus.' });
@@ -823,9 +1016,27 @@ router.delete('/categories/:id', authenticateToken, authorizeRole(['Super Admin'
 // -------------------------------------------------------------
 // 6. BANNERS (REST API CRUD)
 // -------------------------------------------------------------
-router.get('/banners', (req, res) => {
+router.get('/banners', async (req, res) => {
   try {
     const { status } = req.query;
+
+    if (supabase) {
+      try {
+        let q = supabase.from('banners').select('*').order('display_order', { ascending: true });
+        if (status) q = q.eq('status', status);
+        const { data: sbBanners, error: sbErr } = await q;
+        if (!sbErr && sbBanners && sbBanners.length > 0) {
+          const insB = sqlite.prepare(`
+            INSERT OR REPLACE INTO banners (id, title, subtitle, image, target_url, status, display_order, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          `);
+          sbBanners.forEach(b => {
+            try { insB.run(b.id, b.title, b.subtitle || '', b.image, b.target_url || '#', b.status || 'Published', b.display_order || 0, b.created_at || new Date().toISOString()); } catch (e) {}
+          });
+        }
+      } catch (err) {}
+    }
+
     let sql = 'SELECT * FROM banners';
     let params = [];
     if (status) {
@@ -841,16 +1052,33 @@ router.get('/banners', (req, res) => {
   }
 });
 
-router.post('/banners', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.post('/banners', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { title, subtitle = '', image, target_url = '#', status = 'Published', display_order = 0 } = req.body;
     if (!title || !image) {
       return res.status(400).json({ error: 'Judul dan gambar banner wajib diisi.' });
     }
 
-    const id = 'ban_' + Date.now();
+    let id = 'ban_' + Date.now();
+
+    if (supabase) {
+      try {
+        const { data: sbBan, error: sbErr } = await supabase.from('banners').insert({
+          title,
+          subtitle,
+          image,
+          target_url,
+          status,
+          display_order: parseInt(display_order) || 0
+        }).select('id').single();
+        if (sbBan && sbBan.id) id = sbBan.id;
+      } catch (err) {
+        console.warn('Supabase banner insert err:', err.message);
+      }
+    }
+
     sqlite.prepare(`
-      INSERT INTO banners (id, title, subtitle, image, target_url, status, display_order)
+      INSERT OR REPLACE INTO banners (id, title, subtitle, image, target_url, status, display_order)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run(id, title, subtitle, image, target_url, status, display_order);
 
@@ -862,10 +1090,25 @@ router.post('/banners', authenticateToken, authorizeRole(['Super Admin', 'Admin'
   }
 });
 
-router.put('/banners/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.put('/banners/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { id } = req.params;
     const { title, subtitle, image, target_url, status, display_order } = req.body;
+
+    if (supabase) {
+      try {
+        const payload = {};
+        if (title !== undefined) payload.title = title;
+        if (subtitle !== undefined) payload.subtitle = subtitle;
+        if (image !== undefined) payload.image = image;
+        if (target_url !== undefined) payload.target_url = target_url;
+        if (status !== undefined) payload.status = status;
+        if (display_order !== undefined) payload.display_order = parseInt(display_order) || 0;
+        await supabase.from('banners').update(payload).eq('id', id);
+      } catch (err) {
+        console.warn('Supabase banner update err:', err.message);
+      }
+    }
 
     sqlite.prepare(`
       UPDATE banners SET
@@ -886,9 +1129,18 @@ router.put('/banners/:id', authenticateToken, authorizeRole(['Super Admin', 'Adm
   }
 });
 
-router.delete('/banners/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.delete('/banners/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (supabase) {
+      try {
+        await supabase.from('banners').delete().eq('id', id);
+      } catch (err) {
+        console.warn('Supabase banner delete err:', err.message);
+      }
+    }
+
     sqlite.prepare('DELETE FROM banners WHERE id = ?').run(id);
     logActivity(req.user.id, req.user.name, 'DELETE_BANNER', `Menghapus banner ID: ${id}`, req.ip);
     res.json({ message: 'Banner berhasil dihapus.' });
@@ -1234,8 +1486,22 @@ router.get('/public-stats', (req, res) => {
 // -------------------------------------------------------------
 // 9. SEO & SETTINGS MANAGEMENT
 // -------------------------------------------------------------
-router.get('/settings', (req, res) => {
+router.get('/settings', async (req, res) => {
   try {
+    if (supabase) {
+      try {
+        const { data: sbSettings } = await supabase.from('settings').select('*');
+        if (sbSettings && sbSettings.length > 0) {
+          const insS = sqlite.prepare(`
+            INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES (?, ?, ?)
+          `);
+          sbSettings.forEach(s => {
+            try { insS.run(s.key, s.value, s.updated_at || new Date().toISOString()); } catch (e) {}
+          });
+        }
+      } catch (err) {}
+    }
+
     const rows = sqlite.prepare('SELECT key, value FROM settings').all();
     const settings = {};
     rows.forEach(r => { settings[r.key] = r.value; });
@@ -1245,9 +1511,25 @@ router.get('/settings', (req, res) => {
   }
 });
 
-router.post('/settings', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.post('/settings', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const settings = req.body;
+
+    if (supabase) {
+      try {
+        for (const [key, val] of Object.entries(settings)) {
+          const strVal = typeof val === 'object' ? JSON.stringify(val) : String(val);
+          await supabase.from('settings').upsert({
+            key,
+            value: strVal,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'key' });
+        }
+      } catch (err) {
+        console.warn('Supabase settings upsert err:', err.message);
+      }
+    }
+
     const upsert = sqlite.prepare(`
       INSERT INTO settings (key, value, updated_at) 
       VALUES (?, ?, CURRENT_TIMESTAMP)
@@ -1368,7 +1650,7 @@ router.get('/backup/download', authenticateToken, authorizeRole(['Super Admin'])
 // 12. PARTNER PRODUCT SUBMISSION & APPROVAL WORKFLOW
 // -------------------------------------------------------------
 // Public endpoint for submitting a product into catalog queue
-router.post('/submissions', (req, res) => {
+router.post('/submissions', async (req, res) => {
   try {
     const {
       partner_name,
@@ -1387,9 +1669,31 @@ router.post('/submissions', (req, res) => {
       return res.status(400).json({ error: 'Nama, No WhatsApp, Nama Produk, dan Link Produk wajib diisi!' });
     }
 
-    const id = 'sub_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+    let id = 'sub_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+
+    if (supabase) {
+      try {
+        const { data: sbSub, error: sbErr } = await supabase.from('partner_submissions').insert({
+          partner_name: partner_name.trim(),
+          whatsapp: whatsapp.trim(),
+          email: email ? email.trim() : null,
+          product_name: product_name.trim(),
+          marketplace,
+          product_url: product_url.trim(),
+          product_price: parseFloat(product_price || 0),
+          commission_rate: commission_rate ? commission_rate.trim() : null,
+          description: description ? description.trim() : null,
+          image_url: image_url ? image_url.trim() : null,
+          status: 'Pending'
+        }).select('id').single();
+        if (sbSub && sbSub.id) id = sbSub.id;
+      } catch (err) {
+        console.warn('Supabase submission insert err:', err.message);
+      }
+    }
+
     sqlite.prepare(`
-      INSERT INTO partner_submissions (
+      INSERT OR REPLACE INTO partner_submissions (
         id, partner_name, whatsapp, email, product_name, marketplace,
         product_url, product_price, commission_rate, description, image_url, status
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')
@@ -1410,9 +1714,38 @@ router.post('/submissions', (req, res) => {
 });
 
 // Admin endpoint: List submissions
-router.get('/submissions', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Editor']), (req, res) => {
+router.get('/submissions', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Editor']), async (req, res) => {
   try {
     const { status } = req.query;
+
+    if (supabase) {
+      try {
+        let q = supabase.from('partner_submissions').select('*').order('created_at', { ascending: false });
+        if (status) q = q.eq('status', status);
+        const { data: sbSubs, error: sbErr } = await q;
+        if (!sbErr && sbSubs) {
+          const insSub = sqlite.prepare(`
+            INSERT OR REPLACE INTO partner_submissions (
+              id, partner_name, whatsapp, email, product_name, marketplace, product_url,
+              product_price, commission_rate, description, image_url, status, admin_notes,
+              created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `);
+          sbSubs.forEach(s => {
+            try {
+              insSub.run(
+                s.id, s.partner_name, s.whatsapp, s.email || '', s.product_name, s.marketplace || 'Shopee',
+                s.product_url, s.product_price || 0, s.commission_rate || '', s.description || '',
+                s.image_url || '', s.status || 'Pending', s.admin_notes || null,
+                s.created_at || new Date().toISOString(), s.updated_at || new Date().toISOString()
+              );
+            } catch (e) {}
+          });
+          return res.json({ data: sbSubs });
+        }
+      } catch (err) {}
+    }
+
     let sql = 'SELECT * FROM partner_submissions';
     const params = [];
     if (status) {
@@ -1429,10 +1762,21 @@ router.get('/submissions', authenticateToken, authorizeRole(['Super Admin', 'Adm
 });
 
 // Admin endpoint: Update status or notes
-router.put('/submissions/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.put('/submissions/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { id } = req.params;
     const { status, admin_notes } = req.body;
+
+    if (supabase) {
+      try {
+        const payload = { updated_at: new Date().toISOString() };
+        if (status !== undefined) payload.status = status;
+        if (admin_notes !== undefined) payload.admin_notes = admin_notes;
+        await supabase.from('partner_submissions').update(payload).eq('id', id);
+      } catch (err) {
+        console.warn('Supabase submission update err:', err.message);
+      }
+    }
 
     sqlite.prepare(`
       UPDATE partner_submissions SET
@@ -1451,10 +1795,18 @@ router.put('/submissions/:id', authenticateToken, authorizeRole(['Super Admin', 
 });
 
 // Admin endpoint: Approve and automatically publish to products catalog
-router.post('/submissions/:id/approve', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.post('/submissions/:id/approve', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { id } = req.params;
-    const sub = sqlite.prepare('SELECT * FROM partner_submissions WHERE id = ?').get(id);
+    let sub = sqlite.prepare('SELECT * FROM partner_submissions WHERE id = ?').get(id);
+    
+    if (!sub && supabase) {
+      try {
+        const { data: sbSub } = await supabase.from('partner_submissions').select('*').eq('id', id).single();
+        if (sbSub) sub = sbSub;
+      } catch (e) {}
+    }
+
     if (!sub) {
       return res.status(404).json({ error: 'Data pengajuan tidak ditemukan.' });
     }
@@ -1469,13 +1821,41 @@ router.post('/submissions/:id/approve', authenticateToken, authorizeRole(['Super
       slug = `${baseSlug}-${count++}`;
     }
 
-    const prodId = 'prod_' + Date.now();
+    let prodId = 'prod_' + Date.now();
     const isTikTok = (sub.marketplace || '').toLowerCase().includes('tiktok');
     const url_shopee = isTikTok ? '' : sub.product_url;
     const url_tiktok = isTikTok ? sub.product_url : '';
 
+    if (supabase) {
+      try {
+        const { data: sbP } = await supabase.from('products').insert({
+          name: sub.product_name,
+          slug,
+          category_id: category_id || null,
+          description: sub.description || '',
+          price: parseFloat(sub.product_price || 0),
+          commission_rate: sub.commission_rate || '',
+          marketplace: sub.marketplace || 'Shopee',
+          url_shopee,
+          url_tiktok,
+          thumbnail: sub.image_url || '',
+          gallery: [],
+          status: 'Published',
+          is_featured: !!is_featured
+        }).select('id').single();
+        if (sbP && sbP.id) prodId = sbP.id;
+
+        await supabase.from('partner_submissions').update({
+          status: 'Approved',
+          updated_at: new Date().toISOString()
+        }).eq('id', id);
+      } catch (err) {
+        console.warn('Supabase approve submission err:', err.message);
+      }
+    }
+
     sqlite.prepare(`
-      INSERT INTO products (
+      INSERT OR REPLACE INTO products (
         id, name, slug, category_id, description, price, commission_rate,
         marketplace, url_shopee, url_tiktok, url_tokopedia, thumbnail, gallery,
         status, is_featured
@@ -1503,9 +1883,18 @@ router.post('/submissions/:id/approve', authenticateToken, authorizeRole(['Super
 });
 
 // Admin endpoint: Delete submission
-router.delete('/submissions/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), (req, res) => {
+router.delete('/submissions/:id', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (supabase) {
+      try {
+        await supabase.from('partner_submissions').delete().eq('id', id);
+      } catch (err) {
+        console.warn('Supabase delete submission err:', err.message);
+      }
+    }
+
     sqlite.prepare('DELETE FROM partner_submissions WHERE id = ?').run(id);
     logActivity(req.user.id, req.user.name, 'DELETE_SUBMISSION', `Menghapus data pengajuan ID: ${id}`, req.ip);
     res.json({ message: 'Pengajuan produk berhasil dihapus.' });

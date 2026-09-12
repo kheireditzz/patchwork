@@ -1116,11 +1116,9 @@
         previewBox.innerHTML = `<span class="text-xl font-bold">${initials}</span>`;
       }
 
-      // Update link preview — prioritize custom_slug domain
+      // Update link preview — direct path /lynk/:slug is 100% reliable across all domains
       const slug = p.custom_slug || p.id;
-      const lynkUrl = p.custom_slug
-        ? `https://${p.custom_slug}.kheireditz.my.id`
-        : `${window.location.origin}/lynk/${p.id}`;
+      const lynkUrl = `${window.location.origin}/lynk/${slug}`;
       const prevBtn = document.getElementById('btn-preview-lynk');
       const hdrBtn = document.getElementById('header-btn-lynk');
       if (prevBtn) prevBtn.href = lynkUrl;
@@ -1176,9 +1174,8 @@
 
     function copyLynkUrl() {
       if (!currentPartner) return;
-      const url = currentPartner.custom_slug
-        ? `https://${currentPartner.custom_slug}.kheireditz.my.id`
-        : `https://kheireditz.my.id/lynk/${currentPartner.id}`;
+      const slug = currentPartner.custom_slug || currentPartner.id;
+      const url = `${window.location.origin}/lynk/${slug}`;
       navigator.clipboard.writeText(url).then(() => {
         showToast('Tautan LYNK ID berhasil disalin ke clipboard!', 'success');
         const txt = document.getElementById('copy-lynk-text');
