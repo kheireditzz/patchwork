@@ -133,7 +133,7 @@
           <label class="block text-xs font-bold text-slate-700 mb-1.5">Email Administrator *</label>
           <div class="relative">
             <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-            <input type="email" id="login-email" placeholder="admin@patchwork.com" required class="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-900 focus:bg-white transition">
+            <input type="email" id="login-email" placeholder="email-admin@patchwork.com" required class="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-900 focus:bg-white transition">
           </div>
         </div>
 
@@ -149,20 +149,6 @@
           <span>Masuk ke Dashboard</span>
           <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
         </button>
-
-        <!-- Akun Default Super Admin Helper -->
-        <div class="p-3 rounded-2xl bg-indigo-50/80 border border-indigo-100 flex items-center justify-between text-[11px] text-indigo-950">
-          <div class="space-y-0.5">
-            <div class="font-bold flex items-center gap-1 text-indigo-900">
-              <i data-lucide="key" class="w-3.5 h-3.5 text-indigo-600"></i>
-              <span>Akun Default Super Admin</span>
-            </div>
-            <div class="text-[10px] text-slate-500 font-mono">admin@patchwork.com &bull; admin123</div>
-          </div>
-          <button type="button" onclick="fillAdminCredentials(false)" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] shadow-sm transition active:scale-95">
-            Gunakan
-          </button>
-        </div>
 
         <div class="pt-3 border-t border-slate-100 text-center space-y-2">
           <div class="text-xs text-slate-600">
@@ -2302,21 +2288,6 @@
         showToast('Upload gagal. Periksa koneksi.', 'error');
       } finally {
         inputEl.value = '';
-      }
-    }
-
-    // Quick Fill Admin Credentials Helper
-    function fillAdminCredentials(autoSubmit = false) {
-      const emailEl = document.getElementById('login-email');
-      const passEl = document.getElementById('login-password');
-      if (emailEl) emailEl.value = 'admin@patchwork.com';
-      if (passEl) passEl.value = 'admin123';
-      
-      if (autoSubmit) {
-        showToast('Memproses login otomatis dengan akun default...', 'info');
-        submitAdminLogin();
-      } else {
-        showToast('Kredensial default terisi. Silakan klik Masuk.', 'info');
       }
     }
 

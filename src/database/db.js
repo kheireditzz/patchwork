@@ -270,21 +270,37 @@ export async function initDatabase() {
     console.warn('Users table migration notice:', e.message);
   }
 
-  // Ensure default super admin exists and password is always valid: admin@patchwork.com / admin123
-  const passwordHash = bcrypt.hashSync('admin123', 10);
-  const existingUser = sqlite.prepare('SELECT id FROM users WHERE email = ?').get('admin@patchwork.com');
-  if (!existingUser) {
-    const userId = 'usr_superadmin';
-    sqlite.prepare(`
-      INSERT INTO users (id, name, email, phone, password, role, status)
-      VALUES (?, ?, ?, ?, ?, ?, 'Approved')
-    `).run(userId, 'Super Administrator', 'admin@patchwork.com', '0895321154498', passwordHash, 'Super Admin');
-    console.log('👤 Default Super Admin created: admin@patchwork.com / admin123');
+  // Ensure super admin exists using credentials from environment (ADMIN_EMAIL / ADMIN_PASSWORD).
+  // Prevents hardcoded default admin credentials from being shipped in the codebase.
+  const adminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD || '';
+  if (adminEmail && adminPassword) {
+    const passwordHash = bcrypt.hashSync(adminPassword, 10);
+    let existingUser = sqlite.prepare('SELECT id FROM users WHERE lower(email) = ?').get(adminEmail);
+    if (!existingUser) {
+      // Reuse an existing super-admin row (legacy default) if present
+      existingUser = sqlite.prepare(
+        `SELECT id FROM users WHERE id = 'usr_superadmin' OR role = 'Super Admin' OR lower(email) = 'admin@patchwork.com' LIMIT 1`
+      ).get();
+    }
+    if (!existingUser) {
+      const userId = 'usr_superadmin';
+      sqlite.prepare(`
+        INSERT INTO users (id, name, email, phone, password, role, status)
+        VALUES (?, ?, ?, ?, ?, ?, 'Approved')
+      `).run(userId, 'Super Administrator', adminEmail, '', passwordHash, 'Super Admin');
+      console.log('👤 Super Admin created from environment credentials.');
+    } else {
+      sqlite.prepare(`
+        UPDATE users SET name = 'Super Administrator', email = ?, phone = '', password = ?, role = 'Super Admin', status = 'Approved' WHERE id = ?
+      `).run(adminEmail, passwordHash, existingUser.id);
+      console.log('🔑 Super Admin credentials synchronized from environment credentials.');
+    }
+
+    // Remove any legacy default admin account that is no longer the configured one
+    sqlite.prepare(`DELETE FROM users WHERE lower(email) = 'admin@patchwork.com' AND lower(email) <> ?`).run(adminEmail);
   } else {
-    sqlite.prepare(`
-      UPDATE users SET password = ?, role = 'Super Admin', status = 'Approved' WHERE email = 'admin@patchwork.com'
-    `).run(passwordHash);
-    console.log('🔑 Super Admin password synchronized: admin@patchwork.com / admin123');
+    console.warn('⚠️ ADMIN_EMAIL / ADMIN_PASSWORD tidak diatur. Super admin tidak dibuat/di-sinkronkan.');
   }
 
   // Seed default categories

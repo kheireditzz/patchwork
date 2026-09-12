@@ -164,8 +164,7 @@ if (!process.env.VERCEL) {
       console.log(`=======================================================`);
       console.log(`🚀 PATCHWORK Affiliate Platform is running!`);
       console.log(`🌐 Public URL  : http://0.0.0.0:${PORT}`);
-      console.log(`🔐 Admin Panel : http://192.168.0.190:${PORT}/admin`);
-      console.log(`👤 Default Super Admin: admin@patchwork.com / admin123`);
+      console.log(`📡 Admin panel : http://0.0.0.0:${PORT}/admin (akses langsung via URL)`);
       console.log(`=======================================================`);
     });
   }).catch(err => {

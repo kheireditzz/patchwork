@@ -71,7 +71,5 @@ Aplikasi saat ini telah aktif di port `3000`:
 - **Sitemap XML**: `http://localhost:3000/sitemap.xml`
 - **Robots.txt**: `http://localhost:3000/robots.txt`
 
-### Akun Login Admin Default:
-- **Email**: `admin@patchwork.com`
-- **Password**: `admin123`
-- **Role**: Super Admin
+### Akun Login Admin
+Panel admin diakses langsung lewat **`/admin`** (tanpa link publik). Kredensial Super Admin ditentukan dari variabel lingkungan `ADMIN_EMAIL` & `ADMIN_PASSWORD` di file `.env` lokal (tidak pernah masuk ke kode atau GitHub).

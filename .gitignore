@@ -6,3 +6,5 @@ public/uploads/temp_excel/
 .DS_Store
 .vercel
 .env*
+migrations/
+run-sql.mjs
