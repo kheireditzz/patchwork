@@ -102,23 +102,33 @@
       animation: gradientShift 8s ease infinite;
     }
 
-    /* Trending Cards Smooth Magnify */
+    /* Trending Cards Smooth Magnify & High-End Card Styling */
     .trending-card { 
-      transform: scale(0.95); 
-      opacity: 0.85; 
-      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s, box-shadow 0.4s; 
-      will-change: transform, opacity; 
+      transform: scale(0.96); 
+      opacity: 0.9; 
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease; 
+      will-change: transform, opacity, box-shadow;
     }
     .trending-card.is-active { 
-      transform: scale(1.02); 
+      transform: scale(1.01); 
       opacity: 1; 
-      box-shadow: 0 20px 35px -10px rgba(15, 23, 42, 0.12); 
+      box-shadow: 0 20px 35px -8px rgba(15, 23, 42, 0.12); 
       z-index: 10; 
+      border-color: #f59e0b40;
     }
     .trending-card:hover { 
       opacity: 1; 
-      transform: scale(1.04) translateY(-3px); 
+      transform: scale(1.02) translateY(-3px); 
       box-shadow: 0 24px 44px -10px rgba(15, 23, 42, 0.16);
+    }
+    /* Pastikan kartu trending tidak pernah stuck opacity 0 */
+    .trending-card.reveal {
+      opacity: 0.9 !important;
+      transform: scale(0.96) !important;
+    }
+    .trending-card.reveal.active, .trending-card.reveal.is-active {
+      opacity: 1 !important;
+      transform: scale(1.01) !important;
     }
     
     /* Product Card Interactive Elevation & Image Zoom */
@@ -468,29 +478,39 @@
   </section>
 
   <!-- TRENDING -->
-  <section class="py-5 reveal" id="trending-section">
+  <section class="py-6 reveal" id="trending-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center space-x-2.5">
-          <div class="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center">
-            <i data-lucide="flame" class="w-4 h-4 text-amber-400"></i>
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20">
+            <i data-lucide="flame" class="w-5 h-5 text-white animate-subtle-float"></i>
           </div>
           <div>
-            <h2 class="text-base sm:text-lg font-bold tracking-tight text-slate-900">Produk Trending</h2>
-            <p class="text-xs text-slate-500">Rekomendasi paling banyak diminati</p>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-base sm:text-lg font-extrabold tracking-tight text-slate-900">Produk Trending & Viral</h2>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                🔥 Hot
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Produk pilihan kurasi dengan interaksi & peminat tertinggi</p>
           </div>
         </div>
-        <div class="flex items-center space-x-1.5">
-          <button onclick="slideTrending('prev')" class="w-8 h-8 rounded-xl border border-slate-200 bg-white flex items-center justify-center hover:bg-slate-50 transition active:scale-95">
-            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+        <div class="flex items-center space-x-2">
+          <button onclick="slideTrending('prev')" class="w-9 h-9 rounded-xl border border-slate-200 bg-white shadow-sm flex items-center justify-center text-slate-700 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300 transition active:scale-95" title="Geser ke Kiri">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
           </button>
-          <button onclick="slideTrending('next')" class="w-8 h-8 rounded-xl border border-slate-200 bg-white flex items-center justify-center hover:bg-slate-50 transition active:scale-95">
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          <button onclick="slideTrending('next')" class="w-9 h-9 rounded-xl border border-slate-200 bg-white shadow-sm flex items-center justify-center text-slate-700 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300 transition active:scale-95" title="Geser ke Kanan">
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
       <div id="featured-slider-wrapper" class="relative group">
-        <div id="featured-products" class="flex items-stretch gap-4 sm:gap-5 overflow-x-auto slider-container hide-scrollbar py-2 snap-x snap-mandatory"></div>
+        <div id="featured-products" class="flex items-stretch gap-4 sm:gap-5 overflow-x-auto slider-container hide-scrollbar py-3 px-1 snap-x snap-mandatory">
+          <!-- Skeleton Loading Trending -->
+          <div class="w-[72vw] sm:w-[260px] md:w-[270px] shrink-0 h-80 rounded-2xl bg-slate-100 animate-pulse border border-slate-200/80"></div>
+          <div class="w-[72vw] sm:w-[260px] md:w-[270px] shrink-0 h-80 rounded-2xl bg-slate-100 animate-pulse border border-slate-200/80"></div>
+          <div class="w-[72vw] sm:w-[260px] md:w-[270px] shrink-0 h-80 rounded-2xl bg-slate-100 animate-pulse border border-slate-200/80"></div>
+        </div>
       </div>
     </div>
   </section>
@@ -793,15 +813,45 @@
 
     let trendingTimer = null;
     async function loadFeaturedProducts() {
+      const section = document.getElementById('trending-section');
+      const container = document.getElementById('featured-products');
+      if (!section || !container) return;
+
       try {
+        let items = [];
+        // Coba ambil produk featured (pilihan unggulan)
         const res = await fetch('/api/products?is_featured=1&status=Published&limit=10');
-        const json = await res.json();
-        const container = document.getElementById('featured-products');
-        if (!json.data || json.data.length === 0) { document.getElementById('trending-section').style.display = 'none'; return; }
-        container.innerHTML = json.data.map(p => createProductCardHtml(p, true)).join('');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && json.data.length > 0) {
+            items = json.data;
+          }
+        }
+
+        // Fallback cerdas jika belum ada produk yang di-set featured: ambil produk terpopuler
+        if (items.length === 0) {
+          const fallbackRes = await fetch('/api/products?status=Published&sort=popular&limit=8');
+          if (fallbackRes.ok) {
+            const fallbackJson = await fallbackRes.json();
+            if (fallbackJson.data && fallbackJson.data.length > 0) {
+              items = fallbackJson.data;
+            }
+          }
+        }
+
+        if (items.length === 0) {
+          section.style.display = 'none';
+          return;
+        }
+
+        section.style.display = 'block';
+        section.classList.add('active'); // Pastikan section reveal aktif dan terlihat jelas
+        container.innerHTML = items.map((p, idx) => createProductCardHtml(p, true, idx)).join('');
         lucide.createIcons();
         initTrendingAutoSlider();
-      } catch (err) { console.warn('Failed to load featured', err); }
+      } catch (err) {
+        console.warn('Failed to load featured products:', err);
+      }
     }
 
     function slideTrending(direction) {
@@ -880,16 +930,21 @@
       let activeMarket = isTikTok ? 'TikTok Shop' : 'Shopee';
       if (!activeUrl) { activeUrl = `/product/${p.slug}`; activeMarket = 'Detail'; }
       const directTarget = activeUrl.startsWith('http') ? '_blank' : '_self';
-      const sliderWidthClass = isFeatured ? 'w-[72vw] sm:w-[260px] md:w-[270px] shrink-0 snap-center trending-card my-2' : 'w-full';
+      const sliderWidthClass = isFeatured ? 'w-[74vw] sm:w-[260px] md:w-[270px] shrink-0 snap-center trending-card my-1' : 'w-full';
       const staggerDelay = !isFeatured && idx < 8 ? `style="transition-delay: ${(idx % 4) * 60}ms;"` : '';
+      const cardRevealClass = isFeatured ? 'reveal active' : 'reveal';
 
       return `
-        <div ${staggerDelay} class="group ${sliderWidthClass} product-card reveal bg-white rounded-2xl border border-slate-200 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:border-slate-300 flex flex-col overflow-hidden transition-all duration-300">
+        <div ${staggerDelay} class="group ${sliderWidthClass} product-card ${cardRevealClass} bg-white rounded-2xl border ${isFeatured ? 'border-amber-200/80' : 'border-slate-200'} shadow-[0_4px_12px_-2px_rgba(0,0,0,0.06)] hover:border-slate-300 flex flex-col overflow-hidden transition-all duration-300">
           <div class="relative aspect-square overflow-hidden bg-slate-100 block">
             <a href="${activeUrl}" target="${directTarget}" onclick="trackProductClick('${p.id}', '${activeMarket}')" class="block w-full h-full">
               <img src="${thumb}" alt="${p.name}" class="w-full h-full object-cover product-img group-hover:scale-105 transition-transform duration-500 ease-out" loading="lazy">
             </a>
             <div class="absolute top-3 left-3 flex flex-col gap-1 items-start pointer-events-none z-10">
+              ${isFeatured ? `
+              <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-black tracking-wider uppercase shadow-sm bg-gradient-to-r from-amber-500 to-rose-500 text-white flex items-center space-x-1">
+                <span>🔥 TRENDING</span>
+              </span>` : ''}
               <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase shadow-sm ${isTikTok ? 'bg-slate-900 text-white' : 'bg-[#ee4d2d] text-white'}">
                 ${isTikTok ? 'TikTok' : 'Shopee'}
               </span>
