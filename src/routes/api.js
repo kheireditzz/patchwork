@@ -826,7 +826,7 @@ router.delete('/products/:id', authenticateToken, authorizeRole(['Super Admin', 
 // -------------------------------------------------------------
 // 4. CLICK TRACKING & STATS (Shopee, TikTok, Tokopedia)
 // -------------------------------------------------------------
-router.post('/clicks/track', (req, res) => {
+router.post('/clicks/track', async (req, res) => {
   try {
     const { product_id, marketplace } = req.body;
     if (!product_id || !marketplace) {
@@ -849,6 +849,30 @@ router.post('/clicks/track', (req, res) => {
     if (marketplace.toLowerCase().includes('tiktok')) marketplaceColumn = 'tiktok_clicks';
     if (marketplace.toLowerCase().includes('tokopedia')) marketplaceColumn = 'tokopedia_clicks';
 
+    if (supabase) {
+      try {
+        await supabase.from('clicks').insert({
+          product_id,
+          marketplace,
+          visitor_ip: ip,
+          user_agent: ua,
+          referrer
+        });
+
+        // Increment in Supabase products
+        const { data: pData } = await supabase.from('products').select('total_clicks, shopee_clicks, tiktok_clicks, tokopedia_clicks').eq('id', product_id).single();
+        if (pData) {
+          const currentTotal = (pData.total_clicks || 0) + 1;
+          const currentMarket = (pData[marketplaceColumn] || 0) + 1;
+          const upObj = { total_clicks: currentTotal };
+          upObj[marketplaceColumn] = currentMarket;
+          await supabase.from('products').update(upObj).eq('id', product_id);
+        }
+      } catch (e) {
+        console.warn('Supabase click track notice:', e.message);
+      }
+    }
+
     sqlite.prepare(`
       UPDATE products 
       SET total_clicks = total_clicks + 1,
@@ -863,7 +887,7 @@ router.post('/clicks/track', (req, res) => {
 });
 
 // Visitor tracking
-router.post('/visitors/track', (req, res) => {
+router.post('/visitors/track', async (req, res) => {
   try {
     const { page = '/' } = req.body;
     const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -871,6 +895,20 @@ router.post('/visitors/track', (req, res) => {
     const referrer = req.headers['referer'] || '';
 
     const id = 'vis_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+
+    if (supabase) {
+      try {
+        await supabase.from('visitors').insert({
+          visitor_ip: ip,
+          user_agent: ua,
+          page,
+          referrer
+        });
+      } catch (e) {
+        console.warn('Supabase visitor track notice:', e.message);
+      }
+    }
+
     sqlite.prepare(`
       INSERT INTO visitors (id, visitor_ip, user_agent, page, referrer)
       VALUES (?, ?, ?, ?, ?)
@@ -1470,10 +1508,11 @@ router.get('/public-stats', (req, res) => {
     const totalCategories = sqlite.prepare('SELECT count(*) as count FROM categories').get().count;
     const totalShopee = sqlite.prepare("SELECT coalesce(sum(shopee_clicks), 0) as s FROM products").get().s;
     const totalTiktok = sqlite.prepare("SELECT coalesce(sum(tiktok_clicks), 0) as t FROM products").get().t;
+    const totalVisitors = sqlite.prepare("SELECT count(*) as count FROM visitors").get().count;
 
     res.json({
       totalProducts,
-      totalClicks: totalClicks + 1500, // display aggregate nicely
+      totalClicks: totalClicks || (totalShopee + totalTiktok) || totalVisitors || 0,
       totalCategories,
       totalShopee,
       totalTiktok
