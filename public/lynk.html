@@ -842,22 +842,13 @@
     function syncViewButtons() {
       const listBtn = document.getElementById('view-list-btn');
       const gridBtn = document.getElementById('view-grid-btn');
-      const isDark = getCurrentTheme() === 'dark';
 
       if (viewMode === 'grid') {
-        gridBtn.className = isDark
-          ? 'w-8 h-8 rounded-xl flex items-center justify-center transition bg-white/20 text-white shadow-inner'
-          : 'w-8 h-8 rounded-xl flex items-center justify-center transition bg-slate-900 text-white shadow-inner';
-        listBtn.className = isDark
-          ? 'w-8 h-8 rounded-xl flex items-center justify-center transition text-slate-400 hover:text-white'
-          : 'w-8 h-8 rounded-xl flex items-center justify-center transition text-slate-400 hover:text-slate-800';
+        gridBtn.className = 'w-8 h-8 rounded-xl flex items-center justify-center transition bg-white/20 text-white shadow-inner';
+        listBtn.className = 'w-8 h-8 rounded-xl flex items-center justify-center transition text-slate-400 hover:text-white';
       } else {
-        listBtn.className = isDark
-          ? 'w-8 h-8 rounded-xl flex items-center justify-center transition bg-white/20 text-white shadow-inner'
-          : 'w-8 h-8 rounded-xl flex items-center justify-center transition bg-slate-900 text-white shadow-inner';
-        gridBtn.className = isDark
-          ? 'w-8 h-8 rounded-xl flex items-center justify-center transition text-slate-400 hover:text-white'
-          : 'w-8 h-8 rounded-xl flex items-center justify-center transition text-slate-400 hover:text-slate-800';
+        listBtn.className = 'w-8 h-8 rounded-xl flex items-center justify-center transition bg-white/20 text-white shadow-inner';
+        gridBtn.className = 'w-8 h-8 rounded-xl flex items-center justify-center transition text-slate-400 hover:text-white';
       }
     }
 
