@@ -272,10 +272,6 @@ router.put('/auth/profile', authenticateToken, async (req, res) => {
         if (phone !== undefined) payload.phone = phone;
         if (bio !== undefined) payload.bio = bio;
         if (avatar !== undefined) payload.avatar = avatar;
-        if (banner !== undefined) payload.banner = banner;
-        if (background !== undefined) payload.background = background;
-        if (avatar_border !== undefined) payload.avatar_border = avatar_border;
-        if (avatar_shape !== undefined) payload.avatar_shape = avatar_shape;
         if (tiktok !== undefined) payload.tiktok = tiktok;
         if (instagram !== undefined) payload.instagram = instagram;
         if (shopee !== undefined) payload.shopee = shopee;
@@ -284,10 +280,35 @@ router.put('/auth/profile', authenticateToken, async (req, res) => {
         if (template !== undefined) payload.template = template;
         if (cleanSlug !== undefined) payload.custom_slug = cleanSlug || null;
         await supabase.from('users').update(payload).eq('id', userId);
+
+        // Also persist banner, background, avatar_border, avatar_shape to settings table for guaranteed backup
+        const customStyling = {
+          banner: banner !== undefined ? banner : '',
+          background: background !== undefined ? background : '',
+          avatar_border: avatar_border !== undefined ? avatar_border : 'emerald',
+          avatar_shape: avatar_shape !== undefined ? avatar_shape : 'circle'
+        };
+        await supabase.from('settings').upsert({
+          key: `lynk_custom_${userId}`,
+          value: JSON.stringify(customStyling),
+          updated_at: new Date().toISOString()
+        });
       } catch (err) {
         console.warn('Supabase profile update err:', err.message);
       }
     }
+
+    // Also store custom styling locally in settings
+    try {
+      const customStyling = {
+        banner: banner !== undefined ? banner : '',
+        background: background !== undefined ? background : '',
+        avatar_border: avatar_border !== undefined ? avatar_border : 'emerald',
+        avatar_shape: avatar_shape !== undefined ? avatar_shape : 'circle'
+      };
+      sqlite.prepare("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)")
+        .run(`lynk_custom_${userId}`, JSON.stringify(customStyling));
+    } catch (e) {}
 
     sqlite.prepare(`
       UPDATE users 

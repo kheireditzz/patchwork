@@ -770,8 +770,8 @@
                     <input type="text" id="adm-prof-name" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp Resmi *</label>
-                    <input type="tel" id="adm-prof-phone" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp Resmi</label>
+                    <input type="text" id="adm-prof-phone" placeholder="Contoh: 08123456789 atau 628123456789" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
                   </div>
                 </div>
 
@@ -911,7 +911,7 @@
                           <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
                         </label>
                       </div>
-                      <input type="url" id="adm-prof-instagram" oninput="updateAdminPreviewSocials()" placeholder="https://instagram.com/username" class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
+                      <input type="text" id="adm-prof-instagram" oninput="updateAdminPreviewSocials()" placeholder="https://instagram.com/username atau @username" class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
                     </div>
 
                     <!-- TikTok -->
@@ -926,7 +926,7 @@
                           <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
                         </label>
                       </div>
-                      <input type="url" id="adm-prof-tiktok" oninput="updateAdminPreviewSocials()" placeholder="https://tiktok.com/@username" class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
+                      <input type="text" id="adm-prof-tiktok" oninput="updateAdminPreviewSocials()" placeholder="https://tiktok.com/@username atau @username" class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
                     </div>
 
                     <!-- Shopee -->
@@ -941,7 +941,7 @@
                           <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#ee4d2d]"></div>
                         </label>
                       </div>
-                      <input type="url" id="adm-prof-shopee" oninput="updateAdminPreviewSocials()" placeholder="https://shopee.co.id/toko" class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
+                      <input type="text" id="adm-prof-shopee" oninput="updateAdminPreviewSocials()" placeholder="https://shopee.co.id/toko" class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
                     </div>
 
                     <!-- WhatsApp -->
@@ -971,7 +971,7 @@
                           <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-600"></div>
                         </label>
                       </div>
-                      <input type="url" id="adm-prof-youtube" oninput="updateAdminPreviewSocials()" placeholder="https://youtube.com/@channel" class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
+                      <input type="text" id="adm-prof-youtube" oninput="updateAdminPreviewSocials()" placeholder="https://youtube.com/@channel atau @channel" class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
                     </div>
 
                     <!-- Website -->
@@ -986,7 +986,7 @@
                           <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-slate-900"></div>
                         </label>
                       </div>
-                      <input type="url" id="adm-prof-website" oninput="updateAdminPreviewSocials()" placeholder="https://..." class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
+                      <input type="text" id="adm-prof-website" oninput="updateAdminPreviewSocials()" placeholder="https://..." class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
                     </div>
                   </div>
                 </div>
@@ -3443,22 +3443,48 @@
       const isYtOn = document.getElementById('adm-toggle-youtube')?.checked !== false;
       const isWebOn = document.getElementById('adm-toggle-website')?.checked !== false;
 
-      const rawPhone = document.getElementById('adm-prof-phone').value.trim();
+      const rawPhone = (document.getElementById('adm-prof-phone')?.value || '').trim();
+
+      // Normalize social input values if entered as usernames
+      let igVal = (document.getElementById('adm-prof-instagram')?.value || '').trim();
+      if (igVal && !igVal.startsWith('http://') && !igVal.startsWith('https://')) {
+        igVal = 'https://instagram.com/' + igVal.replace(/^@/, '');
+      }
+
+      let ttVal = (document.getElementById('adm-prof-tiktok')?.value || '').trim();
+      if (ttVal && !ttVal.startsWith('http://') && !ttVal.startsWith('https://')) {
+        ttVal = 'https://tiktok.com/@' + ttVal.replace(/^@/, '');
+      }
+
+      let ytVal = (document.getElementById('adm-prof-youtube')?.value || '').trim();
+      if (ytVal && !ytVal.startsWith('http://') && !ytVal.startsWith('https://')) {
+        ytVal = 'https://youtube.com/@' + ytVal.replace(/^@/, '');
+      }
+
+      let shopeeVal = (document.getElementById('adm-prof-shopee')?.value || '').trim();
+      if (shopeeVal && !shopeeVal.startsWith('http://') && !shopeeVal.startsWith('https://')) {
+        shopeeVal = 'https://shopee.co.id/' + shopeeVal.replace(/^@/, '');
+      }
+
+      let webVal = (document.getElementById('adm-prof-website')?.value || '').trim();
+      if (webVal && !webVal.startsWith('http://') && !webVal.startsWith('https://')) {
+        webVal = 'https://' + webVal;
+      }
 
       const payload = {
-        name: document.getElementById('adm-prof-name').value.trim(),
+        name: (document.getElementById('adm-prof-name')?.value || '').trim(),
         phone: rawPhone,
-        avatar: document.getElementById('adm-prof-avatar').value.trim(),
-        banner: document.getElementById('adm-prof-banner').value.trim(),
-        background: document.getElementById('adm-prof-background').value.trim(),
+        avatar: (document.getElementById('adm-prof-avatar')?.value || '').trim(),
+        banner: (document.getElementById('adm-prof-banner')?.value || '').trim(),
+        background: (document.getElementById('adm-prof-background')?.value || '').trim(),
         avatar_border: document.querySelector('input[name="adm-prof-avatar-border"]:checked')?.value || 'emerald',
         avatar_shape: document.querySelector('input[name="adm-prof-avatar-shape"]:checked')?.value || 'circle',
-        bio: document.getElementById('adm-prof-bio').value.trim(),
-        tiktok: isTtOn ? document.getElementById('adm-prof-tiktok').value.trim() : '',
-        instagram: isIgOn ? document.getElementById('adm-prof-instagram').value.trim() : '',
-        shopee: isShopeeOn ? document.getElementById('adm-prof-shopee').value.trim() : '',
-        youtube: isYtOn ? document.getElementById('adm-prof-youtube').value.trim() : '',
-        website: isWebOn ? document.getElementById('adm-prof-website').value.trim() : '',
+        bio: (document.getElementById('adm-prof-bio')?.value || '').trim(),
+        tiktok: isTtOn ? ttVal : '',
+        instagram: isIgOn ? igVal : '',
+        shopee: isShopeeOn ? shopeeVal : '',
+        youtube: isYtOn ? ytVal : '',
+        website: isWebOn ? webVal : '',
         template: document.querySelector('input[name="adm-prof-template"]:checked')?.value || 'modern',
         custom_slug: slugVal
       };
@@ -3466,12 +3492,14 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="inline-block animate-spin mr-1.5">⏳</span><span>Menyimpan...</span>';
 
+      const activeToken = token || localStorage.getItem('patchwork_token');
+
       try {
         const res = await fetch('/api/auth/profile', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${activeToken}`
           },
           body: JSON.stringify(payload)
         });
@@ -3482,7 +3510,7 @@
           showToast('Pengaturan LYNK ID Admin berhasil disimpan!', 'success');
           loadAdminLynkProfile();
         } else {
-          showToast('Gagal menyimpan: ' + (json.error || ''), 'error');
+          showToast('Gagal menyimpan: ' + (json.error || 'Terjadi kesalahan'), 'error');
         }
       } catch (err) {
         showToast('Koneksi gagal saat menyimpan profil.', 'error');

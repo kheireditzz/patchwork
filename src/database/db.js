@@ -304,7 +304,7 @@ export async function initDatabase() {
       console.log('👤 Super Admin created from environment credentials.');
     } else {
       sqlite.prepare(`
-        UPDATE users SET name = 'Super Administrator', email = ?, phone = '', password = ?, role = 'Super Admin', status = 'Approved' WHERE id = ?
+        UPDATE users SET email = ?, password = ?, role = 'Super Admin', status = 'Approved' WHERE id = ?
       `).run(adminEmail, passwordHash, existingUser.id);
       console.log('🔑 Super Admin credentials synchronized from environment credentials.');
     }
@@ -326,12 +326,16 @@ export async function initDatabase() {
         `);
         sbUsers.forEach(u => {
           try {
+            const existing = sqlite.prepare('SELECT banner, background, avatar_border, avatar_shape FROM users WHERE id = ?').get(u.id);
             insU.run(
               u.id, u.name, u.email, u.phone || '', u.password, u.role, u.status,
               u.bio || '', u.avatar || '', u.tiktok || '', u.instagram || '',
               u.shopee || '', u.youtube || '', u.website || '', u.template || 'modern',
-              u.custom_slug || null, u.banner || '', u.background || '',
-              u.avatar_border || 'emerald', u.avatar_shape || 'circle',
+              u.custom_slug || null,
+              u.banner || existing?.banner || '',
+              u.background || existing?.background || '',
+              u.avatar_border || existing?.avatar_border || 'emerald',
+              u.avatar_shape || existing?.avatar_shape || 'circle',
               u.created_at, u.updated_at
             );
           } catch (e) {}
@@ -601,6 +605,31 @@ export async function initDatabase() {
           try { insS.run(s.key, s.value, s.updated_at || new Date().toISOString()); } catch (e) {}
         });
         console.log(`✅ Synced ${sbSettings.length} setting(s) from Supabase.`);
+
+        // Restore any lynk_custom_* settings back to users table
+        try {
+          const customRows = sqlite.prepare("SELECT key, value FROM settings WHERE key LIKE 'lynk_custom_%'").all();
+          customRows.forEach(row => {
+            const uId = row.key.replace('lynk_custom_', '');
+            try {
+              const meta = JSON.parse(row.value);
+              sqlite.prepare(`
+                UPDATE users 
+                SET banner = CASE WHEN ? != '' THEN ? ELSE banner END,
+                    background = CASE WHEN ? != '' THEN ? ELSE background END,
+                    avatar_border = CASE WHEN ? != '' THEN ? ELSE avatar_border END,
+                    avatar_shape = CASE WHEN ? != '' THEN ? ELSE avatar_shape END
+                WHERE id = ?
+              `).run(
+                meta.banner || '', meta.banner || '',
+                meta.background || '', meta.background || '',
+                meta.avatar_border || '', meta.avatar_border || '',
+                meta.avatar_shape || '', meta.avatar_shape || '',
+                uId
+              );
+            } catch (err) {}
+          });
+        } catch (e) {}
       }
     } catch (err) {
       console.warn('⚠️ Supabase settings sync warning:', err.message);
