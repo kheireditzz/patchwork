@@ -24,16 +24,8 @@
         }
       }
     };
-    // Default to Light Mode (white background) unless explicitly saved as 'dark'
-    (function() {
-      const saved = localStorage.getItem('pw_lynk_theme');
-      if (saved === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-        if (!saved) localStorage.setItem('pw_lynk_theme', 'light');
-      }
-    })();
+    // Dark mode exclusively
+    document.documentElement.classList.add('dark');
   </script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="/qrcode.min.js"></script>
@@ -108,19 +100,14 @@
     .avatar-float:hover {
       transform: translate3d(-50%, calc(-50% - 4px), 0) scale(1.02);
     }
-    /* Logo styling with auto-contrast for dark and light */
+    /* Logo styling with auto-contrast for dark theme */
     .logo-theme {
       transition: filter 0.3s ease;
-    }
-    .dark .logo-theme {
       filter: brightness(0) invert(1) drop-shadow(0 2px 8px rgba(255,255,255,0.2));
-    }
-    html:not(.dark) .logo-theme {
-      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.1));
     }
   </style>
 </head>
-<body id="page-body" class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white relative transition-colors duration-300">
+<body id="page-body" class="bg-[#0b0f17] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-emerald-400 selection:text-slate-950 relative">
 
   <!-- DYNAMIC PAGE BACKGROUND WITH SUBTLE OVERLAY (IMAGE OR VIDEO) -->
   <div id="page-custom-bg" class="fixed inset-0 pointer-events-none z-0 bg-cover bg-center transition-all duration-700 opacity-0"></div>
@@ -129,7 +116,7 @@
 
   <!-- TOP APP BAR -->
   <header id="app-header" class="w-full max-w-md mx-auto px-4 pt-4 pb-2 flex items-center justify-between sticky top-0 z-30 transition-colors duration-300">
-    <!-- LOGO DENGAN AUTO CONTRAST (PUTIH DI DARK, NORMAL DI LIGHT) -->
+    <!-- LOGO DENGAN KONTRAST TINGGI (PUTIH TERANG) -->
     <a href="/" class="flex items-center transition active:scale-95 group" title="Beranda PATCHWORK">
       <div class="h-8 flex items-center">
         <img 
@@ -141,18 +128,13 @@
       </div>
     </a>
 
-    <!-- ACTIONS: THEME TOGGLE (LIGHT/DARK), DASHBOARD, & SHARE -->
+    <!-- ACTIONS: DASHBOARD & SHARE -->
     <div class="flex items-center space-x-1.5 sm:space-x-2">
-      <!-- Light / Dark Mode Toggle Button -->
-      <button onclick="toggleTheme()" id="theme-toggle-btn" class="w-9 h-9 rounded-2xl flex items-center justify-center press-bounce transition border shadow-sm" title="Ubah Mode Tampilan (Terang/Gelap)">
-        <i id="theme-toggle-icon" data-lucide="moon" class="w-4 h-4"></i>
-      </button>
-
-      <a href="/dashboard" id="btn-header-dashboard" class="w-9 h-9 rounded-2xl flex items-center justify-center press-bounce transition border shadow-sm" title="Dashboard Admin">
+      <a href="/dashboard" id="btn-header-dashboard" class="w-9 h-9 rounded-2xl flex items-center justify-center press-bounce transition border shadow-sm bg-white/10 hover:bg-white/20 text-slate-200 border-white/15" title="Dashboard Admin">
         <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
       </a>
 
-      <button onclick="openShareModal()" id="btn-header-share" class="w-9 h-9 rounded-2xl flex items-center justify-center press-bounce transition border shadow-sm" title="Bagikan Halaman">
+      <button onclick="openShareModal()" id="btn-header-share" class="w-9 h-9 rounded-2xl flex items-center justify-center press-bounce transition border shadow-sm bg-white/10 hover:bg-white/20 text-slate-200 border-white/15" title="Bagikan Halaman">
         <i data-lucide="share-2" class="w-4 h-4"></i>
       </button>
     </div>
@@ -185,8 +167,16 @@
       <div>
         <h2 class="text-lg font-extrabold text-slate-900 dark:text-white">Profil Belum Tersedia</h2>
         <p class="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto mt-1">Halaman atau akun yang dituju belum terdaftar di patchwork.</p>
+    <!-- NOT FOUND STATE -->
+    <div id="error-state" class="hidden w-full py-20 text-center space-y-4">
+      <div class="w-16 h-16 rounded-3xl bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto border border-rose-500/20">
+        <i data-lucide="alert-circle" class="w-8 h-8"></i>
       </div>
-      <a href="/" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 dark:bg-white/10 dark:hover:bg-white/15 dark:text-white dark:border-white/15 text-xs font-bold transition shadow-sm">
+      <div>
+        <h2 class="text-lg font-extrabold text-white">Profil Belum Tersedia</h2>
+        <p class="text-xs text-slate-400 max-w-xs mx-auto mt-1">Halaman atau akun yang dituju belum terdaftar di patchwork.</p>
+      </div>
+      <a href="/" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/15 text-xs font-bold text-white transition border border-white/15">
         <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
         <span>Kembali ke Beranda</span>
       </a>
@@ -201,17 +191,17 @@
         <!-- HERO PP ZONE: Banner di belakang, Avatar (PP) tepat setengah di dalam & setengah di luar garis bawah banner -->
         <div class="relative w-full max-w-sm mb-12 sm:mb-14">
           <!-- The Banner backdrop -->
-          <div id="profile-banner-wrapper" class="w-full h-32 sm:h-36 rounded-3xl overflow-hidden shadow-lg border border-slate-200/80 dark:border-white/10 bg-slate-100 dark:bg-slate-900 transition-all duration-300 relative">
+          <div id="profile-banner-wrapper" class="w-full h-32 sm:h-36 rounded-3xl overflow-hidden shadow-xl border border-white/10 bg-slate-900 transition-all duration-300 relative">
             <div id="profile-banner-img" class="w-full h-full bg-cover bg-center transition-all duration-300"></div>
-            <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/60 pointer-events-none"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/75 pointer-events-none"></div>
           </div>
 
           <!-- Avatar (PP) diposisikan presisi tepat di tengah garis (50% di dalam & 50% di luar) -->
           <div class="absolute left-1/2 top-full -translate-x-1/2 -translate-y-1/2 z-10 group anim-blur-up avatar-float transition-all duration-300">
-            <div id="profile-avatar" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-emerald-500 shadow-2xl bg-gradient-to-tr from-slate-100 to-white dark:from-slate-900 dark:to-slate-800 flex items-center justify-center ring-4 ring-emerald-500/30 transition-all">
-              <span id="profile-initials" class="text-2xl font-black tracking-wider text-slate-800 dark:text-white"></span>
+            <div id="profile-avatar" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-emerald-400 shadow-2xl bg-gradient-to-tr from-slate-900 to-slate-800 flex items-center justify-center ring-4 ring-emerald-500/40 transition-all">
+              <span id="profile-initials" class="text-2xl font-black tracking-wider text-white"></span>
             </div>
-            <span id="profile-verified-badge" class="hidden absolute bottom-1 right-1 p-1 rounded-full bg-emerald-500 text-white dark:text-slate-950 shadow-md border-2 border-white dark:border-[#0b0f17] flex items-center justify-center" title="Akun Terverifikasi">
+            <span id="profile-verified-badge" class="hidden absolute bottom-1 right-1 p-1 rounded-full bg-emerald-500 text-slate-950 shadow-md border-2 border-[#0b0f17] flex items-center justify-center" title="Akun Terverifikasi">
               <i data-lucide="check" class="w-3 h-3 stroke-[3.5]"></i>
             </span>
           </div>
@@ -219,15 +209,15 @@
 
         <!-- Name & Bio -->
         <div class="space-y-1.5 max-w-sm px-2">
-          <h1 id="profile-name" class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white flex items-center justify-center gap-1.5 min-h-[28px]">
+          <h1 id="profile-name" class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center justify-center gap-1.5 min-h-[28px]">
           </h1>
-          <p id="profile-bio" class="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed font-normal min-h-[18px]">
+          <p id="profile-bio" class="text-xs sm:text-[13px] text-slate-300 leading-relaxed font-normal min-h-[18px]">
           </p>
 
           <!-- Verified Slug / URL Tag with Copy button -->
           <div class="pt-1 flex items-center justify-center gap-2">
-            <button onclick="copyLynkUrl()" id="profile-slug-btn" class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-mono bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 dark:border-white/10 transition press-bounce shadow-sm group" title="Salin Link">
-              <i data-lucide="link-2" class="w-3 h-3 text-emerald-500"></i>
+            <button onclick="copyLynkUrl()" id="profile-slug-btn" class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-mono bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition press-bounce shadow-inner group" title="Salin Link">
+              <i data-lucide="link-2" class="w-3 h-3 text-emerald-400"></i>
               <span id="profile-slug-display"></span>
               <i data-lucide="copy" class="w-3 h-3 opacity-60 group-hover:opacity-100 transition"></i>
             </button>
@@ -239,12 +229,12 @@
           <div class="grid grid-cols-4 gap-2 w-full">
             
             <!-- Kunjungan -->
-            <div id="stat-card-visitors" class="p-2.5 rounded-2xl bg-white border border-slate-200 dark:bg-white/[0.04] dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 transition text-center flex flex-col items-center justify-center space-y-0.5 shadow-sm">
-              <div class="flex items-center space-x-1 text-[10px] text-slate-500 dark:text-slate-400">
-                <i data-lucide="eye" class="w-3 h-3 text-sky-500 dark:text-sky-400"></i>
+            <div id="stat-card-visitors" class="p-2.5 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-white/20 transition text-center flex flex-col items-center justify-center space-y-0.5 shadow-sm">
+              <div class="flex items-center space-x-1 text-[10px] text-slate-400">
+                <i data-lucide="eye" class="w-3 h-3 text-sky-400"></i>
                 <span class="font-medium">Kunjungan</span>
               </div>
-              <div id="stat-visitors-count" class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white font-mono tracking-tight">0</div>
+              <div id="stat-visitors-count" class="text-sm sm:text-base font-extrabold text-white font-mono tracking-tight">0</div>
             </div>
 
             <!-- Klik Shopee -->
@@ -259,36 +249,36 @@
             </div>
 
             <!-- Klik TikTok -->
-            <div id="stat-card-tiktok" class="p-2.5 rounded-2xl bg-slate-100 border border-slate-200 dark:bg-white/[0.06] dark:border-white/15 hover:border-slate-300 dark:hover:border-white/30 transition text-center flex flex-col items-center justify-center space-y-0.5 shadow-sm">
-              <div class="flex items-center space-x-1 text-[10px] text-slate-800 dark:text-slate-200">
+            <div id="stat-card-tiktok" class="p-2.5 rounded-2xl bg-white/[0.06] border border-white/15 hover:border-white/30 transition text-center flex flex-col items-center justify-center space-y-0.5 shadow-sm">
+              <div class="flex items-center space-x-1 text-[10px] text-slate-200">
                 <span class="w-3 h-3 inline-flex items-center justify-center shrink-0 fill-current">
                   <svg role="img" viewBox="0 0 24 24" class="w-full h-full fill-current" xmlns="http://www.w3.org/2000/svg"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
                 </span>
                 <span class="font-bold">TikTok</span>
               </div>
-              <div id="stat-tiktok-count" class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white font-mono tracking-tight">0</div>
+              <div id="stat-tiktok-count" class="text-sm sm:text-base font-extrabold text-white font-mono tracking-tight">0</div>
             </div>
 
             <!-- Total Produk & Klik -->
             <div class="p-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 hover:border-emerald-500/40 transition text-center flex flex-col items-center justify-center space-y-0.5 shadow-sm">
-              <div class="flex items-center space-x-1 text-[10px] text-emerald-600 dark:text-emerald-400">
-                <i data-lucide="mouse-pointer-click" class="w-3 h-3 text-emerald-600 dark:text-emerald-400"></i>
+              <div class="flex items-center space-x-1 text-[10px] text-emerald-400">
+                <i data-lucide="mouse-pointer-click" class="w-3 h-3 text-emerald-400"></i>
                 <span class="font-bold">Total Klik</span>
               </div>
-              <div id="stat-clicks-count" class="text-sm sm:text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono tracking-tight">0</div>
+              <div id="stat-clicks-count" class="text-sm sm:text-base font-extrabold text-emerald-400 font-mono tracking-tight">0</div>
             </div>
 
           </div>
 
-          <div class="flex items-center justify-center gap-3 pt-2 text-[11px] text-slate-500 dark:text-slate-400">
+          <div class="flex items-center justify-center gap-3 pt-2 text-[11px] text-slate-400">
             <div class="flex items-center space-x-1">
-              <span id="stat-products-count" class="font-extrabold text-slate-900 dark:text-white font-mono">0</span>
+              <span id="stat-products-count" class="font-extrabold text-white font-mono">0</span>
               <span>Produk Pilihan</span>
             </div>
-            <span class="text-slate-300 dark:text-white/20">•</span>
-            <div class="flex items-center space-x-1 text-emerald-600 dark:text-emerald-400">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
-              <span class="font-semibold text-emerald-600 dark:text-emerald-400">Statistik Realtime</span>
+            <span class="text-white/20">•</span>
+            <div class="flex items-center space-x-1 text-emerald-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block"></span>
+              <span class="font-semibold text-emerald-400">Statistik Realtime</span>
             </div>
           </div>
         </div>
@@ -303,19 +293,19 @@
       <div id="search-section" class="w-full space-y-2 pt-1">
         <div class="flex items-center gap-2">
           <div class="relative flex-1">
-            <i data-lucide="search" class="w-4 h-4 text-slate-400 dark:text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="product-search" oninput="handleSearch(this.value)" placeholder="Cari nama barang atau kategori..." class="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white border border-slate-200 dark:bg-white/5 dark:border-white/10 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 dark:focus:border-white/30 focus:bg-white dark:focus:bg-white/10 transition shadow-sm">
-            <button id="clear-search-btn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-white transition">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="product-search" oninput="handleSearch(this.value)" placeholder="Cari nama barang atau kategori..." class="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white/5 border border-white/10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30 focus:bg-white/10 transition shadow-inner">
+            <button id="clear-search-btn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition">
               <i data-lucide="x" class="w-3.5 h-3.5"></i>
             </button>
           </div>
 
           <!-- View Switcher (Compact List vs 2-Col Grid) -->
-          <div class="flex items-center rounded-2xl bg-white border border-slate-200 dark:bg-white/5 dark:border-white/10 p-1 shrink-0 shadow-sm">
-            <button id="view-list-btn" onclick="setViewMode('list')" class="w-8 h-8 rounded-xl flex items-center justify-center transition text-slate-400 hover:text-slate-700 dark:hover:text-white" title="Tampilan Daftar">
+          <div class="flex items-center rounded-2xl bg-white/5 border border-white/10 p-1 shrink-0">
+            <button id="view-list-btn" onclick="setViewMode('list')" class="w-8 h-8 rounded-xl flex items-center justify-center transition text-slate-400 hover:text-white" title="Tampilan Daftar">
               <i data-lucide="list" class="w-4 h-4"></i>
             </button>
-            <button id="view-grid-btn" onclick="setViewMode('grid')" class="w-8 h-8 rounded-xl flex items-center justify-center transition bg-slate-900 text-white dark:bg-white/20 dark:text-white" title="Tampilan Grid">
+            <button id="view-grid-btn" onclick="setViewMode('grid')" class="w-8 h-8 rounded-xl flex items-center justify-center transition bg-white/20 text-white" title="Tampilan Grid">
               <i data-lucide="grid-2x2" class="w-4 h-4"></i>
             </button>
           </div>
@@ -329,12 +319,12 @@
 
       <!-- PRODUCT / RECOMMENDATION ITEMS LIST -->
       <div class="w-full space-y-3 pt-1">
-        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-semibold px-1">
+        <div class="flex items-center justify-between text-xs text-slate-400 font-semibold px-1">
           <span class="flex items-center space-x-1.5">
-            <span class="text-slate-900 dark:text-white font-bold">Daftar Produk</span>
-            <span id="products-count-badge" class="px-1.5 py-0.5 text-[10px] rounded-md bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-slate-300 font-mono">0</span>
+            <span class="text-white font-bold">Daftar Produk</span>
+            <span id="products-count-badge" class="px-1.5 py-0.5 text-[10px] rounded-md bg-white/10 text-slate-300 font-mono">0</span>
           </span>
-          <span id="filter-status-label" class="text-[11px] text-slate-500 dark:text-slate-400">Semua Kategori</span>
+          <span id="filter-status-label" class="text-[11px] text-slate-400">Semua Kategori</span>
         </div>
 
         <!-- CONTAINER FOR PRODUCTS (LIST / GRID) -->
@@ -344,14 +334,14 @@
 
         <!-- EMPTY SEARCH STATE -->
         <div id="no-products-found" class="hidden py-12 text-center space-y-3">
-          <div class="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-400 flex items-center justify-center mx-auto border border-slate-200 dark:border-white/10">
+          <div class="w-12 h-12 rounded-2xl bg-white/5 text-slate-400 flex items-center justify-center mx-auto border border-white/10">
             <i data-lucide="search-x" class="w-6 h-6"></i>
           </div>
           <div>
-            <p class="text-xs font-bold text-slate-900 dark:text-white">Produk Tidak Ditemukan</p>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Coba kata kunci lain atau pilih kategori Semua.</p>
+            <p class="text-xs font-bold text-white">Produk Tidak Ditemukan</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Coba kata kunci lain atau pilih kategori Semua.</p>
           </div>
-          <button onclick="resetFilters()" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white dark:bg-white/10 dark:hover:bg-white/15 dark:text-white text-xs font-semibold transition press-bounce border border-transparent dark:border-white/10 shadow-sm">
+          <button onclick="resetFilters()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-white transition press-bounce border border-white/10">
             Reset Pencarian
           </button>
         </div>
@@ -362,10 +352,10 @@
   </main>
 
   <!-- CLEAN PROFESSIONAL FOOTER -->
-  <footer class="w-full max-w-md mx-auto text-center py-6 px-4 text-xs text-slate-500 dark:text-slate-500 space-y-1.5 border-t border-slate-200 dark:border-white/5 relative z-10">
+  <footer class="w-full max-w-md mx-auto text-center py-6 px-4 text-xs text-slate-500 space-y-1.5 border-t border-white/5 relative z-10">
     <div class="flex items-center justify-center space-x-1.5">
       <span>Ditenagai oleh</span>
-      <a href="/" class="font-extrabold tracking-wider text-slate-800 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white transition" title="PATCHWORK">PATCHWORK</a>
+      <a href="/" class="font-extrabold tracking-wider text-slate-300 hover:text-white transition" title="PATCHWORK">PATCHWORK</a>
     </div>
     <div class="text-[11px] text-slate-500">Platform Link Bio &amp; Etalase Belanja Resmi</div>
   </footer>
@@ -379,27 +369,27 @@
   </div>
 
   <!-- SHARE & QR MODAL -->
-  <div id="share-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#111622] border border-slate-200 dark:border-white/15 rounded-3xl max-w-xs sm:max-w-sm w-full p-5 text-center space-y-4 shadow-2xl relative">
-      <button onclick="closeShareModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-slate-300 flex items-center justify-center transition press-bounce" title="Tutup">
+  <div id="share-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[#111622] border border-white/15 rounded-3xl max-w-xs sm:max-w-sm w-full p-5 text-center space-y-4 shadow-2xl relative">
+      <button onclick="closeShareModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition press-bounce" title="Tutup">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
 
       <div class="space-y-1 pt-1">
-        <h3 class="text-base font-black text-slate-900 dark:text-white">Bagikan Profil & Etalase</h3>
-        <p class="text-xs text-slate-500 dark:text-slate-400">Scan QR Code atau gunakan tautan resmi berikut</p>
+        <h3 class="text-base font-black text-white">Bagikan Profil & Etalase</h3>
+        <p class="text-xs text-slate-400">Scan QR Code atau gunakan tautan resmi berikut</p>
       </div>
 
       <!-- QR Code Container -->
-      <div class="p-3.5 bg-slate-50 dark:bg-white rounded-2xl flex flex-col items-center justify-center shadow border border-slate-200/80 dark:border-transparent mx-auto w-fit">
+      <div class="p-3.5 bg-white rounded-2xl flex flex-col items-center justify-center shadow-lg mx-auto w-fit">
         <div id="qrcode-wrapper" class="min-w-[180px] min-h-[180px] flex items-center justify-center overflow-hidden"></div>
       </div>
 
       <!-- Valid URL Preview & Copy Bar -->
       <div class="space-y-2">
-        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-left">
-          <input type="text" id="share-url-input" readonly class="w-full bg-transparent px-2.5 py-1 text-xs text-slate-800 dark:text-slate-200 font-mono focus:outline-none select-all truncate" placeholder="https://...">
-          <button onclick="copyLynkUrl()" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-xs font-bold shrink-0 hover:opacity-90 transition press-bounce shadow flex items-center space-x-1">
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-white/5 border border-white/10 text-left">
+          <input type="text" id="share-url-input" readonly class="w-full bg-transparent px-2.5 py-1 text-xs text-slate-200 font-mono focus:outline-none select-all truncate" placeholder="https://...">
+          <button onclick="copyLynkUrl()" class="px-3 py-1.5 rounded-lg bg-white text-slate-950 text-xs font-bold shrink-0 hover:bg-slate-100 transition press-bounce shadow flex items-center space-x-1">
             <i data-lucide="copy" class="w-3.5 h-3.5"></i>
             <span id="copy-btn-label">Salin</span>
           </button>
@@ -417,7 +407,7 @@
           </button>
         </div>
 
-        <button onclick="downloadQrCode()" class="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-800 dark:text-slate-200 text-xs font-semibold flex items-center justify-center space-x-1.5 transition press-bounce border border-slate-200 dark:border-white/10 shadow-sm">
+        <button onclick="downloadQrCode()" class="w-full py-2 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-semibold flex items-center justify-center space-x-1.5 transition press-bounce border border-white/10">
           <i data-lucide="download" class="w-3.5 h-3.5"></i>
           <span>Unduh Gambar QR Code</span>
         </button>
@@ -436,120 +426,36 @@
       tokopedia: `<svg role="img" viewBox="0 0 24 24" class="w-full h-full fill-current" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.372 0 0 5.372 0 12c0 5.302 3.438 9.8 8.207 11.387.6.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.628-5.372-12-12-12z"/></svg>`
     };
 
-    // CURRENT THEME STATE (Default: Light Mode as requested by user)
-    function getCurrentTheme() {
-      return localStorage.getItem('pw_lynk_theme') || 'light';
-    }
-
-    function applyTheme(theme) {
-      const isDark = theme === 'dark';
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      localStorage.setItem('pw_lynk_theme', theme);
-
-      // Update Theme Toggle Icon & Title
-      const toggleBtn = document.getElementById('theme-toggle-btn');
-      const toggleIcon = document.getElementById('theme-toggle-icon');
-      if (toggleIcon) {
-        toggleIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
-      }
-      if (toggleBtn) {
-        toggleBtn.setAttribute('title', isDark ? 'Beralih ke Mode Terang (Light)' : 'Beralih ke Mode Gelap (Dark)');
-        toggleBtn.className = isDark
-          ? 'w-9 h-9 rounded-2xl flex items-center justify-center press-bounce transition border shadow-sm bg-white/10 hover:bg-white/20 text-amber-300 border-white/15'
-          : 'w-9 h-9 rounded-2xl flex items-center justify-center press-bounce transition border shadow-sm bg-white hover:bg-slate-100 text-slate-700 border-slate-200';
-      }
-
-      // Update Header Navigation Buttons
-      const dashBtn = document.getElementById('btn-header-dashboard');
-      if (dashBtn) {
-        dashBtn.className = isDark
-          ? 'w-9 h-9 rounded-2xl flex items-center justify-center press-bounce transition border shadow-sm bg-white/10 hover:bg-white/20 text-slate-200 border-white/15'
-          : 'w-9 h-9 rounded-2xl flex items-center justify-center press-bounce transition border shadow-sm bg-white hover:bg-slate-100 text-slate-700 border-slate-200';
-      }
-
-      const shareBtn = document.getElementById('btn-header-share');
-      if (shareBtn) {
-        shareBtn.className = isDark
-          ? 'w-9 h-9 rounded-2xl flex items-center justify-center press-bounce transition border shadow-sm bg-white/10 hover:bg-white/20 text-slate-200 border-white/15'
-          : 'w-9 h-9 rounded-2xl flex items-center justify-center press-bounce transition border shadow-sm bg-white hover:bg-slate-100 text-slate-700 border-slate-200';
-      }
-
-      // Update Body Background Classes if profile data already loaded
-      if (profileData) {
-        updateThemeUI();
-      }
-
-      lucide.createIcons();
-    }
-
-    function toggleTheme() {
-      const current = getCurrentTheme();
-      const nextTheme = current === 'dark' ? 'light' : 'dark';
-      applyTheme(nextTheme);
-      showToast(nextTheme === 'dark' ? 'Mode Gelap Aktif' : 'Mode Terang Aktif');
-    }
-
-    // THEMES DEFINITION WITH EXCELLENT CONTRAST IN BOTH LIGHT AND DARK MODES
+    // THEMES DEFINITION (HIGH-CONTRAST DARK THEME ONLY)
     const THEMES = {
       modern: {
-        dark: {
-          body: 'bg-[#0b0f17] text-slate-100 selection:bg-emerald-400 selection:text-slate-950',
-          card: 'bg-white/[0.04] border-white/10 hover:border-white/20 hover:bg-white/[0.07] text-white',
-          cardHighlight: 'bg-gradient-to-r from-emerald-950/40 to-slate-900/60 border-emerald-500/30 text-white',
-          pillActive: 'bg-white text-slate-950 font-bold shadow',
-          pillInactive: 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10',
-          titleColor: 'text-white',
-          bioColor: 'text-slate-300',
-          slugBtn: 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10',
-          statCardDefault: 'bg-white/[0.04] border-white/10 text-white',
-          statLabelDefault: 'text-slate-400',
-          statCardTiktok: 'bg-white/[0.06] border-white/15 text-white',
-          statLabelTiktok: 'text-slate-200',
-          searchInput: 'bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-white/30 focus:bg-white/10',
-          viewBtnActive: 'bg-white/20 text-white shadow-inner',
-          viewBtnInactive: 'text-slate-400 hover:text-white',
-          cardTitle: 'text-white group-hover:text-emerald-400',
-          cardCategory: 'text-slate-400',
-          cardPrice: 'text-emerald-400 font-mono',
-          cardImgBg: 'bg-black/20 border-white/10',
-          footerBorder: 'border-white/5',
-          footerText: 'text-slate-500',
-          footerBrand: 'text-slate-300 hover:text-white'
-        },
-        light: {
-          body: 'bg-[#f8fafc] text-slate-900 selection:bg-emerald-500 selection:text-white',
-          card: 'bg-white border-slate-200/90 hover:border-emerald-500/40 hover:shadow-md text-slate-900 shadow-sm',
-          cardHighlight: 'bg-gradient-to-r from-emerald-50/70 to-teal-50/70 border-emerald-300 text-slate-900 shadow-sm',
-          pillActive: 'bg-slate-900 text-white font-bold shadow',
-          pillInactive: 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 shadow-sm',
-          titleColor: 'text-slate-900',
-          bioColor: 'text-slate-600',
-          slugBtn: 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200 shadow-sm',
-          statCardDefault: 'bg-white border-slate-200 text-slate-900 shadow-sm',
-          statLabelDefault: 'text-slate-500',
-          statCardTiktok: 'bg-slate-100 border-slate-200 text-slate-900 shadow-sm',
-          statLabelTiktok: 'text-slate-800',
-          searchInput: 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white shadow-sm',
-          viewBtnActive: 'bg-slate-900 text-white shadow-inner',
-          viewBtnInactive: 'text-slate-500 hover:text-slate-900',
-          cardTitle: 'text-slate-900 group-hover:text-emerald-600',
-          cardCategory: 'text-slate-500',
-          cardPrice: 'text-emerald-600 font-mono font-extrabold',
-          cardImgBg: 'bg-slate-100 border-slate-200',
-          footerBorder: 'border-slate-200',
-          footerText: 'text-slate-500',
-          footerBrand: 'text-slate-900 hover:text-emerald-600'
-        }
+        body: 'bg-[#0b0f17] text-slate-100 selection:bg-emerald-400 selection:text-slate-950',
+        card: 'bg-white/[0.04] border-white/10 hover:border-white/20 hover:bg-white/[0.07] text-white',
+        cardHighlight: 'bg-gradient-to-r from-emerald-950/40 to-slate-900/60 border-emerald-500/30 text-white',
+        pillActive: 'bg-white text-slate-950 font-bold shadow',
+        pillInactive: 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10',
+        titleColor: 'text-white',
+        bioColor: 'text-slate-300',
+        slugBtn: 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10',
+        statCardDefault: 'bg-white/[0.04] border-white/10 text-white',
+        statLabelDefault: 'text-slate-400',
+        statCardTiktok: 'bg-white/[0.06] border-white/15 text-white',
+        statLabelTiktok: 'text-slate-200',
+        searchInput: 'bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-white/30 focus:bg-white/10',
+        viewBtnActive: 'bg-white/20 text-white shadow-inner',
+        viewBtnInactive: 'text-slate-400 hover:text-white',
+        cardTitle: 'text-white group-hover:text-emerald-400',
+        cardCategory: 'text-slate-400',
+        cardPrice: 'text-emerald-400 font-mono',
+        cardImgBg: 'bg-black/20 border-white/10',
+        footerBorder: 'border-white/5',
+        footerText: 'text-slate-500',
+        footerBrand: 'text-slate-300 hover:text-white'
       }
     };
 
-    function getThemeStyles(templateName) {
-      const mode = getCurrentTheme() === 'dark' ? 'dark' : 'light';
-      return THEMES.modern[mode];
+    function getThemeStyles() {
+      return THEMES.modern;
     }
 
     // PARSE IDENTIFIER (Path /lynk/:id, /@:id, /:id, or query)
@@ -619,42 +525,12 @@
       showError();
     }
 
-    function updateThemeUI() {
-      const mode = getCurrentTheme();
-      const isDark = mode === 'dark';
-      const styles = getThemeStyles();
-
-      // Body styling
-      const body = document.getElementById('page-body');
-      if (body) {
-        body.className = `${styles.body} min-h-screen flex flex-col antialiased relative transition-colors duration-300`;
-      }
-
-      // Profile Name & Bio styling
-      const pName = document.getElementById('profile-name');
-      if (pName) {
-        pName.className = `text-xl sm:text-2xl font-black tracking-tight ${styles.titleColor} flex items-center justify-center gap-1.5 min-h-[28px]`;
-      }
-      const pBio = document.getElementById('profile-bio');
-      if (pBio) {
-        pBio.className = `text-xs sm:text-[13px] ${styles.bioColor} leading-relaxed font-normal min-h-[18px]`;
-      }
-
-      // Re-render categories & products with current theme
-      renderCategories(categoriesList);
-      syncViewButtons();
-      renderProducts();
-    }
-
     function renderProfile(data) {
       document.getElementById('loading-state').classList.add('hidden');
       document.getElementById('profile-container').classList.remove('hidden');
 
       const u = data.user || {};
       profileData = u;
-
-      // Apply initial theme UI
-      applyTheme(getCurrentTheme());
 
       // Page Title & Meta
       const name = u.name || '';
