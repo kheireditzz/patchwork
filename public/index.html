@@ -601,7 +601,11 @@
     document.documentElement.classList.remove('dark');
     localStorage.removeItem('theme');
 
-    fetch('/api/visitors/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ page: window.location.pathname }) }).catch(() => {});
+    // Track visitor only if not logged in as admin
+    const adminToken = localStorage.getItem('patchwork_token');
+    if (!adminToken) {
+      fetch('/api/visitors/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ page: window.location.pathname }) }).catch(() => {});
+    }
 
     function formatRupiah(amount) {
       return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
@@ -908,7 +912,15 @@
     function resetAllFilters() { state.search = ''; state.category = ''; state.marketplace = ''; document.getElementById('nav-search-input').value = ''; document.getElementById('mobile-search-input').value = ''; document.getElementById('filter-marketplace').value = ''; loadCategories(); loadProducts(); }
 
     async function trackProductClick(productId, marketplace) {
-      try { await fetch('/api/clicks/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: productId, marketplace }) }); } catch (err) { console.warn('Click track error', err); }
+      const token = localStorage.getItem('patchwork_token');
+      if (token) return; // Admin clicks are not tracked
+      try { 
+        await fetch('/api/clicks/track', { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' }, 
+          body: JSON.stringify({ product_id: productId, marketplace }) 
+        }); 
+      } catch (err) { console.warn('Click track error', err); }
     }
 
     function openShareModal(slug, name, thumb) {

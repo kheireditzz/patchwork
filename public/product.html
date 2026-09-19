@@ -316,6 +316,8 @@
     function setMainImage(url) { document.getElementById('main-image').src = url; }
 
     async function trackClick(productId, marketplace) {
+      const token = localStorage.getItem('patchwork_token');
+      if (token) return; // Admin clicks are not tracked
       try { await fetch('/api/clicks/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: productId, marketplace }) }); } catch (err) { console.warn(err); }
     }
 

@@ -465,14 +465,17 @@
     let viewMode = localStorage.getItem('pw_lynk_view') || 'grid'; // Default 'grid' (2-kolom)
 
     async function initPage() {
-      // Track page visitor for this Lynk ID
-      try {
-        fetch('/api/visitors/track', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ page: window.location.pathname })
-        }).catch(() => {});
-      } catch (e) {}
+      // Track page visitor for this Lynk ID (only if not logged in as admin)
+      const adminToken = localStorage.getItem('patchwork_token');
+      if (!adminToken) {
+        try {
+          fetch('/api/visitors/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ page: window.location.pathname })
+          }).catch(() => {});
+        } catch (e) {}
+      }
 
       const fetchUrl = identifier 
         ? `/api/profile/${encodeURIComponent(identifier)}`
@@ -839,6 +842,8 @@
 
     function trackClick(productId, marketplace) {
       if (!productId) return;
+      const adminToken = localStorage.getItem('patchwork_token');
+      if (adminToken) return; // Admin clicks are not tracked or counted
 
       // Optimistic UI counter update for instantaneous feedback
       const mp = (marketplace || '').toLowerCase();

@@ -920,6 +920,20 @@ router.post('/clicks/track', async (req, res) => {
       return res.status(400).json({ error: 'product_id dan marketplace wajib diisi.' });
     }
 
+    // Check if requester is Admin or Super Admin -> Do NOT count admin clicks!
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : req.cookies?.token;
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded && (decoded.role === 'Super Admin' || decoded.role === 'Admin')) {
+          return res.json({ success: true, ignored: true, message: 'Aktivitas Admin tidak dihitung ke statistik.' });
+        }
+      } catch (e) {
+        // Invalid or expired token, proceed as regular visitor
+      }
+    }
+
     const clickId = 'clk_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
     const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const ua = req.headers['user-agent'] || '';
@@ -977,6 +991,21 @@ router.post('/clicks/track', async (req, res) => {
 router.post('/visitors/track', async (req, res) => {
   try {
     const { page = '/' } = req.body;
+
+    // Check if requester is Admin or Super Admin -> Do NOT count admin visits!
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : req.cookies?.token;
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded && (decoded.role === 'Super Admin' || decoded.role === 'Admin')) {
+          return res.json({ success: true, ignored: true, message: 'Kunjungan Admin tidak dihitung ke statistik.' });
+        }
+      } catch (e) {
+        // Invalid or expired token, proceed as regular visitor
+      }
+    }
+
     const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const ua = req.headers['user-agent'] || '';
     const referrer = req.headers['referer'] || '';
@@ -1596,7 +1625,7 @@ router.post('/analytics/reset', authenticateToken, authorizeRole(['Super Admin',
       sqlite.prepare('DELETE FROM visitors').run();
       if (supabase) {
         try {
-          await supabase.from('visitors').delete().neq('id', 'keep_safe_non_existent_id');
+          await supabase.from('visitors').delete().neq('id', '00000000-0000-0000-0000-000000000000');
         } catch (e) {
           console.warn('Supabase reset visitors notice:', e.message);
         }
@@ -1610,7 +1639,7 @@ router.post('/analytics/reset', authenticateToken, authorizeRole(['Super Admin',
       if (supabase) {
         try {
           await supabase.from('clicks').delete().ilike('marketplace', '%shopee%');
-          await supabase.from('products').update({ shopee_clicks: 0 }).neq('id', 'keep_safe');
+          await supabase.from('products').update({ shopee_clicks: 0 }).neq('id', '00000000-0000-0000-0000-000000000000');
         } catch (e) {}
       }
     } else if (target === 'tiktok') {
@@ -1620,7 +1649,7 @@ router.post('/analytics/reset', authenticateToken, authorizeRole(['Super Admin',
       if (supabase) {
         try {
           await supabase.from('clicks').delete().ilike('marketplace', '%tiktok%');
-          await supabase.from('products').update({ tiktok_clicks: 0 }).neq('id', 'keep_safe');
+          await supabase.from('products').update({ tiktok_clicks: 0 }).neq('id', '00000000-0000-0000-0000-000000000000');
         } catch (e) {}
       }
     } else if (target === 'clicks' || target === 'all') {
@@ -1628,13 +1657,13 @@ router.post('/analytics/reset', authenticateToken, authorizeRole(['Super Admin',
       sqlite.prepare('UPDATE products SET total_clicks = 0, shopee_clicks = 0, tiktok_clicks = 0, tokopedia_clicks = 0').run();
       if (supabase) {
         try {
-          await supabase.from('clicks').delete().neq('id', 'keep_safe_non_existent_id');
+          await supabase.from('clicks').delete().neq('id', '00000000-0000-0000-0000-000000000000');
           await supabase.from('products').update({
             total_clicks: 0,
             shopee_clicks: 0,
             tiktok_clicks: 0,
             tokopedia_clicks: 0
-          }).neq('id', 'keep_safe');
+          }).neq('id', '00000000-0000-0000-0000-000000000000');
         } catch (e) {}
       }
     }
