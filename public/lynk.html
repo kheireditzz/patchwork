@@ -459,18 +459,24 @@
     }
 
     // PARSE IDENTIFIER (Path /lynk/:id, /@:id, /:id, or query)
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const decodedPath = decodeURIComponent(window.location.pathname || '');
+    const pathParts = decodedPath.split('/').filter(Boolean);
     const urlParams = new URLSearchParams(window.location.search);
-    let identifier = urlParams.get('id') || urlParams.get('user') || '';
+    let identifier = (urlParams.get('id') || urlParams.get('user') || '').trim();
 
     if (!identifier && pathParts.length > 0) {
-      if (pathParts[0] === 'lynk' || pathParts[0] === 'link') {
+      const p0 = pathParts[0];
+      if (p0 === 'lynk' || p0 === 'link') {
         identifier = pathParts[1] || '';
-      } else if (pathParts[0].startsWith('@')) {
-        identifier = pathParts[0].substring(1);
-      } else if (!['admin', 'partner', 'product', 'api', 'uploads', 'dashboard'].includes(pathParts[0].toLowerCase())) {
-        identifier = pathParts[0];
+      } else if (p0.startsWith('@')) {
+        identifier = p0.substring(1);
+      } else if (!['admin', 'partner', 'product', 'api', 'uploads', 'dashboard'].includes(p0.toLowerCase())) {
+        identifier = p0;
       }
+    }
+
+    if (identifier && identifier.startsWith('@')) {
+      identifier = identifier.substring(1);
     }
 
     const host = (window.location.hostname || '').toLowerCase();
@@ -506,23 +512,41 @@
         : `/api/profile/default`;
 
       try {
-        const res = await fetch(fetchUrl);
+        let res = await fetch(fetchUrl);
+        // If specific identifier fails with 404, gracefully try default profile as fallback
+        if (!res.ok && identifier && identifier.toLowerCase() !== 'default') {
+          res = await fetch('/api/profile/default');
+        }
         if (!res.ok) {
-          loadFallbackShowcase();
+          showError();
           return;
         }
         const data = await res.json();
+        if (!data || !data.user) {
+          showError();
+          return;
+        }
         profileData = data.user || {};
         productsList = data.products || [];
         categoriesList = data.categories || [];
         renderProfile(data);
       } catch (e) {
-        loadFallbackShowcase();
+        // Network or fetch error: try fallback default
+        try {
+          const fallbackRes = await fetch('/api/profile/default');
+          if (fallbackRes.ok) {
+            const fallbackData = await fallbackRes.json();
+            if (fallbackData && fallbackData.user) {
+              profileData = fallbackData.user || {};
+              productsList = fallbackData.products || [];
+              categoriesList = fallbackData.categories || [];
+              renderProfile(fallbackData);
+              return;
+            }
+          }
+        } catch (err) {}
+        showError();
       }
-    }
-
-    async function loadFallbackShowcase() {
-      showError();
     }
 
     function renderProfile(data) {

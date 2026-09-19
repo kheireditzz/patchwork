@@ -360,8 +360,11 @@ router.put('/auth/profile', authenticateToken, async (req, res) => {
 // Public Lynk.id Profile Endpoint by User ID or custom_slug
 router.get('/profile/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const lowerParam = id.toLowerCase();
+    let { id } = req.params;
+    if (id && id.startsWith('@')) {
+      id = id.substring(1);
+    }
+    const lowerParam = (id || '').toLowerCase();
     let user = sqlite.prepare(`
       SELECT id, name, email, bio, avatar, banner, background, avatar_border, avatar_shape, tiktok, instagram, shopee, youtube, website, template, role, custom_slug
       FROM users WHERE id = ? OR LOWER(email) = ? OR LOWER(custom_slug) = ? OR LOWER(email) LIKE ?
