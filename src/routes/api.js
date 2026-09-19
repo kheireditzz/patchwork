@@ -380,17 +380,12 @@ router.get('/profile/:id', async (req, res) => {
 
     if (!user) {
       if (lowerParam === 'default' || lowerParam === 'patchwork') {
-        user = sqlite.prepare("SELECT id, name, email, bio, avatar, banner, background, avatar_border, avatar_shape, tiktok, instagram, shopee, youtube, website, template, role, custom_slug FROM users ORDER BY id ASC LIMIT 1").get() || {
-          id: 'patchwork',
-          name: 'patchwork',
-          email: 'kheireditz@admin.com',
-          bio: 'Koleksi tautan resmi dan etalase rekomendasi belanja terbaik.',
-          custom_slug: 'kheireditz',
-          template: 'modern',
-          avatar_border: 'emerald',
-          avatar_shape: 'circle'
-        };
-      } else {
+        user = sqlite.prepare("SELECT id, name, email, bio, avatar, banner, background, avatar_border, avatar_shape, tiktok, instagram, shopee, youtube, website, template, role, custom_slug FROM users WHERE role = 'Super Admin' OR role = 'Admin' ORDER BY id ASC LIMIT 1").get();
+        if (!user) {
+          user = sqlite.prepare("SELECT id, name, email, bio, avatar, banner, background, avatar_border, avatar_shape, tiktok, instagram, shopee, youtube, website, template, role, custom_slug FROM users ORDER BY id ASC LIMIT 1").get();
+        }
+      }
+      if (!user) {
         return res.status(404).json({ error: 'Profil tidak ditemukan' });
       }
     }
@@ -410,21 +405,9 @@ router.get('/profile/:id', async (req, res) => {
       SELECT p.*, c.name as category_name, c.slug as category_slug
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
-      WHERE (p.created_by = ? OR ? = 'patchwork' OR ? = '1') AND p.status = 'Published'
+      WHERE (p.created_by = ? OR (? = 'Super Admin' AND (p.created_by IS NULL OR p.created_by = ''))) AND p.status = 'Published'
       ORDER BY p.is_featured DESC, p.created_at DESC
-    `).all(user.id, user.id, user.id);
-
-    // Fallback: If user has 0 products, show latest published products from store
-    if (products.length === 0) {
-      products = sqlite.prepare(`
-        SELECT p.*, c.name as category_name, c.slug as category_slug
-        FROM products p
-        LEFT JOIN categories c ON p.category_id = c.id
-        WHERE p.status = 'Published'
-        ORDER BY p.is_featured DESC, p.created_at DESC
-        LIMIT 40
-      `).all();
-    }
+    `).all(user.id, user.role || '');
 
     if (products.length === 0 && supabase) {
       try {

@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title id="page-title">patchwork - Profil & Rekomendasi Pilihan</title>
+  <title id="page-title">LYNK ID Official</title>
   <meta name="description" id="page-desc" content="Koleksi tautan resmi, etalase rekomendasi belanja, dan promo terverifikasi.">
-  <meta property="og:title" id="og-title" content="patchwork">
+  <meta property="og:title" id="og-title" content="LYNK ID Official">
   <meta property="og:description" id="og-desc" content="Koleksi tautan resmi dan rekomendasi pilihan">
   <meta property="og:image" id="og-img" content="">
   <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
@@ -174,9 +174,9 @@
           <!-- Avatar (PP) diposisikan presisi tepat di tengah garis (50% di dalam & 50% di luar) -->
           <div class="absolute left-1/2 top-full -translate-x-1/2 -translate-y-1/2 z-10 group anim-blur-up avatar-float transition-all duration-300">
             <div id="profile-avatar" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-emerald-400 shadow-2xl bg-gradient-to-tr from-slate-900 to-slate-800 flex items-center justify-center ring-4 ring-emerald-500/40 transition-all">
-              <span id="profile-initials" class="text-2xl font-black tracking-wider text-white">PW</span>
+              <span id="profile-initials" class="text-2xl font-black tracking-wider text-white"></span>
             </div>
-            <span id="profile-verified-badge" class="absolute bottom-1 right-1 p-1 rounded-full bg-emerald-500 text-slate-950 shadow-md border-2 border-[#0b0f17] flex items-center justify-center" title="Akun Terverifikasi">
+            <span id="profile-verified-badge" class="hidden absolute bottom-1 right-1 p-1 rounded-full bg-emerald-500 text-slate-950 shadow-md border-2 border-[#0b0f17] flex items-center justify-center" title="Akun Terverifikasi">
               <i data-lucide="check" class="w-3 h-3 stroke-[3.5]"></i>
             </span>
           </div>
@@ -184,18 +184,16 @@
 
         <!-- Name & Bio -->
         <div class="space-y-1.5 max-w-sm px-2">
-          <h1 id="profile-name" class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center justify-center gap-1.5">
-            --
+          <h1 id="profile-name" class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center justify-center gap-1.5 min-h-[28px]">
           </h1>
-          <p id="profile-bio" class="text-xs sm:text-[13px] text-slate-300 leading-relaxed font-normal">
-            --
+          <p id="profile-bio" class="text-xs sm:text-[13px] text-slate-300 leading-relaxed font-normal min-h-[18px]">
           </p>
 
           <!-- Verified Slug / URL Tag with Copy button -->
           <div class="pt-1 flex items-center justify-center gap-2">
             <button onclick="copyLynkUrl()" class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-mono bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition press-bounce shadow-inner group" title="Salin Link">
               <i data-lucide="link-2" class="w-3 h-3 text-emerald-400"></i>
-              <span id="profile-slug-display">patchwork.link</span>
+              <span id="profile-slug-display"></span>
               <i data-lucide="copy" class="w-3 h-3 opacity-60 group-hover:opacity-100 transition"></i>
             </button>
           </div>
@@ -499,28 +497,7 @@
     }
 
     async function loadFallbackShowcase() {
-      try {
-        const [resP, resC] = await Promise.all([
-          fetch('/api/products?limit=50&status=Published'),
-          fetch('/api/categories')
-        ]);
-        const jsonP = await resP.json();
-        const jsonC = await resC.json();
-        const prods = jsonP.data || [];
-        const cats = jsonC.data || [];
-
-        profileData = {
-          name: 'patchwork',
-          bio: 'Koleksi tautan resmi, sosial media, dan etalase rekomendasi belanja terbaik.',
-          custom_slug: 'patchwork',
-          template: 'modern'
-        };
-        productsList = prods;
-        categoriesList = cats;
-        renderProfile({ user: profileData, products: prods, categories: cats });
-      } catch (err) {
-        showError();
-      }
+      showError();
     }
 
     function renderProfile(data) {
@@ -534,19 +511,29 @@
       document.getElementById('page-body').className = `${tmpl.body} min-h-screen flex flex-col antialiased`;
 
       // Page Title & Meta
-      const name = u.name || 'patchwork';
-      document.title = `${name} | patchwork`;
-      document.getElementById('page-title').innerText = `${name} - Rekomendasi Belanja`;
+      const name = u.name || '';
+      document.title = name ? `${name} | LYNK ID Official` : 'LYNK ID Official';
+      document.getElementById('page-title').innerText = name ? `${name} - Rekomendasi Pilihan` : 'LYNK ID Official';
       document.getElementById('profile-name').innerText = name;
-      document.getElementById('profile-bio').innerText = u.bio || 'Etalase rekomendasi produk terverifikasi & tautan resmi.';
+      document.getElementById('profile-bio').innerText = u.bio || '';
 
       // Avatar & Border Styling
       const avBox = document.getElementById('profile-avatar');
       if (u.avatar) {
         avBox.innerHTML = `<img src="${u.avatar}" alt="${name}" class="w-full h-full object-cover">`;
       } else {
-        const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase() || 'PW';
+        const initials = name ? name.split(' ').map(w => w[0]).filter(Boolean).join('').substring(0, 2).toUpperCase() : '';
         avBox.innerHTML = `<span id="profile-initials" class="text-2xl font-black tracking-wider text-white">${initials}</span>`;
+      }
+
+      // Verified Badge (Only show if user has an account)
+      const verifiedBadge = document.getElementById('profile-verified-badge');
+      if (verifiedBadge) {
+        if (u.id || u.email) {
+          verifiedBadge.classList.remove('hidden');
+        } else {
+          verifiedBadge.classList.add('hidden');
+        }
       }
 
       // Apply Avatar Shape (Circle vs Squircle)
@@ -654,8 +641,12 @@
 
       // Display Slug
       const slugPill = document.getElementById('profile-slug-display');
-      const cleanSlug = u.custom_slug || (u.email && u.email.includes('@') ? u.email.split('@')[0] : '') || identifier || 'kheireditz';
-      slugPill.innerText = `@${cleanSlug}`;
+      const cleanSlug = u.custom_slug || identifier || (u.email && u.email.includes('@') ? u.email.split('@')[0] : '');
+      if (cleanSlug) {
+        slugPill.innerText = `@${cleanSlug}`;
+      } else {
+        slugPill.innerText = '';
+      }
 
       // Live Stats Dashboard (Kunjungan, Shopee, TikTok, Total Klik)
       const stats = data.stats || {};
@@ -1109,14 +1100,14 @@
     function getShareUrl() {
       const u = profileData || {};
       const origin = window.location.origin;
-      let slug = u.custom_slug || (u.email && u.email.includes('@') ? u.email.split('@')[0] : '') || identifier || 'kheireditz';
+      let slug = u.custom_slug || identifier || (u.email && u.email.includes('@') ? u.email.split('@')[0] : '');
       
       // If slug matches a raw UUID pattern, replace with clean handle
       if (!slug || /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)) {
-        slug = (u.email && u.email.includes('@') ? u.email.split('@')[0] : '') || 'kheireditz';
+        slug = (u.email && u.email.includes('@') ? u.email.split('@')[0] : '') || identifier || '';
       }
       
-      return `${origin}/@${encodeURIComponent(slug)}`;
+      return slug ? `${origin}/@${encodeURIComponent(slug)}` : origin;
     }
 
     function openShareModal() {
