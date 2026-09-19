@@ -523,8 +523,45 @@ router.post('/upload', authenticateToken, upload.single('file'), async (req, res
 // 3. PRODUCTS (REST API CRUD, Filter, Search, Pagination)
 // -------------------------------------------------------------
 // GET /api/products (Public or Admin)
-router.get('/products', (req, res) => {
+router.get('/products', async (req, res) => {
   try {
+    // If Supabase is connected, ensure local SQLite products match Supabase products
+    if (supabase) {
+      try {
+        const { data: sbProds, error: sbErr } = await supabase.from('products').select('*');
+        if (!sbErr && sbProds) {
+          if (sbProds.length > 0) {
+            const insP = sqlite.prepare(`
+              INSERT OR REPLACE INTO products (
+                id, name, slug, category_id, description, price, commission_rate,
+                marketplace, url_shopee, url_tiktok, url_tokopedia, thumbnail, gallery,
+                status, is_featured, total_clicks, shopee_clicks, tiktok_clicks, tokopedia_clicks,
+                created_by, created_at, updated_at
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `);
+            sbProds.forEach(p => {
+              try {
+                const gal = typeof p.gallery === 'string' ? p.gallery : JSON.stringify(p.gallery || []);
+                insP.run(
+                  p.id, p.name, p.slug, p.category_id || null, p.description || '',
+                  p.price || 0, p.commission_rate || '', p.marketplace || 'Shopee',
+                  p.url_shopee || '', p.url_tiktok || '', p.url_tokopedia || '',
+                  p.thumbnail || '', gal, p.status || 'Published', p.is_featured ? 1 : 0,
+                  p.total_clicks || 0, p.shopee_clicks || 0, p.tiktok_clicks || 0, p.tokopedia_clicks || 0,
+                  p.created_by || null, p.created_at || new Date().toISOString(), p.updated_at || new Date().toISOString()
+                );
+              } catch (e) {}
+            });
+            const validIds = sbProds.map(p => `'${p.id}'`).join(',');
+            sqlite.prepare(`DELETE FROM products WHERE id NOT IN (${validIds})`).run();
+          } else {
+            // Supabase is empty, wipe SQLite products too
+            sqlite.prepare('DELETE FROM products').run();
+          }
+        }
+      } catch (e) {}
+    }
+
     const {
       search = '',
       category_id = '',
@@ -1180,14 +1217,22 @@ router.get('/banners', async (req, res) => {
         let q = supabase.from('banners').select('*').order('display_order', { ascending: true });
         if (status) q = q.eq('status', status);
         const { data: sbBanners, error: sbErr } = await q;
-        if (!sbErr && sbBanners && sbBanners.length > 0) {
-          const insB = sqlite.prepare(`
-            INSERT OR REPLACE INTO banners (id, title, subtitle, image, target_url, status, display_order, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          `);
-          sbBanners.forEach(b => {
-            try { insB.run(b.id, b.title, b.subtitle || '', b.image, b.target_url || '#', b.status || 'Published', b.display_order || 0, b.created_at || new Date().toISOString()); } catch (e) {}
-          });
+        if (!sbErr && sbBanners) {
+          if (sbBanners.length > 0) {
+            const insB = sqlite.prepare(`
+              INSERT OR REPLACE INTO banners (id, title, subtitle, image, target_url, status, display_order, created_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            `);
+            sbBanners.forEach(b => {
+              try { insB.run(b.id, b.title, b.subtitle || '', b.image, b.target_url || '#', b.status || 'Published', b.display_order || 0, b.created_at || new Date().toISOString()); } catch (e) {}
+            });
+            // Also remove any banner in sqlite that is no longer in Supabase
+            const sbIds = sbBanners.map(b => `'${b.id}'`).join(',');
+            sqlite.prepare(`DELETE FROM banners WHERE id NOT IN (${sbIds})`).run();
+          } else {
+            // Supabase has 0 banners, so sqlite should also have 0 banners
+            sqlite.prepare('DELETE FROM banners').run();
+          }
         }
       } catch (err) {}
     }

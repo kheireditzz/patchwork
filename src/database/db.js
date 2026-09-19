@@ -403,9 +403,10 @@ export async function initDatabase() {
     }
   }
 
-  // Seed default banners if none exist
+  // Seed default banners ONLY ONCE if never initialized before
+  const seedBannersDone = sqlite.prepare("SELECT value FROM settings WHERE key = 'seed_banners_initialized'").get();
   const bannerCount = sqlite.prepare('SELECT count(*) as count FROM banners').get().count;
-  if (bannerCount === 0 && !syncedBanners) {
+  if (!seedBannersDone && bannerCount === 0 && !syncedBanners) {
     const defaultBanners = [
       {
         id: 'ban_1',
@@ -426,6 +427,15 @@ export async function initDatabase() {
     ];
     const insertBan = sqlite.prepare('INSERT INTO banners (id, title, subtitle, image, target_url, status, display_order) VALUES (?, ?, ?, ?, ?, ?, ?)');
     defaultBanners.forEach((b, idx) => insertBan.run(b.id, b.title, b.subtitle, b.image, b.target_url, b.status, idx));
+    sqlite.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('seed_banners_initialized', 'true')").run();
+    if (supabase) {
+      try { await supabase.from('settings').upsert({ key: 'seed_banners_initialized', value: 'true', updated_at: new Date().toISOString() }); } catch (e) {}
+    }
+  } else if (!seedBannersDone) {
+    sqlite.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('seed_banners_initialized', 'true')").run();
+    if (supabase) {
+      try { await supabase.from('settings').upsert({ key: 'seed_banners_initialized', value: 'true', updated_at: new Date().toISOString() }); } catch (e) {}
+    }
   }
 
   // Synchronize products from Supabase PostgreSQL if connected
@@ -463,9 +473,10 @@ export async function initDatabase() {
     }
   }
 
-  // Seed initial products if none exist
+  // Seed initial products ONLY ONCE if never initialized before
+  const seedProdsDone = sqlite.prepare("SELECT value FROM settings WHERE key = 'seed_products_initialized'").get();
   const prodCount = sqlite.prepare('SELECT count(*) as count FROM products').get().count;
-  if (prodCount === 0 && !syncedProducts) {
+  if (!seedProdsDone && prodCount === 0 && !syncedProducts) {
     const products = [
       {
         id: 'prod_1',
@@ -567,6 +578,15 @@ export async function initDatabase() {
         p.status, p.is_featured, p.total_clicks, p.shopee_clicks, p.tiktok_clicks
       );
     });
+    sqlite.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('seed_products_initialized', 'true')").run();
+    if (supabase) {
+      try { await supabase.from('settings').upsert({ key: 'seed_products_initialized', value: 'true', updated_at: new Date().toISOString() }); } catch (e) {}
+    }
+  } else if (!seedProdsDone) {
+    sqlite.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('seed_products_initialized', 'true')").run();
+    if (supabase) {
+      try { await supabase.from('settings').upsert({ key: 'seed_products_initialized', value: 'true', updated_at: new Date().toISOString() }); } catch (e) {}
+    }
   }
 
   // Synchronize settings from Supabase
