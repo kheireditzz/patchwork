@@ -105,6 +105,21 @@
       transition: filter 0.3s ease;
       filter: brightness(0) invert(1) drop-shadow(0 2px 8px rgba(255,255,255,0.2));
     }
+    /* Header sticky dynamic glass effect */
+    .header-idle {
+      background-color: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
+    .header-scrolled {
+      background-color: rgba(11, 15, 23, 0.78) !important;
+      backdrop-filter: blur(12px) saturate(160%) !important;
+      -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5) !important;
+    }
   </style>
 </head>
 <body id="page-body" class="bg-[#0b0f17] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-emerald-400 selection:text-slate-950 relative">
@@ -114,8 +129,8 @@
   <video id="page-custom-video" class="fixed inset-0 w-full h-full object-cover pointer-events-none z-0 transition-opacity duration-700 opacity-0 hidden" autoplay loop muted playsinline></video>
   <div id="page-custom-bg-overlay" class="fixed inset-0 pointer-events-none z-0 bg-[#0b0f17]/75 backdrop-blur-[2px] transition-opacity duration-700 opacity-0"></div>
 
-  <!-- TOP APP BAR -->
-  <header id="app-header" class="w-full max-w-md mx-auto px-4 pt-4 pb-2 flex items-center justify-between sticky top-0 z-30 transition-colors duration-300">
+  <!-- TOP APP BAR: Menyatu (transparent/seamless) saat diam, kaca halus berbatas saat discroll -->
+  <header id="app-header" class="w-full max-w-md mx-auto px-4 pt-4 pb-2.5 flex items-center justify-between sticky top-0 z-30 transition-all duration-300 bg-transparent border-b border-transparent">
     <!-- LOGO DENGAN KONTRAST TINGGI (PUTIH TERANG) -->
     <a href="/" class="flex items-center transition active:scale-95 group" title="Beranda PATCHWORK">
       <div class="h-8 flex items-center">
@@ -1331,6 +1346,21 @@
       const text = `Halo! Kunjungi koleksi produk & tautan resmi pilihan ${name}: ${url}`;
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     }
+
+    // Dynamic Header: menyatu & tanpa blur saat di atas (diam), frosted glass berbatas saat discroll
+    const appHeader = document.getElementById('app-header');
+    function handleHeaderScroll() {
+      if (!appHeader) return;
+      if (window.scrollY > 24) {
+        appHeader.classList.remove('header-idle', 'bg-transparent', 'border-transparent');
+        appHeader.classList.add('header-scrolled');
+      } else {
+        appHeader.classList.remove('header-scrolled');
+        appHeader.classList.add('header-idle', 'bg-transparent', 'border-transparent');
+      }
+    }
+    window.addEventListener('scroll', handleHeaderScroll, { passive: true });
+    handleHeaderScroll();
 
     // Auto-init on page load
     initPage();
