@@ -706,7 +706,84 @@ router.get('/products/:idOrSlug', (req, res) => {
   }
 });
 
-// POST /api/products
+// POST /api/products/fetch-meta (Extract details from affiliate link)
+router.post('/products/fetch-meta', authenticateToken, async (req, res) => {
+  try {
+    const { url } = req.body;
+    if (!url || typeof url !== 'string') {
+      return res.status(400).json({ error: 'URL produk wajib diisi.' });
+    }
+
+    const cleanUrl = url.trim();
+    let name = '';
+    let image = '';
+    let marketplace = 'Shopee';
+    let price = 0;
+    let original_price = 0;
+    let discount_percent = 0;
+
+    const lowerUrl = cleanUrl.toLowerCase();
+    if (lowerUrl.includes('tokopedia') || lowerUrl.includes('tiktok')) {
+      marketplace = 'TikTok Shop';
+      try {
+        const headRes = await fetch(cleanUrl, {
+          redirect: 'manual',
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+          }
+        });
+        const loc = headRes.headers.get('location');
+        if (loc) {
+          const u = new URL(loc);
+          const ogInfoRaw = u.searchParams.get('og_info');
+          if (ogInfoRaw) {
+            try {
+              const og = JSON.parse(ogInfoRaw);
+              if (og.title) name = og.title.replace(/\+/g, ' ').trim();
+              if (og.image) image = og.image.replace(/~tplv-[^?]+/, '').trim();
+            } catch (e) {}
+          }
+        }
+      } catch (err) {
+        console.warn('Error fetching TikTok/Tokopedia redirect:', err.message);
+      }
+    } else {
+      marketplace = 'Shopee';
+      try {
+        const pageRes = await fetch(cleanUrl, {
+          headers: {
+            'User-Agent': 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+          }
+        });
+        const html = await pageRes.text();
+        const titleMatch = html.match(/<meta\s+property=["']og:title["']\s+content=["']([^"']+)["']/i) ||
+                           html.match(/<title>([^<]+)<\/title>/i);
+        const imageMatch = html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i);
+        if (titleMatch && titleMatch[1]) name = titleMatch[1].trim();
+        if (imageMatch && imageMatch[1]) image = imageMatch[1].trim();
+      } catch (err) {
+        console.warn('Error fetching Shopee page:', err.message);
+      }
+    }
+
+    res.json({
+      success: true,
+      data: {
+        name,
+        image,
+        marketplace,
+        price,
+        original_price,
+        discount_percent,
+        url: cleanUrl
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/products
 router.post('/products', authenticateToken, authorizeRole(['Super Admin', 'Admin', 'Editor', 'Partner']), async (req, res) => {
   try {

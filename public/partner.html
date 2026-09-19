@@ -697,6 +697,25 @@
           </div>
         </div>
 
+        <!-- AUTO-FETCH PRODUCT FROM AFFILIATE LINK -->
+        <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-4 h-4 text-emerald-600"></i>
+              <span>Tarik Otomatis dari URL Produk</span>
+            </span>
+            <span class="text-[10px] bg-emerald-600/15 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Shopee / Tokopedia / TikTok</span>
+          </div>
+          <div class="flex gap-2">
+            <input type="url" id="partner-autofetch-url" placeholder="Tempel URL produk (contoh: https://vt.tokopedia.com/...)" class="flex-1 py-2 px-3 rounded-xl border border-emerald-200 bg-white text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            <button type="button" id="btn-partner-autofetch" onclick="handlePartnerAutoFetch()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shrink-0 transition active:scale-95 flex items-center gap-1.5 shadow-sm">
+              <i data-lucide="arrow-down-to-dot" class="w-3.5 h-3.5"></i>
+              <span>Ambil Info</span>
+            </button>
+          </div>
+          <p class="text-[11px] text-emerald-800/80">Otomatis mengisi Nama Produk, Foto Thumbnail, dan Marketplace dari link Anda.</p>
+        </div>
+
         <!-- Marketplace Channel Selection -->
         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3.5">
           <label class="block text-xs font-bold text-slate-800">Platform Marketplace *</label>
@@ -1575,6 +1594,8 @@
       document.getElementById('prod-modal-title').innerText = 'Tambah Produk ke Katalog';
       document.getElementById('partner-prod-form').reset();
       document.getElementById('prod-id').value = '';
+      const autoInp = document.getElementById('partner-autofetch-url');
+      if (autoInp) autoInp.value = '';
       prodGalleryList = [];
       updateGalleryPreview();
       toggleChannel('Shopee');
@@ -1582,6 +1603,71 @@
       document.getElementById('partner-prod-modal').classList.remove('hidden');
       document.body.classList.add('overflow-hidden');
       lucide.createIcons();
+    }
+
+    async function handlePartnerAutoFetch() {
+      const urlInput = document.getElementById('partner-autofetch-url');
+      const rawUrl = (urlInput?.value || '').trim();
+      if (!rawUrl) {
+        showToast('Silakan tempel URL produk terlebih dahulu!', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-partner-autofetch');
+      const origHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="inline-block animate-spin">⏳</span><span>Menarik...</span>';
+
+      try {
+        const res = await fetch('/api/products/fetch-meta', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${partnerToken}`
+          },
+          body: JSON.stringify({ url: rawUrl })
+        });
+        const json = await res.json();
+
+        if (res.ok && json.success && json.data) {
+          const { name, image, marketplace, price } = json.data;
+
+          if (name) {
+            document.getElementById('prod-name').value = name;
+          }
+          if (image) {
+            document.getElementById('prod-thumbnail').value = image;
+            updateThumbPreview(image);
+          }
+          if (price && price > 0) {
+            document.getElementById('prod-price').value = price;
+          }
+
+          if (marketplace === 'TikTok Shop') {
+            toggleChannel('TikTok Shop');
+            document.getElementById('prod-url-tiktok').value = rawUrl;
+            document.getElementById('prod-url-shopee').value = '';
+          } else {
+            toggleChannel('Shopee');
+            document.getElementById('prod-url-shopee').value = rawUrl;
+            document.getElementById('prod-url-tiktok').value = '';
+          }
+
+          if (name || image) {
+            showToast('Informasi produk berhasil diambil otomatis!', 'success');
+          } else {
+            showToast('Tautan berhasil diset. Silakan lengkapi nama dan harga.', 'info');
+          }
+        } else {
+          showToast(json.error || 'Gagal mengambil metadata tautan.', 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan saat memproses tautan.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+        lucide.createIcons();
+      }
     }
 
     function closeProductModal() {
