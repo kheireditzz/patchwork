@@ -93,8 +93,9 @@
 </head>
 <body id="page-body" class="bg-[#0b0f17] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-emerald-400 selection:text-slate-950 relative">
 
-  <!-- DYNAMIC PAGE BACKGROUND WITH SUBTLE OVERLAY -->
+  <!-- DYNAMIC PAGE BACKGROUND WITH SUBTLE OVERLAY (IMAGE OR VIDEO) -->
   <div id="page-custom-bg" class="fixed inset-0 pointer-events-none z-0 bg-cover bg-center transition-all duration-700 opacity-0"></div>
+  <video id="page-custom-video" class="fixed inset-0 w-full h-full object-cover pointer-events-none z-0 transition-opacity duration-700 opacity-0 hidden" autoplay loop muted playsinline></video>
   <div id="page-custom-bg-overlay" class="fixed inset-0 pointer-events-none z-0 bg-[#0b0f17]/75 backdrop-blur-[2px] transition-opacity duration-700 opacity-0"></div>
 
   <!-- TOP APP BAR -->
@@ -591,22 +592,63 @@
         }
       }
 
-      // Page Custom Background
+      // Page Custom Background (Image or Video)
       const customBg = document.getElementById('page-custom-bg');
+      const customVideo = document.getElementById('page-custom-video');
       const bgOverlay = document.getElementById('page-custom-bg-overlay');
-      if (customBg && bgOverlay) {
-        if (u.background && u.background.trim()) {
-          customBg.style.backgroundImage = `url('${u.background.trim()}')`;
-          customBg.classList.remove('opacity-0');
-          customBg.classList.add('opacity-100');
+      const bgUrl = (u.background || '').trim();
+
+      const isVideoBg = bgUrl && (
+        /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(bgUrl) ||
+        bgUrl.includes('/video/') ||
+        bgUrl.startsWith('data:video/')
+      );
+
+      if (bgUrl) {
+        if (isVideoBg) {
+          if (customVideo) {
+            customVideo.src = bgUrl;
+            customVideo.classList.remove('hidden', 'opacity-0');
+            customVideo.classList.add('opacity-100');
+            customVideo.play().catch(() => {});
+          }
+          if (customBg) {
+            customBg.style.backgroundImage = 'none';
+            customBg.classList.add('hidden', 'opacity-0');
+            customBg.classList.remove('opacity-100');
+          }
+        } else {
+          if (customVideo) {
+            customVideo.pause();
+            customVideo.src = '';
+            customVideo.classList.add('hidden', 'opacity-0');
+            customVideo.classList.remove('opacity-100');
+          }
+          if (customBg) {
+            customBg.style.backgroundImage = `url('${bgUrl}')`;
+            customBg.classList.remove('hidden', 'opacity-0');
+            customBg.classList.add('opacity-100');
+          }
+        }
+        if (bgOverlay) {
           bgOverlay.classList.remove('opacity-0');
           bgOverlay.classList.add('opacity-100');
-        } else {
+        }
+      } else {
+        if (customVideo) {
+          customVideo.pause();
+          customVideo.src = '';
+          customVideo.classList.add('hidden', 'opacity-0');
+          customVideo.classList.remove('opacity-100');
+        }
+        if (customBg) {
           customBg.style.backgroundImage = 'none';
-          customBg.classList.remove('opacity-100');
           customBg.classList.add('opacity-0');
-          bgOverlay.classList.remove('opacity-100');
+          customBg.classList.remove('opacity-100');
+        }
+        if (bgOverlay) {
           bgOverlay.classList.add('opacity-0');
+          bgOverlay.classList.remove('opacity-100');
         }
       }
 
@@ -620,7 +662,7 @@
       let totalShopee = stats.totalShopee !== undefined ? stats.totalShopee : 0;
       let totalTiktok = stats.totalTiktok !== undefined ? stats.totalTiktok : 0;
       let totalClicks = stats.totalClicks !== undefined ? stats.totalClicks : (totalShopee + totalTiktok);
-      let totalVisitors = stats.totalVisitors !== undefined ? stats.totalVisitors : 1;
+      let totalVisitors = stats.totalVisitors !== undefined ? stats.totalVisitors : 0;
 
       // Fallback calculation if backend stats are empty
       if (!data.stats && productsList.length > 0) {

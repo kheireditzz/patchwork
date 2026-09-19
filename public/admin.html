@@ -125,6 +125,17 @@
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-slate-900 selection:text-white">
+  <script>
+    // Instant auth check to prevent flash of login screen on page refresh
+    (function() {
+      try {
+        var t = localStorage.getItem('patchwork_token');
+        if (t) {
+          document.write('<style>#login-container{display:none!important;}#dashboard-container{display:flex!important;}</style>');
+        }
+      } catch (e) {}
+    })();
+  </script>
 
   <!-- ================= AUTH CONTAINER (LOGIN) ================= -->
   <div id="login-container" class="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-slate-950 relative overflow-hidden selection:bg-indigo-500 selection:text-white">
@@ -147,7 +158,7 @@
           </a>
         </div>
         <h1 class="text-xl font-black text-slate-900 tracking-tight">Login Administrator</h1>
-        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">Kelola katalog produk, akun kreator, link affiliate, dan analitik</p>
+        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">Kelola katalog produk affiliate, link toko, dan analitik</p>
       </div>
 
       <form id="login-form" onsubmit="submitAdminLogin(event)" class="space-y-4">
@@ -262,7 +273,7 @@
 
         <button onclick="navigateTab('users')" id="nav-users" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition relative">
           <i data-lucide="users" class="w-3.5 h-3.5"></i>
-          <span>Pengguna & Kreator</span>
+          <span>Pengguna</span>
           <span id="badge-pending-users" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-500 text-white leading-tight">0</span>
         </button>
 
@@ -500,8 +511,8 @@
         <div id="tab-users" class="hidden space-y-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Pengguna & Kreator</h3>
-              <p class="text-xs text-slate-500">Kelola akun pengguna, kreator, dan hak akses</p>
+              <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Pengguna &amp; Hak Akses</h3>
+              <p class="text-xs text-slate-500">Kelola akun administrator dan hak akses pengguna</p>
             </div>
             <div class="flex items-center gap-2">
               <button onclick="openUserModal()" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs shadow-sm flex items-center space-x-1.5 transition">
@@ -695,7 +706,7 @@
         <div id="tab-submissions" class="hidden space-y-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 class="text-base font-bold text-slate-900">Antrean Pengajuan Produk Kreator</h3>
+              <h3 class="text-base font-bold text-slate-900">Antrean Pengajuan Produk Mitra</h3>
               <p class="text-xs text-slate-500">Tinjau, setujui (approve), atau tolak produk yang diajukan sebelum tampil di katalog</p>
             </div>
             <div class="flex items-center space-x-2">
@@ -860,16 +871,16 @@
                 <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
                   <div class="flex items-center justify-between">
                     <div>
-                      <label class="block text-xs font-bold text-slate-800">Background Halaman LYNK ID</label>
-                      <p class="text-[11px] text-slate-500">Kustom wallpaper / background untuk keseluruhan halaman profil etalase</p>
+                      <label class="block text-xs font-bold text-slate-800">Background Halaman LYNK ID (Foto atau Video)</label>
+                      <p class="text-[11px] text-slate-500">Upload wallpaper foto atau video (mp4/webm/mov) langsung dari HP atau laptop untuk background etalase</p>
                     </div>
                   </div>
                   <div class="flex gap-2">
-                    <input type="text" id="adm-prof-background" oninput="updateAdminPreviewBg(this.value)" placeholder="https://... atau upload wallpaper" class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-white text-xs focus:border-slate-900 focus:outline-none transition">
+                    <input type="text" id="adm-prof-background" oninput="updateAdminPreviewBg(this.value)" placeholder="https://... atau upload foto/video dari HP" class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-white text-xs focus:border-slate-900 focus:outline-none transition">
                     <label class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold cursor-pointer shrink-0 flex items-center space-x-1.5 transition active:scale-95 shadow-sm">
                       <i data-lucide="upload" class="w-4 h-4"></i>
-                      <span class="hidden sm:inline">Upload Background</span>
-                      <input type="file" class="hidden" accept="image/*" onchange="uploadAdminMedia(this, 'adm-prof-background', 'background')">
+                      <span class="hidden sm:inline">Upload Foto/Video</span>
+                      <input type="file" class="hidden" accept="image/*,video/*" onchange="uploadAdminMedia(this, 'adm-prof-background', 'background')">
                     </label>
                   </div>
                 </div>
@@ -1022,6 +1033,7 @@
             <!-- Right: Preview -->
             <div id="adm-preview-card" class="relative overflow-hidden bg-slate-900 text-white rounded-3xl border border-slate-800 shadow-xl flex flex-col justify-between space-y-5 transition-all">
               <div id="adm-preview-bg-overlay" class="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none transition-all"></div>
+              <video id="adm-preview-video" class="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none hidden" autoplay loop muted playsinline></video>
               <div class="relative z-10 p-6 flex flex-col h-full justify-between space-y-5">
                 <div>
                   <div class="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-4">
@@ -1376,7 +1388,7 @@
         <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto mb-2.5">
           <i data-lucide="user-plus" class="w-6 h-6"></i>
         </div>
-        <h3 class="text-base font-bold text-slate-900">Daftar Akun Kreator Baru</h3>
+        <h3 class="text-base font-bold text-slate-900">Daftar Akun Mitra Baru</h3>
         <p class="text-xs text-slate-500 mt-0.5">Masukkan data akun untuk verifikasi sebelum menginput produk</p>
       </div>
 
@@ -1405,7 +1417,7 @@
         </div>
 
         <button type="submit" id="btn-admin-reg-submit" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2 active:scale-95 mt-2">
-          <span>Kirim Pendaftaran Kreator</span>
+          <span>Kirim Pendaftaran Mitra</span>
           <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
         </button>
 
@@ -1623,14 +1635,20 @@
           const json = await res.json();
           currentUser = json.user;
           showDashboard();
-        } else {
+        } else if (res.status === 401 || res.status === 403) {
+          // Token expired or invalid
           token = '';
           localStorage.removeItem('patchwork_token');
           currentUser = null;
           showLogin();
+        } else {
+          // Server error 5xx: keep session alive and show dashboard
+          showDashboard();
         }
       } catch (err) {
-        showLogin();
+        // Network timeout / connection glitch: keep dashboard active if token exists
+        console.warn('Auth verification network glitch, keeping dashboard visible:', err);
+        showDashboard();
       }
     }
 
@@ -1941,11 +1959,12 @@
       const target = selected ? selected.value : 'all';
       const btn = document.getElementById('btn-execute-reset');
 
-      const confirmed = await customConfirm(
-        `Apakah Anda benar-benar yakin ingin mereset statistik (${target.toUpperCase()}) ke nol? Riwayat ini tidak dapat dikembalikan.`,
-        'Konfirmasi Reset Statistik',
-        'danger'
-      );
+      const confirmed = await showConfirm({
+        title: 'Konfirmasi Reset Statistik',
+        message: `Apakah Anda benar-benar yakin ingin mereset statistik (${target.toUpperCase()}) ke nol? Riwayat ini tidak dapat dikembalikan.`,
+        type: 'danger',
+        confirmText: 'Ya, Reset Sekarang'
+      });
 
       if (!confirmed) return;
 
@@ -3234,12 +3253,47 @@
 
     function updateAdminPreviewBg(url) {
       const bgOverlay = document.getElementById('adm-preview-bg-overlay');
-      if (!bgOverlay) return;
-      if (url && url.trim()) {
-        bgOverlay.style.backgroundImage = `url('${url.trim()}')`;
-        bgOverlay.style.opacity = '0.35';
+      const bgVideo = document.getElementById('adm-preview-video');
+      const cleanUrl = (url || '').trim();
+      const isVideo = cleanUrl && (
+        /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(cleanUrl) ||
+        cleanUrl.includes('/video/') ||
+        cleanUrl.startsWith('data:video/')
+      );
+
+      if (cleanUrl) {
+        if (isVideo) {
+          if (bgVideo) {
+            bgVideo.src = cleanUrl;
+            bgVideo.classList.remove('hidden');
+            bgVideo.play().catch(() => {});
+          }
+          if (bgOverlay) {
+            bgOverlay.style.backgroundImage = 'none';
+            bgOverlay.classList.add('hidden');
+          }
+        } else {
+          if (bgVideo) {
+            bgVideo.pause();
+            bgVideo.src = '';
+            bgVideo.classList.add('hidden');
+          }
+          if (bgOverlay) {
+            bgOverlay.classList.remove('hidden');
+            bgOverlay.style.backgroundImage = `url('${cleanUrl}')`;
+            bgOverlay.style.opacity = '0.35';
+          }
+        }
       } else {
-        bgOverlay.style.backgroundImage = 'none';
+        if (bgVideo) {
+          bgVideo.pause();
+          bgVideo.src = '';
+          bgVideo.classList.add('hidden');
+        }
+        if (bgOverlay) {
+          bgOverlay.classList.remove('hidden');
+          bgOverlay.style.backgroundImage = 'none';
+        }
       }
     }
 

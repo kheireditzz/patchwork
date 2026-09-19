@@ -48,13 +48,14 @@ const storage = isVercelEnv
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB for video/image background
   fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|webp|gif|svg/;
-    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mime = allowed.test(file.mimetype);
-    if (ext && mime) cb(null, true);
-    else cb(new Error('Hanya file gambar (jpg, png, webp, gif, svg) yang diperbolehkan!'));
+    const allowedExts = /jpeg|jpg|png|webp|gif|svg|mp4|webm|ogg|mov/;
+    const ext = allowedExts.test(path.extname(file.originalname).toLowerCase());
+    const isImage = /image\/(jpeg|jpg|png|webp|gif|svg\+xml)/.test(file.mimetype);
+    const isVideo = /video\/(mp4|webm|ogg|quicktime)/.test(file.mimetype);
+    if (ext || isImage || isVideo) cb(null, true);
+    else cb(new Error('Format file tidak didukung! Unggah gambar (jpg, png, webp, gif) atau video (mp4, webm, mov).'));
   }
 });
 
@@ -454,9 +455,9 @@ router.get('/profile/:id', async (req, res) => {
       `).get(`%@${cleanSlug}%`, `%/lynk/${cleanSlug}%`, `%/lynk/${user.id}%`);
       
       const overallVis = sqlite.prepare("SELECT count(*) as count FROM visitors").get();
-      totalVisitors = (visQuery && visQuery.count > 0) ? visQuery.count : Math.max(overallVis ? overallVis.count : 0, 1);
+      totalVisitors = (visQuery && visQuery.count > 0) ? visQuery.count : (overallVis ? overallVis.count : 0);
     } catch (e) {
-      totalVisitors = 1;
+      totalVisitors = 0;
     }
 
     res.json({
