@@ -249,6 +249,10 @@ export async function initDatabase() {
   try { rawDb.exec(`ALTER TABLE users ADD COLUMN template TEXT DEFAULT 'modern';`); } catch (e) {}
 
   try { rawDb.exec(`ALTER TABLE users ADD COLUMN custom_slug TEXT;`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN banner TEXT DEFAULT '';`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN background TEXT DEFAULT '';`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN avatar_border TEXT DEFAULT 'emerald';`); } catch (e) {}
+  try { rawDb.exec(`ALTER TABLE users ADD COLUMN avatar_shape TEXT DEFAULT 'circle';`); } catch (e) {}
   try { rawDb.exec(`ALTER TABLE products ADD COLUMN created_by TEXT;`); } catch (e) {}
 
   // Upgrade users table check constraint if it doesn't support 'Partner'
@@ -317,8 +321,8 @@ export async function initDatabase() {
       const { data: sbUsers, error: uErr } = await supabase.from('users').select('*');
       if (!uErr && sbUsers && sbUsers.length > 0) {
         const insU = sqlite.prepare(`
-          INSERT OR REPLACE INTO users (id, name, email, phone, password, role, status, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug, created_at, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT OR REPLACE INTO users (id, name, email, phone, password, role, status, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug, banner, background, avatar_border, avatar_shape, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
         sbUsers.forEach(u => {
           try {
@@ -326,7 +330,9 @@ export async function initDatabase() {
               u.id, u.name, u.email, u.phone || '', u.password, u.role, u.status,
               u.bio || '', u.avatar || '', u.tiktok || '', u.instagram || '',
               u.shopee || '', u.youtube || '', u.website || '', u.template || 'modern',
-              u.custom_slug || null, u.created_at, u.updated_at
+              u.custom_slug || null, u.banner || '', u.background || '',
+              u.avatar_border || 'emerald', u.avatar_shape || 'circle',
+              u.created_at, u.updated_at
             );
           } catch (e) {}
         });
@@ -480,9 +486,9 @@ export async function initDatabase() {
         ]),
         status: 'Published',
         is_featured: 1,
-        total_clicks: 142,
-        shopee_clicks: 65,
-        tiktok_clicks: 77
+        total_clicks: 0,
+        shopee_clicks: 0,
+        tiktok_clicks: 0
       },
       {
         id: 'prod_2',
@@ -500,9 +506,9 @@ export async function initDatabase() {
         gallery: JSON.stringify(['https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&q=80']),
         status: 'Published',
         is_featured: 1,
-        total_clicks: 98,
-        shopee_clicks: 62,
-        tiktok_clicks: 36
+        total_clicks: 0,
+        shopee_clicks: 0,
+        tiktok_clicks: 0
       },
       {
         id: 'prod_3',
@@ -520,9 +526,9 @@ export async function initDatabase() {
         gallery: JSON.stringify(['https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=80']),
         status: 'Published',
         is_featured: 1,
-        total_clicks: 215,
-        shopee_clicks: 80,
-        tiktok_clicks: 135
+        total_clicks: 0,
+        shopee_clicks: 0,
+        tiktok_clicks: 0
       },
       {
         id: 'prod_4',
@@ -540,9 +546,9 @@ export async function initDatabase() {
         gallery: JSON.stringify(['https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600&q=80']),
         status: 'Published',
         is_featured: 0,
-        total_clicks: 74,
-        shopee_clicks: 44,
-        tiktok_clicks: 30
+        total_clicks: 0,
+        shopee_clicks: 0,
+        tiktok_clicks: 0
       }
     ];
 

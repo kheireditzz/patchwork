@@ -14,19 +14,10 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="/qrcode.min.js"></script>
+  <script>window.QRCode || document.write('<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script>');</script>
 
-  <!-- Adcash AutoTag Monetization -->
-  <script id="aclib" type="text/javascript" src="https://acscdn.com/script/aclib.js"></script>
-  <script type="text/javascript">
-    aclib.runAutoTag({
-      zoneId: 'jbfxlpzzyr',
-    });
-  </script>
 
-  <!-- Profitable CPM Network Ad Tags -->
-  <script src="https://pl31303305.profitableratecpmnetwork.com/cb/0c/70/cb0c700c4f0884eec808d6ab2fccaa33.js"></script>
-  <script src="https://pl31303306.profitableratecpmnetwork.com/ee/d0/e7/eed0e7e0764b1cbcbec93e5a42ca6983.js"></script>
 
   <script>
     tailwind.config = {
@@ -264,17 +255,10 @@
             <span class="flex items-center space-x-2.5"><i data-lucide="grid" class="w-4 h-4 text-slate-400 group-hover:text-slate-900"></i><span>Katalog Lengkap Produk</span></span>
             <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
           </a>
-          <a href="#cta-join" onclick="toggleSidebar(false)" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-semibold transition group">
-            <span class="flex items-center space-x-2.5"><i data-lucide="briefcase" class="w-4 h-4 text-slate-400 group-hover:text-slate-900"></i><span>Kemitraan & Afiliasi</span></span>
+
+          <a href="/lynk" class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition group shadow-sm">
+            <span class="flex items-center space-x-2.5"><i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i><span>Etalase Bio (Lynk ID)</span></span>
             <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
-          </a>
-          <button onclick="toggleSidebar(false); openPartnerModal();" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold transition group text-left">
-            <span class="flex items-center space-x-2.5"><i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i><span>Daftar Akun Mitra</span></span>
-            <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-600 text-white">DAFTAR</span>
-          </button>
-          <a href="/partner" class="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold transition group">
-            <span class="flex items-center space-x-2.5"><i data-lucide="store" class="w-4 h-4 text-emerald-600"></i><span>Portal Mitra Penjual</span></span>
-            <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-600 text-white font-mono">MITRA</span>
           </a>
           </div>
       </div>
@@ -554,169 +538,7 @@
     </div>
   </main>
 
-  <!-- SPONSORED PROMO BANNER (MONETIZATION DIRECT LINK) -->
-  <section class="py-4 reveal">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <a href="https://www.profitableratecpmnetwork.com/cgtpgfq1xi?key=5132c67297ebe9de5caef9ac99e3bd71" target="_blank" rel="noopener noreferrer sponsored" class="group block relative rounded-2xl overflow-hidden bg-gradient-to-r from-indigo-900 via-slate-900 to-slate-950 p-4 sm:p-5 border border-indigo-500/20 shadow-lg hover:shadow-indigo-500/10 hover:border-indigo-500/40 transition-all duration-300">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
-          <div class="flex items-center space-x-3.5">
-            <div class="w-10 h-10 rounded-xl bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 flex items-center justify-center shrink-0">
-              <i data-lucide="sparkles" class="w-5 h-5 text-amber-300 animate-subtle-float"></i>
-            </div>
-            <div>
-              <div class="flex items-center space-x-2">
-                <span class="text-[10px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Sponsor Pilihan</span>
-                <span class="text-xs font-bold text-amber-300 flex items-center space-x-1">
-                  <span>Promo Terbatas</span>
-                </span>
-              </div>
-              <h4 class="text-xs sm:text-sm font-bold text-white mt-0.5 group-hover:text-indigo-200 transition-colors">
-                Klaim Voucher Belanja, Diskon Spesial, & Penawaran Eksklusif Hari Ini
-              </h4>
-            </div>
-          </div>
-          <div class="flex items-center space-x-2 shrink-0">
-            <span class="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 group-hover:from-indigo-600 group-hover:to-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/30 transition-all group-hover:scale-105">
-              <span>Buka Penawaran</span>
-              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-            </span>
-          </div>
-        </div>
-      </a>
-    </div>
-  </section>
 
-  <!-- CTA (CURVED PREMIUM BANNER) -->
-  <section id="cta-join" class="py-10 reveal">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="relative rounded-3xl overflow-hidden bg-slate-950 text-white border border-slate-800 p-8 sm:p-12 md:p-14 shadow-xl text-center">
-        <!-- Subtle Background Glow / Texture -->
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950 pointer-events-none opacity-90"></div>
-        <div class="max-w-3xl mx-auto relative z-10">
-          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-lg bg-white/10 text-slate-200 text-xs font-semibold mb-5 border border-white/15">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span>Kemitraan & Rekomendasi Resmi</span>
-          </div>
-          <h2 id="cta-text" class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-white leading-tight">
-            Ingin Produk Anda Masuk Katalog PATCHWORK?
-          </h2>
-          <p class="text-slate-300 text-sm sm:text-base max-w-xl mx-auto mb-8 leading-relaxed font-normal">
-            Hubungi kami untuk kolaborasi afiliasi, peninjauan produk resmi, atau update promo diskon terbaru.
-          </p>
-          <div class="flex items-center justify-center">
-            <button onclick="openPartnerModal()" class="btn-bounce px-8 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm tracking-wide shadow-lg shadow-emerald-500/25 transition flex items-center space-x-2 active:scale-95">
-              <i data-lucide="user-plus" class="w-4 h-4"></i>
-              <span>Daftar Mitra Penjual</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SPONSORED SIDE-BY-SIDE / CURATED PROMO BANNER (160x300 HIGH REVENUE FORMAT) -->
-  <section class="py-6 reveal">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
-        <div class="flex-1 max-w-xl text-center md:text-left">
-          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-semibold mb-3 border border-indigo-100">
-            <i data-lucide="award" class="w-3.5 h-3.5 text-indigo-600"></i>
-            <span>Penawaran Mitra & Sponsor Terpercaya</span>
-          </div>
-          <h3 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
-            Temukan Diskon Ekstra & Flash Promo Hari Ini
-          </h3>
-          <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
-            Dukung kelangsungan platform PATCHWORK dengan menelusuri promo pilihan sponsor resmi kami. Semua penawaran telah disaring dan aman untuk dikunjungi.
-          </p>
-          <div class="mt-4 flex flex-wrap items-center justify-center md:justify-start gap-3">
-            <a href="https://www.profitableratecpmnetwork.com/cgtpgfq1xi?key=5132c67297ebe9de5caef9ac99e3bd71" target="_blank" rel="noopener noreferrer sponsored" class="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all hover:scale-105 shadow">
-              <span>Buka Voucher Diskon</span>
-              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-            </a>
-          </div>
-        </div>
-
-        <!-- Ad Unit Wrapper (160x300 iframe) -->
-        <div class="shrink-0 flex flex-col items-center p-3 rounded-2xl bg-slate-50 border border-slate-200/70 shadow-inner">
-          <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2">Iklan Sponsor</span>
-          <div class="w-[160px] h-[300px] bg-white rounded-xl overflow-hidden border border-slate-200 flex items-center justify-center shadow-sm">
-            <script type="text/javascript">
-              atOptions = {
-                'key' : 'a7a21952f7026cf44368c73b41fa36fb',
-                'format' : 'iframe',
-                'height' : 300,
-                'width' : 160,
-                'params' : {}
-              };
-            </script>
-            <script type="text/javascript" src="https://www.highrevenueformat.com/a7a21952f7026cf44368c73b41fa36fb/invoke.js"></script>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PARTNER REGISTRATION & PRODUCT MODAL -->
-  <div id="partner-modal" class="fixed inset-0 z-[120] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto hide-scrollbar">
-      <button onclick="closePartnerModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition">
-        <i data-lucide="x" class="w-4 h-4"></i>
-      </button>
-
-      <div class="flex items-center space-x-3 mb-5">
-        <div class="w-11 h-11 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
-          <i data-lucide="user-plus" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <h3 class="text-lg font-black text-slate-900 tracking-tight">Pendaftaran Akun Mitra Penjual</h3>
-          <p class="text-xs text-slate-500">Daftarkan akun Anda. Setelah disetujui Admin, Anda dapat login ke Portal Mitra untuk memasukkan produk.</p>
-        </div>
-      </div>
-
-      <div id="partner-msg" class="hidden mb-4 p-3.5 rounded-2xl text-xs font-semibold"></div>
-
-      <!-- FORM PENDAFTARAN AKUN MITRA -->
-      <form id="partner-reg-form" onsubmit="submitPartnerRegistration(event)" class="space-y-4">
-        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 flex items-start space-x-2">
-          <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
-          <span>Wajib mengisi <strong>Nama Asli</strong> dan <strong>Nomor WhatsApp Asli</strong> yang aktif. Admin akan memverifikasi sebelum menyetujui akun Anda.</span>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Nama Asli Lengkap *</label>
-          <input type="text" id="reg-name" required placeholder="Nama asli Anda sesuai identitas/KTP" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:border-slate-900 focus:outline-none">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp Asli (Aktif) *</label>
-          <div class="relative">
-            <input type="tel" id="reg-whatsapp" required placeholder="08xxxxxxxxxx atau 628xxxxxxxxxx" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:border-slate-900 focus:outline-none">
-          </div>
-          <span class="text-[10px] text-slate-400 mt-1 block">Digunakan admin untuk konfirmasi dan notifikasi persetujuan akun</span>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Alamat Email *</label>
-          <input type="email" id="reg-email" required placeholder="email@tokoanda.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:border-slate-900 focus:outline-none">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Password Baru *</label>
-          <input type="password" id="reg-password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:border-slate-900 focus:outline-none">
-          <span class="text-[10px] text-slate-400 mt-1 block">Password untuk login ke Portal Mitra setelah disetujui admin</span>
-        </div>
-
-        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
-          <a href="/partner" class="text-xs text-slate-500 hover:text-emerald-700 underline font-medium">Sudah disetujui? Login ke Portal Mitra</a>
-          <button type="submit" id="btn-reg-submit" onclick="if(!this.form.checkValidity()) { this.form.reportValidity(); return false; } submitPartnerRegistration(event);" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition flex items-center space-x-2 active:scale-95 cursor-pointer">
-            <span>Kirim Pendaftaran</span>
-            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 
   <!-- SHARE MODAL -->
   <div id="share-modal" class="fixed inset-0 z-[120] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1095,7 +917,18 @@
       document.getElementById('modal-product-name').innerText = name;
       const qrEl = document.getElementById('qrcode');
       qrEl.innerHTML = '';
-      new QRCode(qrEl, { text: currentShareUrl, width: 160, height: 160, colorDark: "#0f172a", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+      let rendered = false;
+      if (typeof QRCode !== 'undefined') {
+        try {
+          new QRCode(qrEl, { text: currentShareUrl, width: 180, height: 180, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+          rendered = true;
+        } catch(e) {
+          rendered = false;
+        }
+      }
+      if (!rendered || qrEl.children.length === 0) {
+        qrEl.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(currentShareUrl)}" class="w-[160px] h-[160px] rounded-lg" alt="QR Code" />`;
+      }
       document.getElementById('share-modal').classList.remove('hidden');
       document.body.classList.add('overflow-hidden');
       lucide.createIcons();
@@ -1150,29 +983,8 @@
       if (e.key === 'Escape') {
         toggleSidebar(false);
         closeShareModal();
-        closePartnerModal();
       }
     });
-
-    // PARTNER REGISTRATION MODAL HANDLER
-    function openPartnerModal() {
-      const modal = document.getElementById('partner-modal');
-      const msg = document.getElementById('partner-msg');
-      if (msg) msg.classList.add('hidden');
-      if (modal) {
-        modal.classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');
-        lucide.createIcons();
-      }
-    }
-
-    function closePartnerModal() {
-      const modal = document.getElementById('partner-modal');
-      if (modal) {
-        modal.classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-      }
-    }
 
     function escapeHtml(text) {
       if (!text) return '';
@@ -1182,82 +994,6 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
-    }
-
-    async function submitPartnerRegistration(e) {
-      if (e) e.preventDefault();
-      const btn = document.getElementById('btn-reg-submit');
-      const msg = document.getElementById('partner-msg');
-      const modalBox = document.querySelector('#partner-modal > div');
-
-      const nameVal = document.getElementById('reg-name').value.trim();
-      const whatsappVal = document.getElementById('reg-whatsapp').value.trim();
-      const emailVal = document.getElementById('reg-email').value.trim();
-      const passwordVal = document.getElementById('reg-password').value;
-
-      if (!nameVal || !whatsappVal || !emailVal || !passwordVal) {
-        msg.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 block';
-        msg.innerText = 'Mohon lengkapi semua kolom bertanda bintang (*).';
-        if (modalBox) modalBox.scrollTop = 0;
-        return;
-      }
-
-      if (passwordVal.length < 6) {
-        msg.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 block';
-        msg.innerText = 'Password minimal 6 karakter.';
-        if (modalBox) modalBox.scrollTop = 0;
-        return;
-      }
-
-      const payload = {
-        name: nameVal,
-        whatsapp: whatsappVal,
-        email: emailVal,
-        password: passwordVal
-      };
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="inline-block animate-spin mr-1.5">⏳</span><span>Mendaftarkan...</span>';
-
-      try {
-        const res = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-          msg.className = 'mb-4 p-4 rounded-2xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 block';
-          msg.innerHTML = `
-            <div class="flex items-start space-x-2">
-              <span class="text-lg">🎉</span>
-              <div>
-                <strong class="block text-sm mb-1">Pendaftaran Berhasil Terkirim!</strong>
-                <p class="leading-relaxed">Data pendaftaran <strong>${escapeHtml(payload.name)}</strong> telah masuk ke antrean verifikasi Admin PATCHWORK.</p>
-                <div class="mt-2.5 p-2.5 rounded-xl bg-white/80 border border-emerald-300/60 text-emerald-900 text-[11px]">
-                  ⏳ <strong>Tahap Selanjutnya:</strong> Admin akan meninjau akun & nomor WhatsApp Anda. Setelah status disetujui (Approved), Anda dapat langsung login di <strong><a href="/partner" class="underline text-emerald-700 font-bold">Portal Mitra (/partner)</a></strong> menggunakan email & password tadi untuk memasukkan produk ke katalog.
-                </div>
-              </div>
-            </div>
-          `;
-          document.getElementById('partner-reg-form').reset();
-          if (modalBox) modalBox.scrollTop = 0;
-        } else {
-          msg.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 block';
-          msg.innerText = data.error || 'Gagal mendaftar. Pastikan data terisi dengan benar.';
-          if (modalBox) modalBox.scrollTop = 0;
-        }
-      } catch (err) {
-        console.error('Registration error:', err);
-        msg.className = 'mb-4 p-3.5 rounded-2xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 block';
-        msg.innerText = (err && err.message) ? `Gagal mendaftar: ${err.message}` : 'Koneksi ke server terganggu. Silakan coba lagi.';
-        if (modalBox) modalBox.scrollTop = 0;
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span>Kirim Pendaftaran</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>';
-        lucide.createIcons();
-      }
     }
 
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW failed:', err)); }); }

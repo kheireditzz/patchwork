@@ -235,10 +235,13 @@ router.get('/auth/me', authenticateToken, (req, res) => {
   res.json({ user: req.user });
 });
 
-// Update Profile & Bio / Social Links / Template / Custom Slug
+// Update Profile & Bio / Social Links / Template / Custom Slug / Banner / Background / Avatar styling
 router.put('/auth/profile', authenticateToken, async (req, res) => {
   try {
-    const { name, phone, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug } = req.body;
+    const {
+      name, phone, bio, avatar, banner, background, avatar_border, avatar_shape,
+      tiktok, instagram, shopee, youtube, website, template, custom_slug
+    } = req.body;
     const userId = req.user.id;
 
     let cleanSlug = null;
@@ -268,6 +271,10 @@ router.put('/auth/profile', authenticateToken, async (req, res) => {
         if (phone !== undefined) payload.phone = phone;
         if (bio !== undefined) payload.bio = bio;
         if (avatar !== undefined) payload.avatar = avatar;
+        if (banner !== undefined) payload.banner = banner;
+        if (background !== undefined) payload.background = background;
+        if (avatar_border !== undefined) payload.avatar_border = avatar_border;
+        if (avatar_shape !== undefined) payload.avatar_shape = avatar_shape;
         if (tiktok !== undefined) payload.tiktok = tiktok;
         if (instagram !== undefined) payload.instagram = instagram;
         if (shopee !== undefined) payload.shopee = shopee;
@@ -287,6 +294,10 @@ router.put('/auth/profile', authenticateToken, async (req, res) => {
           phone = COALESCE(?, phone),
           bio = COALESCE(?, bio),
           avatar = COALESCE(?, avatar),
+          banner = COALESCE(?, banner),
+          background = COALESCE(?, background),
+          avatar_border = COALESCE(?, avatar_border),
+          avatar_shape = COALESCE(?, avatar_shape),
           tiktok = COALESCE(?, tiktok),
           instagram = COALESCE(?, instagram),
           shopee = COALESCE(?, shopee),
@@ -301,6 +312,10 @@ router.put('/auth/profile', authenticateToken, async (req, res) => {
       phone || null,
       bio !== undefined ? bio : null,
       avatar !== undefined ? avatar : null,
+      banner !== undefined ? banner : null,
+      background !== undefined ? background : null,
+      avatar_border !== undefined ? avatar_border : null,
+      avatar_shape !== undefined ? avatar_shape : null,
       tiktok !== undefined ? tiktok : null,
       instagram !== undefined ? instagram : null,
       shopee !== undefined ? shopee : null,
@@ -311,7 +326,7 @@ router.put('/auth/profile', authenticateToken, async (req, res) => {
       userId
     );
 
-    const updatedUser = sqlite.prepare('SELECT id, name, email, phone, role, status, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug FROM users WHERE id = ?').get(userId);
+    const updatedUser = sqlite.prepare('SELECT id, name, email, phone, role, status, bio, avatar, banner, background, avatar_border, avatar_shape, tiktok, instagram, shopee, youtube, website, template, custom_slug FROM users WHERE id = ?').get(userId);
     logActivity(userId, updatedUser.name, 'UPDATE_PROFILE', `Memperbarui profil / Lynk ID`, req.ip);
 
     res.json({ message: 'Profil dan pengaturan Link ID berhasil diperbarui.', user: updatedUser });
@@ -326,23 +341,46 @@ router.get('/profile/:id', async (req, res) => {
     const { id } = req.params;
     const lowerParam = id.toLowerCase();
     let user = sqlite.prepare(`
-      SELECT id, name, bio, avatar, tiktok, instagram, shopee, youtube, website, template, role, custom_slug
-      FROM users WHERE id = ? OR LOWER(email) = ? OR LOWER(custom_slug) = ?
-    `).get(id, lowerParam, lowerParam);
+      SELECT id, name, email, bio, avatar, banner, background, avatar_border, avatar_shape, tiktok, instagram, shopee, youtube, website, template, role, custom_slug
+      FROM users WHERE id = ? OR LOWER(email) = ? OR LOWER(custom_slug) = ? OR LOWER(email) LIKE ?
+    `).get(id, lowerParam, lowerParam, `${lowerParam}@%`);
 
     if (!user && supabase) {
       try {
         const { data: sbUser } = await supabase
           .from('users')
-          .select('id, name, bio, avatar, tiktok, instagram, shopee, youtube, website, template, role, custom_slug')
-          .or(`id.eq.${id},email.ilike.${lowerParam},custom_slug.ilike.${lowerParam}`)
+          .select('id, name, email, bio, avatar, banner, background, avatar_border, avatar_shape, tiktok, instagram, shopee, youtube, website, template, role, custom_slug')
+          .or(`id.eq.${id},email.ilike.${lowerParam},custom_slug.ilike.${lowerParam},email.ilike.${lowerParam}@%`)
           .single();
         if (sbUser) user = sbUser;
       } catch (e) {}
     }
 
     if (!user) {
-      return res.status(404).json({ error: 'Profil tidak ditemukan' });
+      if (lowerParam === 'default' || lowerParam === 'patchwork') {
+        user = sqlite.prepare("SELECT id, name, email, bio, avatar, banner, background, avatar_border, avatar_shape, tiktok, instagram, shopee, youtube, website, template, role, custom_slug FROM users ORDER BY id ASC LIMIT 1").get() || {
+          id: 'patchwork',
+          name: 'patchwork',
+          email: 'kheireditz@admin.com',
+          bio: 'Koleksi tautan resmi dan etalase rekomendasi belanja terbaik.',
+          custom_slug: 'kheireditz',
+          template: 'modern',
+          avatar_border: 'emerald',
+          avatar_shape: 'circle'
+        };
+      } else {
+        return res.status(404).json({ error: 'Profil tidak ditemukan' });
+      }
+    }
+
+    if (user && (!user.custom_slug || user.custom_slug.trim() === '')) {
+      user.custom_slug = user.email ? user.email.split('@')[0] : 'kheireditz';
+      try {
+        sqlite.prepare("UPDATE users SET custom_slug = ? WHERE id = ?").run(user.custom_slug, user.id);
+        if (supabase) {
+          supabase.from('users').update({ custom_slug: user.custom_slug }).eq('id', user.id).then(() => {}).catch(() => {});
+        }
+      } catch (e) {}
     }
 
     // Get user products for this Lynk
@@ -350,9 +388,21 @@ router.get('/profile/:id', async (req, res) => {
       SELECT p.*, c.name as category_name, c.slug as category_slug
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
-      WHERE p.created_by = ? AND p.status = 'Published'
+      WHERE (p.created_by = ? OR ? = 'patchwork' OR ? = '1') AND p.status = 'Published'
       ORDER BY p.is_featured DESC, p.created_at DESC
-    `).all(user.id);
+    `).all(user.id, user.id, user.id);
+
+    // Fallback: If user has 0 products, show latest published products from store
+    if (products.length === 0) {
+      products = sqlite.prepare(`
+        SELECT p.*, c.name as category_name, c.slug as category_slug
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.id
+        WHERE p.status = 'Published'
+        ORDER BY p.is_featured DESC, p.created_at DESC
+        LIMIT 40
+      `).all();
+    }
 
     if (products.length === 0 && supabase) {
       try {
@@ -380,10 +430,47 @@ router.get('/profile/:id', async (req, res) => {
       }
     });
 
+    // Compute profile click & visitor stats for this creator / Lynk ID
+    const prodIds = products.map(p => p.id);
+    let totalShopee = 0;
+    let totalTiktok = 0;
+    let totalTokopedia = 0;
+    let totalClicks = 0;
+
+    products.forEach(p => {
+      totalShopee += (p.shopee_clicks || 0);
+      totalTiktok += (p.tiktok_clicks || 0);
+      totalTokopedia += (p.tokopedia_clicks || 0);
+      totalClicks += (p.total_clicks || (p.shopee_clicks || 0) + (p.tiktok_clicks || 0) + (p.tokopedia_clicks || 0));
+    });
+
+    // Page visitors count for this profile/lynk
+    let totalVisitors = 0;
+    try {
+      const cleanSlug = user.custom_slug || (user.email ? user.email.split('@')[0] : 'kheireditz');
+      const visQuery = sqlite.prepare(`
+        SELECT count(*) as count FROM visitors 
+        WHERE page LIKE ? OR page LIKE ? OR page LIKE ?
+      `).get(`%@${cleanSlug}%`, `%/lynk/${cleanSlug}%`, `%/lynk/${user.id}%`);
+      
+      const overallVis = sqlite.prepare("SELECT count(*) as count FROM visitors").get();
+      totalVisitors = (visQuery && visQuery.count > 0) ? visQuery.count : Math.max(overallVis ? overallVis.count : 0, 1);
+    } catch (e) {
+      totalVisitors = 1;
+    }
+
     res.json({
       user,
       categories: Object.values(catMap),
-      products
+      products,
+      stats: {
+        totalProducts: products.length,
+        totalClicks,
+        totalShopee,
+        totalTiktok,
+        totalTokopedia,
+        totalVisitors
+      }
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -1494,6 +1581,75 @@ router.get('/analytics', authenticateToken, (req, res) => {
       dailyClicks,
       monthlyClicks,
       recentLogs
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Reset Analytics & Tracking Stats Endpoint (Web Visitors, Lynk ID, Shopee, TikTok, Clicks)
+router.post('/analytics/reset', authenticateToken, authorizeRole(['Super Admin', 'Admin']), async (req, res) => {
+  try {
+    const { target = 'all' } = req.body; // 'all' | 'visitors' | 'shopee' | 'tiktok' | 'clicks'
+
+    if (target === 'visitors' || target === 'all') {
+      sqlite.prepare('DELETE FROM visitors').run();
+      if (supabase) {
+        try {
+          await supabase.from('visitors').delete().neq('id', 'keep_safe_non_existent_id');
+        } catch (e) {
+          console.warn('Supabase reset visitors notice:', e.message);
+        }
+      }
+    }
+
+    if (target === 'shopee') {
+      sqlite.prepare("DELETE FROM clicks WHERE LOWER(marketplace) LIKE '%shopee%'").run();
+      sqlite.prepare('UPDATE products SET shopee_clicks = 0').run();
+      sqlite.prepare('UPDATE products SET total_clicks = coalesce(tiktok_clicks, 0) + coalesce(tokopedia_clicks, 0)').run();
+      if (supabase) {
+        try {
+          await supabase.from('clicks').delete().ilike('marketplace', '%shopee%');
+          await supabase.from('products').update({ shopee_clicks: 0 }).neq('id', 'keep_safe');
+        } catch (e) {}
+      }
+    } else if (target === 'tiktok') {
+      sqlite.prepare("DELETE FROM clicks WHERE LOWER(marketplace) LIKE '%tiktok%'").run();
+      sqlite.prepare('UPDATE products SET tiktok_clicks = 0').run();
+      sqlite.prepare('UPDATE products SET total_clicks = coalesce(shopee_clicks, 0) + coalesce(tokopedia_clicks, 0)').run();
+      if (supabase) {
+        try {
+          await supabase.from('clicks').delete().ilike('marketplace', '%tiktok%');
+          await supabase.from('products').update({ tiktok_clicks: 0 }).neq('id', 'keep_safe');
+        } catch (e) {}
+      }
+    } else if (target === 'clicks' || target === 'all') {
+      sqlite.prepare('DELETE FROM clicks').run();
+      sqlite.prepare('UPDATE products SET total_clicks = 0, shopee_clicks = 0, tiktok_clicks = 0, tokopedia_clicks = 0').run();
+      if (supabase) {
+        try {
+          await supabase.from('clicks').delete().neq('id', 'keep_safe_non_existent_id');
+          await supabase.from('products').update({
+            total_clicks: 0,
+            shopee_clicks: 0,
+            tiktok_clicks: 0,
+            tokopedia_clicks: 0
+          }).neq('id', 'keep_safe');
+        } catch (e) {}
+      }
+    }
+
+    logActivity(
+      req.user.id,
+      req.user.name,
+      'RESET_STATS',
+      `Mereset statistik analitik (target: ${target})`,
+      req.ip
+    );
+
+    res.json({
+      success: true,
+      message: `Statistik analitik (${target}) berhasil di-reset ke 0.`
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

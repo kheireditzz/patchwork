@@ -121,13 +121,7 @@ export async function createApp() {
     res.sendFile(path.join(__dirname, 'public/admin.html'));
   });
 
-  app.get('/partner', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/partner.html'));
-  });
 
-  app.get('/partner/*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/partner.html'));
-  });
 
   app.get('/lynk', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/lynk.html'));

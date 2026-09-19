@@ -61,6 +61,25 @@
       border-radius: 1rem;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
+    @keyframes blurSlideUp {
+      0% {
+        opacity: 0;
+        transform: translate3d(-50%, calc(-50% + 24px), 0) scale(0.92);
+        filter: blur(10px);
+      }
+      50% {
+        filter: blur(4px);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(-50%, -50%, 0) scale(1);
+        filter: blur(0);
+      }
+    }
+    .anim-blur-up {
+      animation: blurSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, filter, opacity;
+    }
     .admin-card:hover {
       border-color: #cbd5e1;
       box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04), 0 8px 10px -6px rgba(15, 23, 42, 0.02);
@@ -128,7 +147,7 @@
           </a>
         </div>
         <h1 class="text-xl font-black text-slate-900 tracking-tight">Login Administrator</h1>
-        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">Kelola katalog produk, persetujuan mitra, link affiliate, dan analitik</p>
+        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">Kelola katalog produk, akun kreator, link affiliate, dan analitik</p>
       </div>
 
       <form id="login-form" onsubmit="submitAdminLogin(event)" class="space-y-4">
@@ -156,10 +175,6 @@
         </button>
 
         <div class="pt-3 border-t border-slate-100 text-center space-y-2">
-          <div class="text-xs text-slate-600">
-            Anda Mitra Penjual? 
-            <a href="/partner" class="text-emerald-700 font-bold hover:underline">Masuk ke Portal Mitra</a>
-          </div>
           <div>
             <a href="/" class="text-xs text-slate-500 hover:text-slate-900 transition">← Halaman Beranda Publik</a>
           </div>
@@ -247,7 +262,7 @@
 
         <button onclick="navigateTab('users')" id="nav-users" class="tab-pill px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-2 border border-transparent bg-slate-100 text-slate-600 transition relative">
           <i data-lucide="users" class="w-3.5 h-3.5"></i>
-          <span>Pengguna & Mitra</span>
+          <span>Pengguna & Kreator</span>
           <span id="badge-pending-users" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-500 text-white leading-tight">0</span>
         </button>
 
@@ -284,6 +299,28 @@
 
         <!-- 1. OVERVIEW & ANALYTICS TAB -->
         <div id="tab-overview" class="space-y-6">
+          
+          <!-- OVERVIEW ACTIONS & QUICK RESET BAR -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <div>
+              <h2 class="text-sm font-extrabold text-slate-900 tracking-tight flex items-center space-x-2">
+                <i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-600"></i>
+                <span>Ringkasan Performa &amp; Analitik</span>
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">Monitoring kunjungan web, Lynk ID, dan performa klik affiliate Shopee &amp; TikTok</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="loadAnalytics()" class="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition active:scale-95 shadow-xs" title="Segarkan Data">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Refresh</span>
+              </button>
+              <button onclick="openResetStatsModal()" class="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold flex items-center space-x-1.5 transition active:scale-95 shadow-xs" title="Reset Statistik">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-rose-600"></i>
+                <span>Reset Statistik</span>
+              </button>
+            </div>
+          </div>
+
           <!-- Metric KPI Cards -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
@@ -463,8 +500,8 @@
         <div id="tab-users" class="hidden space-y-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Pengguna & Mitra Penjual</h3>
-              <p class="text-xs text-slate-500">Kelola verifikasi pendaftaran mitra, persetujuan akun, dan hak akses staf</p>
+              <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Pengguna & Kreator</h3>
+              <p class="text-xs text-slate-500">Kelola akun pengguna, kreator, dan hak akses</p>
             </div>
             <div class="flex items-center gap-2">
               <button onclick="openUserModal()" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold text-xs shadow-sm flex items-center space-x-1.5 transition">
@@ -562,9 +599,9 @@
           </div>
         </div>
 
-        <!-- 7. TOOLS (IMPORT / EXPORT / BACKUP) TAB -->
+        <!-- 7. TOOLS (IMPORT / EXPORT / BACKUP / RESET) TAB -->
         <div id="tab-tools" class="hidden space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <!-- Export Excel -->
             <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
               <div>
@@ -616,6 +653,21 @@
                 <span>Download Backup</span>
               </button>
             </div>
+
+            <!-- Reset Metrik & Kunjungan -->
+            <div class="p-5 rounded-2xl bg-white border border-rose-200 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-3">
+                  <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                </div>
+                <h4 class="font-bold text-xs uppercase tracking-wider text-rose-700 mb-1">Reset Metrik &amp; Kunjungan</h4>
+                <p class="text-xs text-slate-500 mb-4 leading-relaxed">Kosongkan riwayat kunjungan web, Lynk ID, atau klik Shopee &amp; TikTok dari nol.</p>
+              </div>
+              <button onclick="openResetStatsModal()" class="w-full py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center space-x-2 transition shadow-sm">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                <span>Buka Opsi Reset</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -643,8 +695,8 @@
         <div id="tab-submissions" class="hidden space-y-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 class="text-base font-bold text-slate-900">Antrean Pengajuan Produk Mitra</h3>
-              <p class="text-xs text-slate-500">Tinjau, setujui (approve), atau tolak produk yang diajukan oleh calon mitra/penjual sebelum tampil di katalog</p>
+              <h3 class="text-base font-bold text-slate-900">Antrean Pengajuan Produk Kreator</h3>
+              <p class="text-xs text-slate-500">Tinjau, setujui (approve), atau tolak produk yang diajukan sebelum tampil di katalog</p>
             </div>
             <div class="flex items-center space-x-2">
               <select id="filter-submission-status" onchange="loadSubmissionsList()" class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 focus:outline-none">
@@ -722,9 +774,104 @@
                   <p class="text-[10px] text-slate-400 mt-1">Buat link ID sendiri. Etalase Anda akan bisa diakses via <strong>namapilihan.kheireditz.my.id</strong> atau <strong>kheireditz.my.id/lynk/namapilihan</strong></p>
                 </div>
 
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">URL Foto Profil / Logo LYNK ID</label>
-                  <input type="url" id="adm-prof-avatar" placeholder="https://..." class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
+                <!-- AVATAR / PP SECTION -->
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <label class="block text-xs font-bold text-slate-800">Foto Profil / Avatar (PP)</label>
+                    <span class="text-[10px] text-slate-400 font-medium">Bisa upload foto atau link URL</span>
+                  </div>
+                  <div class="flex gap-2">
+                    <input type="text" id="adm-prof-avatar" oninput="updateAdminPreviewAvatar(this.value)" placeholder="https://... atau upload file" class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-white text-xs focus:border-slate-900 focus:outline-none transition">
+                    <label class="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer shrink-0 flex items-center space-x-1.5 transition active:scale-95 shadow-sm">
+                      <i data-lucide="upload" class="w-4 h-4"></i>
+                      <span class="hidden sm:inline">Upload PP</span>
+                      <input type="file" class="hidden" accept="image/*" onchange="uploadAdminMedia(this, 'adm-prof-avatar', 'avatar')">
+                    </label>
+                  </div>
+
+                  <!-- Border & Shape Styling for PP -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-200/60">
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-700 mb-1.5">Warna Border PP</label>
+                      <div class="flex items-center gap-2">
+                        <label class="flex items-center space-x-1 cursor-pointer">
+                          <input type="radio" name="adm-prof-avatar-border" value="emerald" checked onchange="updateAdminPreviewStyles()">
+                          <span class="w-4 h-4 rounded-full bg-emerald-500 border border-emerald-600 block inline-block" title="Emerald"></span>
+                          <span class="text-[11px] text-slate-600">Emerald</span>
+                        </label>
+                        <label class="flex items-center space-x-1 cursor-pointer">
+                          <input type="radio" name="adm-prof-avatar-border" value="amber" onchange="updateAdminPreviewStyles()">
+                          <span class="w-4 h-4 rounded-full bg-amber-400 border border-amber-500 block inline-block" title="Gold/Amber"></span>
+                          <span class="text-[11px] text-slate-600">Gold</span>
+                        </label>
+                        <label class="flex items-center space-x-1 cursor-pointer">
+                          <input type="radio" name="adm-prof-avatar-border" value="purple" onchange="updateAdminPreviewStyles()">
+                          <span class="w-4 h-4 rounded-full bg-purple-500 border border-purple-600 block inline-block" title="Purple"></span>
+                          <span class="text-[11px] text-slate-600">Purple</span>
+                        </label>
+                        <label class="flex items-center space-x-1 cursor-pointer">
+                          <input type="radio" name="adm-prof-avatar-border" value="cyan" onchange="updateAdminPreviewStyles()">
+                          <span class="w-4 h-4 rounded-full bg-cyan-400 border border-cyan-500 block inline-block" title="Cyan"></span>
+                          <span class="text-[11px] text-slate-600">Cyan</span>
+                        </label>
+                        <label class="flex items-center space-x-1 cursor-pointer">
+                          <input type="radio" name="adm-prof-avatar-border" value="white" onchange="updateAdminPreviewStyles()">
+                          <span class="w-4 h-4 rounded-full bg-white border border-slate-300 block inline-block" title="White"></span>
+                          <span class="text-[11px] text-slate-600">White</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-700 mb-1.5">Bentuk Avatar</label>
+                      <div class="flex items-center gap-3">
+                        <label class="flex items-center space-x-1.5 cursor-pointer">
+                          <input type="radio" name="adm-prof-avatar-shape" value="circle" checked onchange="updateAdminPreviewStyles()">
+                          <span class="text-[11px] text-slate-700 font-medium">Bulat Penuh (Circle)</span>
+                        </label>
+                        <label class="flex items-center space-x-1.5 cursor-pointer">
+                          <input type="radio" name="adm-prof-avatar-shape" value="squircle" onchange="updateAdminPreviewStyles()">
+                          <span class="text-[11px] text-slate-700 font-medium">Kotak Melengkung (Squircle)</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- BANNER BEHIND PP SECTION -->
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <label class="block text-xs font-bold text-slate-800">Header Banner (Belakang Foto Profil)</label>
+                      <p class="text-[11px] text-slate-500">Banner panorama yang muncul di bagian atas di belakang avatar profil</p>
+                    </div>
+                  </div>
+                  <div class="flex gap-2">
+                    <input type="text" id="adm-prof-banner" oninput="updateAdminPreviewBanner(this.value)" placeholder="https://... atau upload foto panorama" class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-white text-xs focus:border-slate-900 focus:outline-none transition">
+                    <label class="px-3.5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer shrink-0 flex items-center space-x-1.5 transition active:scale-95 shadow-sm">
+                      <i data-lucide="upload" class="w-4 h-4"></i>
+                      <span class="hidden sm:inline">Upload Banner</span>
+                      <input type="file" class="hidden" accept="image/*" onchange="uploadAdminMedia(this, 'adm-prof-banner', 'banner')">
+                    </label>
+                  </div>
+                </div>
+
+                <!-- PAGE BACKGROUND SECTION -->
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <label class="block text-xs font-bold text-slate-800">Background Halaman LYNK ID</label>
+                      <p class="text-[11px] text-slate-500">Kustom wallpaper / background untuk keseluruhan halaman profil etalase</p>
+                    </div>
+                  </div>
+                  <div class="flex gap-2">
+                    <input type="text" id="adm-prof-background" oninput="updateAdminPreviewBg(this.value)" placeholder="https://... atau upload wallpaper" class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-white text-xs focus:border-slate-900 focus:outline-none transition">
+                    <label class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold cursor-pointer shrink-0 flex items-center space-x-1.5 transition active:scale-95 shadow-sm">
+                      <i data-lucide="upload" class="w-4 h-4"></i>
+                      <span class="hidden sm:inline">Upload Background</span>
+                      <input type="file" class="hidden" accept="image/*" onchange="uploadAdminMedia(this, 'adm-prof-background', 'background')">
+                    </label>
+                  </div>
                 </div>
 
                 <div>
@@ -733,28 +880,103 @@
                 </div>
 
                 <div class="pt-2 border-t border-slate-100">
-                  <label class="block text-xs font-bold text-slate-900 mb-3">Tautan Akun Medsos & Marketplace Resmi</label>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div class="flex items-center justify-between mb-3">
                     <div>
-                      <label class="block text-[11px] font-semibold text-slate-600 mb-1">TikTok Shop / Profil</label>
-                      <input type="url" id="adm-prof-tiktok" placeholder="https://tiktok.com/@patchwork" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
-                    </div>
-                    <div>
-                      <label class="block text-[11px] font-semibold text-slate-600 mb-1">Instagram Resmi</label>
-                      <input type="url" id="adm-prof-instagram" placeholder="https://instagram.com/patchwork" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
-                    </div>
-                    <div>
-                      <label class="block text-[11px] font-semibold text-slate-600 mb-1">Shopee Mall / Official</label>
-                      <input type="url" id="adm-prof-shopee" placeholder="https://shopee.co.id/patchwork" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
-                    </div>
-                    <div>
-                      <label class="block text-[11px] font-semibold text-slate-600 mb-1">YouTube Channel</label>
-                      <input type="url" id="adm-prof-youtube" placeholder="https://youtube.com/@patchwork" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+                      <label class="block text-xs font-bold text-slate-900">Tautan Akun Medsos & Marketplace Resmi (Bisa ON/OFF)</label>
+                      <p class="text-[10px] text-slate-500">Aktifkan atau matikan akun yang ingin ditampilkan di bawah foto profil LYNK ID</p>
                     </div>
                   </div>
-                  <div class="mt-3.5">
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Website Utama</label>
-                    <input type="url" id="adm-prof-website" placeholder="https://..." class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+                  
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <!-- Instagram -->
+                    <div class="p-3 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+                      <div class="flex items-center justify-between">
+                        <label class="flex items-center space-x-1.5 text-xs font-bold text-slate-800">
+                          <span class="w-4 h-4 rounded-md bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] text-white flex items-center justify-center text-[10px]">📸</span>
+                          <span>Instagram</span>
+                        </label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" id="adm-toggle-instagram" checked onchange="handleSocialToggle('instagram')" class="sr-only peer">
+                          <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                        </label>
+                      </div>
+                      <input type="url" id="adm-prof-instagram" oninput="updateAdminPreviewSocials()" placeholder="https://instagram.com/username" class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
+                    </div>
+
+                    <!-- TikTok -->
+                    <div class="p-3 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+                      <div class="flex items-center justify-between">
+                        <label class="flex items-center space-x-1.5 text-xs font-bold text-slate-800">
+                          <span class="w-4 h-4 rounded-md bg-black text-white flex items-center justify-center text-[10px]">🎵</span>
+                          <span>TikTok</span>
+                        </label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" id="adm-toggle-tiktok" checked onchange="handleSocialToggle('tiktok')" class="sr-only peer">
+                          <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                        </label>
+                      </div>
+                      <input type="url" id="adm-prof-tiktok" oninput="updateAdminPreviewSocials()" placeholder="https://tiktok.com/@username" class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
+                    </div>
+
+                    <!-- Shopee -->
+                    <div class="p-3 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+                      <div class="flex items-center justify-between">
+                        <label class="flex items-center space-x-1.5 text-xs font-bold text-[#ee4d2d]">
+                          <span class="w-4 h-4 rounded-md bg-[#ee4d2d] text-white flex items-center justify-center text-[10px]">🛍️</span>
+                          <span>Shopee Official</span>
+                        </label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" id="adm-toggle-shopee" checked onchange="handleSocialToggle('shopee')" class="sr-only peer">
+                          <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#ee4d2d]"></div>
+                        </label>
+                      </div>
+                      <input type="url" id="adm-prof-shopee" oninput="updateAdminPreviewSocials()" placeholder="https://shopee.co.id/toko" class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
+                    </div>
+
+                    <!-- WhatsApp -->
+                    <div class="p-3 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+                      <div class="flex items-center justify-between">
+                        <label class="flex items-center space-x-1.5 text-xs font-bold text-emerald-700">
+                          <span class="w-4 h-4 rounded-md bg-[#25D366] text-white flex items-center justify-center text-[10px]">💬</span>
+                          <span>WhatsApp Chat</span>
+                        </label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" id="adm-toggle-phone" checked onchange="handleSocialToggle('phone')" class="sr-only peer">
+                          <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                        </label>
+                      </div>
+                      <p class="text-[10px] text-slate-500">Menggunakan Nomor WhatsApp Resmi yang terisi di atas.</p>
+                    </div>
+
+                    <!-- YouTube -->
+                    <div class="p-3 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+                      <div class="flex items-center justify-between">
+                        <label class="flex items-center space-x-1.5 text-xs font-bold text-red-600">
+                          <span class="w-4 h-4 rounded-md bg-red-600 text-white flex items-center justify-center text-[10px]">▶️</span>
+                          <span>YouTube</span>
+                        </label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" id="adm-toggle-youtube" checked onchange="handleSocialToggle('youtube')" class="sr-only peer">
+                          <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-600"></div>
+                        </label>
+                      </div>
+                      <input type="url" id="adm-prof-youtube" oninput="updateAdminPreviewSocials()" placeholder="https://youtube.com/@channel" class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
+                    </div>
+
+                    <!-- Website -->
+                    <div class="p-3 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+                      <div class="flex items-center justify-between">
+                        <label class="flex items-center space-x-1.5 text-xs font-bold text-slate-800">
+                          <span class="w-4 h-4 rounded-md bg-slate-700 text-white flex items-center justify-center text-[10px]">🌐</span>
+                          <span>Website Utama</span>
+                        </label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" id="adm-toggle-website" checked onchange="handleSocialToggle('website')" class="sr-only peer">
+                          <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-slate-900"></div>
+                        </label>
+                      </div>
+                      <input type="url" id="adm-prof-website" oninput="updateAdminPreviewSocials()" placeholder="https://..." class="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs">
+                    </div>
                   </div>
                 </div>
 
@@ -798,25 +1020,58 @@
             </div>
 
             <!-- Right: Preview -->
-            <div class="bg-slate-900 text-white rounded-3xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between space-y-5">
-              <div>
-                <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
-                  <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Preview LYNK ID Admin</span>
-                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono">OFFICIAL</span>
-                </div>
-                <div class="text-center space-y-3">
-                  <div class="w-20 h-20 rounded-2xl bg-slate-800 border-2 border-white/20 mx-auto flex items-center justify-center overflow-hidden" id="adm-box-avatar">
-                    <span class="text-xl font-bold">SA</span>
+            <div id="adm-preview-card" class="relative overflow-hidden bg-slate-900 text-white rounded-3xl border border-slate-800 shadow-xl flex flex-col justify-between space-y-5 transition-all">
+              <div id="adm-preview-bg-overlay" class="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none transition-all"></div>
+              <div class="relative z-10 p-6 flex flex-col h-full justify-between space-y-5">
+                <div>
+                  <div class="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-4">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Preview LYNK ID</span>
+                    <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono">OFFICIAL</span>
                   </div>
-                  <h4 class="text-base font-black" id="adm-preview-name">PATCHWORK Official</h4>
-                  <p class="text-xs text-slate-400 mt-1 line-clamp-2" id="adm-preview-bio">Bio profil official admin</p>
+
+                  <!-- Avatar & Banner Hero Zone: Banner di belakang, PP tepat setengah di dalam & setengah di luar -->
+                  <div class="w-full relative mb-12">
+                    <!-- Banner backdrop -->
+                    <div class="relative w-full h-24 rounded-2xl overflow-hidden border border-white/10 shadow-inner">
+                      <div id="adm-preview-banner" class="absolute inset-0 bg-gradient-to-r from-emerald-950 via-slate-900 to-indigo-950 bg-cover bg-center transition-all"></div>
+                      <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/75 pointer-events-none"></div>
+                    </div>
+
+                    <!-- Avatar on bottom edge (tepat di tengah garis: setengah keluar & setengah ke dalam) -->
+                    <div class="absolute left-1/2 top-full -translate-x-1/2 -translate-y-1/2 z-10 anim-blur-up">
+                      <div id="adm-box-avatar" class="w-20 h-20 rounded-full bg-slate-800 border-2 border-emerald-400 ring-4 ring-emerald-500/40 mx-auto flex items-center justify-center overflow-hidden shadow-2xl transition-all">
+                        <span class="text-xl font-bold">SA</span>
+                      </div>
+                      <span class="absolute bottom-0 right-0 p-1 rounded-full bg-emerald-500 text-slate-950 shadow-md border-2 border-slate-900 flex items-center justify-center">
+                        <i data-lucide="check" class="w-3 h-3 stroke-[3.5]"></i>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="text-center space-y-1.5 pt-1">
+                    <h4 class="text-base font-black tracking-tight" id="adm-preview-name">PATCHWORK Official</h4>
+                    <p class="text-xs text-slate-300 line-clamp-2 px-2 leading-relaxed" id="adm-preview-bio">Bio profil official admin</p>
+                    <div class="pt-1">
+                      <span id="adm-preview-slug" class="inline-block px-3 py-1 rounded-full text-[11px] font-mono bg-white/10 text-emerald-400 border border-white/10">@kheireditz</span>
+                    </div>
+
+                    <!-- Social Channels Live Preview (Dibawah PP) -->
+                    <div id="adm-preview-socials" class="flex flex-wrap items-center justify-center gap-1.5 pt-2">
+                      <!-- Injected via updateAdminPreviewSocials() -->
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="pt-4 border-t border-slate-800">
-                <button onclick="copyAdminLynkUrl()" class="w-full py-2.5 rounded-xl bg-white text-slate-950 font-bold text-xs hover:bg-slate-100 transition flex items-center justify-center space-x-2">
-                  <i data-lucide="copy" class="w-4 h-4"></i>
-                  <span>Salin Tautan LYNK ID Admin</span>
-                </button>
+
+                <div class="pt-4 border-t border-slate-800/80 space-y-2">
+                  <a id="admin-preview-lynk-direct-link" href="#" target="_blank" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition flex items-center justify-center space-x-2 shadow-sm">
+                    <i data-lucide="external-link" class="w-4 h-4"></i>
+                    <span>Buka LYNK ID di Tab Baru</span>
+                  </a>
+                  <button type="button" onclick="copyAdminLynkUrl()" class="w-full py-2.5 rounded-xl bg-white text-slate-950 font-bold text-xs hover:bg-slate-100 transition flex items-center justify-center space-x-2">
+                    <i data-lucide="copy" class="w-4 h-4"></i>
+                    <span>Salin Tautan LYNK ID</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1121,27 +1376,27 @@
         <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto mb-2.5">
           <i data-lucide="user-plus" class="w-6 h-6"></i>
         </div>
-        <h3 class="text-base font-bold text-slate-900">Daftar Akun Mitra Baru</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Masukkan data asli untuk verifikasi admin sebelum menginput produk</p>
+        <h3 class="text-base font-bold text-slate-900">Daftar Akun Kreator Baru</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Masukkan data akun untuk verifikasi sebelum menginput produk</p>
       </div>
 
       <div id="reg-feedback" class="hidden mb-4 p-3.5 rounded-2xl text-xs font-semibold"></div>
 
       <form id="admin-reg-form" onsubmit="handlePartnerRegistration(event)" class="space-y-3.5">
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Nama Asli Lengkap *</label>
-          <input type="text" id="admin-reg-name" required placeholder="Nama asli sesuai identitas" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap *</label>
+          <input type="text" id="admin-reg-name" required placeholder="Nama asli atau nama brand" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp Asli *</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp *</label>
           <input type="tel" id="admin-reg-phone" required placeholder="08xxxxxxxxxx" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
-          <span class="text-[10px] text-slate-400 mt-0.5 block">Admin akan menghubungi nomor ini saat akun disetujui</span>
+          <span class="text-[10px] text-slate-400 mt-0.5 block">Notifikasi akun akan dikirimkan ke nomor ini</span>
         </div>
 
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Email *</label>
-          <input type="email" id="admin-reg-email" required placeholder="email@tokoanda.com" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
+          <input type="email" id="admin-reg-email" required placeholder="email@domain.com" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:border-slate-900 focus:bg-white focus:outline-none transition">
         </div>
 
         <div>
@@ -1150,7 +1405,7 @@
         </div>
 
         <button type="submit" id="btn-admin-reg-submit" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2 active:scale-95 mt-2">
-          <span>Kirim Pendaftaran Mitra</span>
+          <span>Kirim Pendaftaran Kreator</span>
           <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
         </button>
 
@@ -1158,6 +1413,82 @@
           <button type="button" onclick="closeRegisterModal()" class="text-xs text-slate-500 hover:text-slate-900 font-medium">Sudah punya akun? Kembali ke Login</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- RESET STATS MODAL -->
+  <div id="reset-stats-modal" class="fixed inset-0 z-[997] hidden">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeResetStatsModal()"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative z-10" style="animation: fadeInUp 0.25s ease-out;">
+        
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+              <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Reset Metrik &amp; Kunjungan</h3>
+              <p class="text-xs text-slate-500">Pilih jenis data statistik yang ingin di-reset</p>
+            </div>
+          </div>
+          <button type="button" onclick="closeResetStatsModal()" class="w-8 h-8 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center transition">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="space-y-2.5 py-4">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Target yang Akan Di-Reset:</label>
+
+          <label class="flex items-start space-x-3 p-3 rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50/60 cursor-pointer transition">
+            <input type="radio" name="reset_target_option" value="all" checked class="mt-0.5 w-4 h-4 text-rose-600 focus:ring-rose-500">
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold text-slate-900">Semua Statistik (Full Reset)</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Mereset kunjungan web, Lynk ID, klik Shopee, klik TikTok, &amp; total klik ke 0.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start space-x-3 p-3 rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50/60 cursor-pointer transition">
+            <input type="radio" name="reset_target_option" value="visitors" class="mt-0.5 w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold text-slate-900">Kunjungan Pengunjung Saja</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Mereset jumlah traffic pengunjung beranda &amp; Lynk ID tanpa menghapus histori klik produk.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start space-x-3 p-3 rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50/60 cursor-pointer transition">
+            <input type="radio" name="reset_target_option" value="shopee" class="mt-0.5 w-4 h-4 text-[#ee4d2d] focus:ring-[#ee4d2d]">
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold text-[#ee4d2d]">Klik Shopee Saja</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Mengosongkan hitungan klik tombol Shopee pada seluruh produk dan etalase.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start space-x-3 p-3 rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50/60 cursor-pointer transition">
+            <input type="radio" name="reset_target_option" value="tiktok" class="mt-0.5 w-4 h-4 text-slate-900 focus:ring-slate-900">
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold text-slate-900">Klik TikTok Shop Saja</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Mengosongkan hitungan klik tombol TikTok Shop pada seluruh produk dan etalase.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] leading-relaxed flex items-start space-x-2 mb-4">
+          <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+          <span>Tindakan ini akan mengupdate database dan menyinkronkan data secara permanen ke Supabase jika terhubung.</span>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeResetStatsModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+            Batal
+          </button>
+          <button type="button" id="btn-execute-reset" onclick="executeResetStats()" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-xs font-bold text-white shadow-lg shadow-rose-600/20 transition active:scale-95 flex items-center space-x-1.5">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            <span>Konfirmasi Reset</span>
+          </button>
+        </div>
+
+      </div>
     </div>
   </div>
 
@@ -1581,6 +1912,77 @@
         }
       } catch (err) {
         console.error('Error loading overview:', err);
+      }
+    }
+
+    function loadAnalytics() {
+      return loadOverviewData();
+    }
+
+    function openResetStatsModal() {
+      const modal = document.getElementById('reset-stats-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      }
+      lucide.createIcons();
+    }
+
+    function closeResetStatsModal() {
+      const modal = document.getElementById('reset-stats-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    async function executeResetStats() {
+      const selected = document.querySelector('input[name="reset_target_option"]:checked');
+      const target = selected ? selected.value : 'all';
+      const btn = document.getElementById('btn-execute-reset');
+
+      const confirmed = await customConfirm(
+        `Apakah Anda benar-benar yakin ingin mereset statistik (${target.toUpperCase()}) ke nol? Riwayat ini tidak dapat dikembalikan.`,
+        'Konfirmasi Reset Statistik',
+        'danger'
+      );
+
+      if (!confirmed) return;
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="inline-block animate-spin mr-1.5">⏳</span><span>Mereset...</span>';
+      }
+
+      try {
+        const res = await fetch('/api/analytics/reset', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ target })
+        });
+
+        const json = await res.json();
+        if (res.ok) {
+          showToast(json.message || 'Statistik berhasil di-reset ke 0!', 'success');
+          closeResetStatsModal();
+          await loadOverviewData();
+          if (typeof loadAdminProducts === 'function') {
+            loadAdminProducts();
+          }
+        } else {
+          showToast(json.error || 'Gagal mereset statistik.', 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan koneksi saat mereset statistik.', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5"></i><span>Konfirmasi Reset</span>';
+          lucide.createIcons();
+        }
       }
     }
 
@@ -2772,6 +3174,136 @@
       }
     }
 
+    // Universal Admin Media Uploader (Avatar, Banner, Background)
+    async function uploadAdminMedia(inputEl, targetInputId, mediaType) {
+      const file = inputEl.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      showToast(`Mengunggah gambar ${mediaType}...`, 'info');
+
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok && data.url) {
+          const targetEl = document.getElementById(targetInputId);
+          if (targetEl) {
+            targetEl.value = data.url;
+            if (mediaType === 'avatar') updateAdminPreviewAvatar(data.url);
+            if (mediaType === 'banner') updateAdminPreviewBanner(data.url);
+            if (mediaType === 'background') updateAdminPreviewBg(data.url);
+          }
+          showToast(`Gambar ${mediaType} berhasil diunggah!`, 'success');
+        } else {
+          showToast('Upload gagal: ' + (data.error || ''), 'error');
+        }
+      } catch (err) {
+        showToast('Upload gagal. Periksa koneksi.', 'error');
+      } finally {
+        inputEl.value = '';
+      }
+    }
+
+    function updateAdminPreviewAvatar(url) {
+      const avBox = document.getElementById('adm-box-avatar');
+      if (!avBox) return;
+      if (url && url.trim()) {
+        avBox.innerHTML = `<img src="${url.trim()}" class="w-full h-full object-cover">`;
+      } else {
+        const name = document.getElementById('adm-prof-name')?.value || 'Admin';
+        const init = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'SA';
+        avBox.innerHTML = `<span class="text-xl font-bold">${init}</span>`;
+      }
+    }
+
+    function updateAdminPreviewBanner(url) {
+      const bannerEl = document.getElementById('adm-preview-banner');
+      if (!bannerEl) return;
+      if (url && url.trim()) {
+        bannerEl.style.backgroundImage = `url('${url.trim()}')`;
+      } else {
+        bannerEl.style.backgroundImage = 'none';
+      }
+    }
+
+    function updateAdminPreviewBg(url) {
+      const bgOverlay = document.getElementById('adm-preview-bg-overlay');
+      if (!bgOverlay) return;
+      if (url && url.trim()) {
+        bgOverlay.style.backgroundImage = `url('${url.trim()}')`;
+        bgOverlay.style.opacity = '0.35';
+      } else {
+        bgOverlay.style.backgroundImage = 'none';
+      }
+    }
+
+    function updateAdminPreviewStyles() {
+      const avBox = document.getElementById('adm-box-avatar');
+      if (!avBox) return;
+
+      const borderCol = document.querySelector('input[name="adm-prof-avatar-border"]:checked')?.value || 'emerald';
+      const shape = document.querySelector('input[name="adm-prof-avatar-shape"]:checked')?.value || 'circle';
+
+      // Reset border and shape classes
+      avBox.classList.remove('rounded-full', 'rounded-2xl', 'rounded-3xl', 'ring-4', 'ring-emerald-500/50', 'border-emerald-400', 'ring-amber-500/50', 'border-amber-400', 'ring-purple-500/50', 'border-purple-400', 'ring-cyan-500/50', 'border-cyan-400', 'ring-white/50', 'border-white');
+
+      if (shape === 'circle') {
+        avBox.classList.add('rounded-full');
+      } else {
+        avBox.classList.add('rounded-2xl');
+      }
+
+      const borderClassMap = {
+        emerald: ['ring-4', 'ring-emerald-500/40', 'border-2', 'border-emerald-400'],
+        amber: ['ring-4', 'ring-amber-400/40', 'border-2', 'border-amber-300'],
+        purple: ['ring-4', 'ring-purple-500/40', 'border-2', 'border-purple-400'],
+        cyan: ['ring-4', 'ring-cyan-400/40', 'border-2', 'border-cyan-300'],
+        white: ['ring-4', 'ring-white/40', 'border-2', 'border-white']
+      };
+
+      const classes = borderClassMap[borderCol] || borderClassMap.emerald;
+      avBox.classList.add(...classes);
+    }
+
+    function handleSocialToggle(key) {
+      updateAdminPreviewSocials();
+    }
+
+    function updateAdminPreviewSocials() {
+      const container = document.getElementById('adm-preview-socials');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const items = [
+        { id: 'adm-toggle-instagram', input: 'adm-prof-instagram', label: 'Instagram', icon: '📸', color: 'bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888]' },
+        { id: 'adm-toggle-tiktok', input: 'adm-prof-tiktok', label: 'TikTok', icon: '🎵', color: 'bg-black text-white' },
+        { id: 'adm-toggle-shopee', input: 'adm-prof-shopee', label: 'Shopee', icon: '🛍️', color: 'bg-[#ee4d2d] text-white' },
+        { id: 'adm-toggle-phone', input: 'adm-prof-phone', label: 'WhatsApp', icon: '💬', color: 'bg-[#25D366] text-slate-950 font-bold' },
+        { id: 'adm-toggle-youtube', input: 'adm-prof-youtube', label: 'YouTube', icon: '▶️', color: 'bg-[#FF0000] text-white' },
+        { id: 'adm-toggle-website', input: 'adm-prof-website', label: 'Web', icon: '🌐', color: 'bg-white/10 text-white' }
+      ];
+
+      items.forEach(it => {
+        const toggle = document.getElementById(it.id);
+        const input = document.getElementById(it.input);
+        const isOn = toggle ? toggle.checked : true;
+        const hasVal = input ? Boolean(input.value.trim()) : false;
+
+        if (isOn && hasVal) {
+          const badge = document.createElement('span');
+          badge.className = `inline-flex items-center space-x-1 px-2 py-0.5 rounded-lg text-[10px] font-semibold border border-white/10 shadow-sm ${it.color}`;
+          badge.innerHTML = `<span class="text-[11px]">${it.icon}</span><span>${it.label}</span>`;
+          container.appendChild(badge);
+        }
+      });
+    }
+
     // ==========================================
     // LYNK ID ADMIN PROFILE MANAGEMENT
     // ==========================================
@@ -2791,6 +3323,8 @@
       document.getElementById('adm-prof-name').value = u.name || '';
       document.getElementById('adm-prof-phone').value = u.phone || '';
       document.getElementById('adm-prof-avatar').value = u.avatar || '';
+      document.getElementById('adm-prof-banner').value = u.banner || '';
+      document.getElementById('adm-prof-background').value = u.background || '';
       document.getElementById('adm-prof-bio').value = u.bio || '';
       document.getElementById('adm-prof-tiktok').value = u.tiktok || '';
       document.getElementById('adm-prof-instagram').value = u.instagram || '';
@@ -2804,20 +3338,43 @@
       const rad = document.querySelector(`input[name="adm-prof-template"][value="${tmpl}"]`);
       if (rad) rad.checked = true;
 
+      const borderCol = u.avatar_border || 'emerald';
+      const radBorder = document.querySelector(`input[name="adm-prof-avatar-border"][value="${borderCol}"]`);
+      if (radBorder) radBorder.checked = true;
+
+      const shape = u.avatar_shape || 'circle';
+      const radShape = document.querySelector(`input[name="adm-prof-avatar-shape"][value="${shape}"]`);
+      if (radShape) radShape.checked = true;
+
       // Update Preview
       document.getElementById('adm-preview-name').innerText = u.name || 'PATCHWORK Official';
       document.getElementById('adm-preview-bio').innerText = u.bio || 'Etalase rekomendasi resmi dari Admin PATCHWORK';
       
-      const avBox = document.getElementById('adm-box-avatar');
-      if (u.avatar) {
-        avBox.innerHTML = `<img src="${u.avatar}" class="w-full h-full object-cover">`;
-      } else {
-        const init = (u.name || 'S A').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-        avBox.innerHTML = `<span class="text-xl font-bold">${init}</span>`;
-      }
+      const cleanSlug = u.custom_slug || 'kheireditz';
+      const slugEl = document.getElementById('adm-preview-slug');
+      if (slugEl) slugEl.innerText = `@${cleanSlug}`;
 
-      const lynkUrl = u.custom_slug ? `https://${u.custom_slug}.kheireditz.my.id` : `${window.location.origin}/lynk/${u.id}`;
-      document.getElementById('admin-preview-lynk-btn').href = lynkUrl;
+      updateAdminPreviewAvatar(u.avatar);
+      updateAdminPreviewBanner(u.banner);
+      updateAdminPreviewBg(u.background);
+      updateAdminPreviewStyles();
+
+      // Sync toggles with whether values exist or defaults
+      if (document.getElementById('adm-toggle-instagram')) document.getElementById('adm-toggle-instagram').checked = Boolean(u.instagram);
+      if (document.getElementById('adm-toggle-tiktok')) document.getElementById('adm-toggle-tiktok').checked = Boolean(u.tiktok);
+      if (document.getElementById('adm-toggle-shopee')) document.getElementById('adm-toggle-shopee').checked = Boolean(u.shopee);
+      if (document.getElementById('adm-toggle-phone')) document.getElementById('adm-toggle-phone').checked = Boolean(u.phone);
+      if (document.getElementById('adm-toggle-youtube')) document.getElementById('adm-toggle-youtube').checked = Boolean(u.youtube);
+      if (document.getElementById('adm-toggle-website')) document.getElementById('adm-toggle-website').checked = Boolean(u.website);
+      updateAdminPreviewSocials();
+
+      const lynkUrl = window.location.hostname.includes('kheireditz.my.id') && u.custom_slug
+        ? `https://${u.custom_slug}.kheireditz.my.id`
+        : `${window.location.origin}/@${cleanSlug}`;
+      const previewBtn = document.getElementById('admin-preview-lynk-btn');
+      if (previewBtn) previewBtn.href = lynkUrl;
+      const directBtn = document.getElementById('admin-preview-lynk-direct-link');
+      if (directBtn) directBtn.href = lynkUrl;
     }
 
     async function handleSaveAdminProfile(e) {
@@ -2825,16 +3382,29 @@
       const btn = document.getElementById('btn-save-adm-profile');
       const slugVal = (document.getElementById('adm-prof-slug')?.value || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
 
+      const isIgOn = document.getElementById('adm-toggle-instagram')?.checked !== false;
+      const isTtOn = document.getElementById('adm-toggle-tiktok')?.checked !== false;
+      const isShopeeOn = document.getElementById('adm-toggle-shopee')?.checked !== false;
+      const isPhoneOn = document.getElementById('adm-toggle-phone')?.checked !== false;
+      const isYtOn = document.getElementById('adm-toggle-youtube')?.checked !== false;
+      const isWebOn = document.getElementById('adm-toggle-website')?.checked !== false;
+
+      const rawPhone = document.getElementById('adm-prof-phone').value.trim();
+
       const payload = {
         name: document.getElementById('adm-prof-name').value.trim(),
-        phone: document.getElementById('adm-prof-phone').value.trim(),
+        phone: rawPhone,
         avatar: document.getElementById('adm-prof-avatar').value.trim(),
+        banner: document.getElementById('adm-prof-banner').value.trim(),
+        background: document.getElementById('adm-prof-background').value.trim(),
+        avatar_border: document.querySelector('input[name="adm-prof-avatar-border"]:checked')?.value || 'emerald',
+        avatar_shape: document.querySelector('input[name="adm-prof-avatar-shape"]:checked')?.value || 'circle',
         bio: document.getElementById('adm-prof-bio').value.trim(),
-        tiktok: document.getElementById('adm-prof-tiktok').value.trim(),
-        instagram: document.getElementById('adm-prof-instagram').value.trim(),
-        shopee: document.getElementById('adm-prof-shopee').value.trim(),
-        youtube: document.getElementById('adm-prof-youtube').value.trim(),
-        website: document.getElementById('adm-prof-website').value.trim(),
+        tiktok: isTtOn ? document.getElementById('adm-prof-tiktok').value.trim() : '',
+        instagram: isIgOn ? document.getElementById('adm-prof-instagram').value.trim() : '',
+        shopee: isShopeeOn ? document.getElementById('adm-prof-shopee').value.trim() : '',
+        youtube: isYtOn ? document.getElementById('adm-prof-youtube').value.trim() : '',
+        website: isWebOn ? document.getElementById('adm-prof-website').value.trim() : '',
         template: document.querySelector('input[name="adm-prof-template"]:checked')?.value || 'modern',
         custom_slug: slugVal
       };
@@ -2871,7 +3441,8 @@
 
     function copyAdminLynkUrl() {
       if (!currentUser) return;
-      const url = currentUser.custom_slug ? `https://${currentUser.custom_slug}.kheireditz.my.id` : `${window.location.origin}/lynk/${currentUser.id}`;
+      const cleanSlug = currentUser.custom_slug || (currentUser.email ? currentUser.email.split('@')[0] : currentUser.id);
+      const url = `${window.location.origin}/@${cleanSlug}`;
       navigator.clipboard.writeText(url).then(() => {
         showToast('Tautan LYNK ID Admin disalin ke clipboard!', 'success');
       }).catch(() => {

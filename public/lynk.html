@@ -1,202 +1,325 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="h-full">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="page-title">Etalase Rekomendasi - PATCHWORK</title>
-  <meta name="description" id="page-desc" content="Koleksi produk rekomendasi resmi & promo marketplace pilihan.">
-  <meta property="og:title" id="og-title" content="Etalase Rekomendasi - PATCHWORK">
-  <meta property="og:description" id="og-desc" content="Koleksi produk rekomendasi pilihan">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title id="page-title">patchwork - Profil & Rekomendasi Pilihan</title>
+  <meta name="description" id="page-desc" content="Koleksi tautan resmi, etalase rekomendasi belanja, dan promo terverifikasi.">
+  <meta property="og:title" id="og-title" content="patchwork">
+  <meta property="og:description" id="og-desc" content="Koleksi tautan resmi dan rekomendasi pilihan">
   <meta property="og:image" id="og-img" content="">
   <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
 
+  <!-- Tailwind CSS & Lucide Icons & QRCode -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="/qrcode.min.js"></script>
+  <script>window.QRCode || document.write('<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script>');</script>
 
-  <!-- Adcash AutoTag Monetization -->
-  <script id="aclib" type="text/javascript" src="https://acscdn.com/script/aclib.js"></script>
-  <script type="text/javascript">
-    aclib.runAutoTag({
-      zoneId: 'jbfxlpzzyr',
-    });
-  </script>
-
-  <!-- Profitable CPM Network Ad Tags -->
-  <script src="https://pl31303305.profitableratecpmnetwork.com/cb/0c/70/cb0c700c4f0884eec808d6ab2fccaa33.js"></script>
-  <script src="https://pl31303306.profitableratecpmnetwork.com/ee/d0/e7/eed0e7e0764b1cbcbec93e5a42ca6983.js"></script>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
-    html {
-      -webkit-text-size-adjust: 100%;
-      scroll-behavior: smooth;
-      zoom: 85%;
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
     }
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       letter-spacing: -0.015em;
     }
-    .product-card {
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.2s ease;
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
     }
-    .product-card:hover {
-      transform: translateY(-4px);
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
-    .btn-action {
-      transition: transform 0.15s ease, background-color 0.15s ease;
+    .press-bounce {
+      transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.16s ease, background-color 0.15s ease, border-color 0.15s ease;
     }
-    .btn-action:active {
+    .press-bounce:active {
       transform: scale(0.97);
+    }
+    .card-item {
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.18s ease;
+    }
+    .card-item:hover {
+      transform: translateY(-2px);
+    }
+    .grid-view-card {
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.18s ease;
+    }
+    .grid-view-card:hover {
+      transform: translateY(-3px);
+    }
+    .glass-surface {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .toast-anim {
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+    }
+    @keyframes blurSlideUp {
+      0% {
+        opacity: 0;
+        transform: translate3d(-50%, calc(-50% + 28px), 0) scale(0.92);
+        filter: blur(14px);
+      }
+      50% {
+        filter: blur(4px);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(-50%, -50%, 0) scale(1);
+        filter: blur(0);
+      }
+    }
+    .anim-blur-up {
+      animation: blurSlideUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, filter, opacity;
+    }
+    .avatar-float:hover {
+      transform: translate3d(-50%, calc(-50% - 4px), 0) scale(1.02);
+    }
+    /* Logo Putih Bersih High-Contrast untuk Dark Theme */
+    .logo-white {
+      filter: brightness(0) invert(1) drop-shadow(0 2px 8px rgba(255,255,255,0.25));
     }
   </style>
 </head>
-<body id="lynk-body" class="bg-slate-950 text-white min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white pb-16">
+<body id="page-body" class="bg-[#0b0f17] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-emerald-400 selection:text-slate-950 relative">
 
-  <!-- TOP BAR -->
-  <header class="w-full max-w-xl mx-auto px-4 pt-6 pb-2 flex items-center justify-end">
-    <button onclick="openShareModal()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 transition" title="Bagikan">
-      <i data-lucide="share-2" class="w-4 h-4"></i>
-    </button>
+  <!-- DYNAMIC PAGE BACKGROUND WITH SUBTLE OVERLAY -->
+  <div id="page-custom-bg" class="fixed inset-0 pointer-events-none z-0 bg-cover bg-center transition-all duration-700 opacity-0"></div>
+  <div id="page-custom-bg-overlay" class="fixed inset-0 pointer-events-none z-0 bg-[#0b0f17]/75 backdrop-blur-[2px] transition-opacity duration-700 opacity-0"></div>
+
+  <!-- TOP APP BAR -->
+  <header class="w-full max-w-md mx-auto px-4 pt-4 pb-2 flex items-center justify-between sticky top-0 z-30 bg-[#0b0f17]/85 backdrop-blur-md">
+    <!-- LOGO IKON ASLI DENGAN FILTER WARNA PUTIH HIGH-CONTRAST -->
+    <a href="/" class="flex items-center transition active:scale-95 group" title="Beranda PATCHWORK">
+      <div class="h-8 flex items-center">
+        <img 
+          src="/images/logo.png" 
+          onerror="this.onerror=null; this.src='https://i.ibb.co.com/mwpHfGn/263941-removebg-preview.png';" 
+          alt="PATCHWORK" 
+          class="h-7 w-auto max-w-[125px] object-contain logo-white group-hover:brightness-125 transition"
+        >
+      </div>
+    </a>
+
+    <!-- ACTIONS: DASHBOARD (IKON SAJA) & SHARE -->
+    <div class="flex items-center space-x-2">
+      <a href="/dashboard" class="w-9 h-9 rounded-2xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white flex items-center justify-center press-bounce transition border border-white/10 shadow-sm" title="Dashboard">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+      </a>
+      <button onclick="openShareModal()" class="w-9 h-9 rounded-2xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white flex items-center justify-center press-bounce transition border border-white/10 shadow-sm" title="Bagikan Halaman">
+        <i data-lucide="share-2" class="w-4 h-4"></i>
+      </button>
+    </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="w-full max-w-xl mx-auto px-4 flex-1 flex flex-col items-center">
-    
-    <!-- LOADING SKELETON -->
-    <div id="lynk-loading" class="w-full py-12 flex flex-col items-center space-y-4 animate-pulse">
-      <div class="w-24 h-24 rounded-3xl bg-white/10"></div>
-      <div class="h-6 w-48 bg-white/10 rounded-xl"></div>
-      <div class="h-4 w-64 bg-white/10 rounded-lg"></div>
-      <div class="w-full h-24 bg-white/5 rounded-2xl mt-6"></div>
-      <div class="w-full h-32 bg-white/5 rounded-2xl"></div>
+  <!-- MAIN CONTAINER (LYNK.ID EXPERIENCE: MOBILE-FIRST, HIGH CONTRAST, COMPACT) -->
+  <main class="w-full max-w-md mx-auto px-4 flex-1 flex flex-col items-center pb-20 relative z-10">
+
+    <!-- SKELETON LOADING -->
+    <div id="loading-state" class="w-full py-10 flex flex-col items-center space-y-4 animate-pulse">
+      <div class="w-24 h-24 rounded-full bg-white/10 border-2 border-white/10"></div>
+      <div class="h-6 w-40 bg-white/10 rounded-xl"></div>
+      <div class="h-4 w-60 bg-white/10 rounded-lg"></div>
+      <div class="flex gap-2 pt-2">
+        <div class="w-10 h-10 rounded-2xl bg-white/10"></div>
+        <div class="w-10 h-10 rounded-2xl bg-white/10"></div>
+        <div class="w-10 h-10 rounded-2xl bg-white/10"></div>
+      </div>
+      <div class="w-full h-12 bg-white/5 rounded-2xl mt-4"></div>
+      <div class="w-full h-24 bg-white/5 rounded-2xl"></div>
+      <div class="w-full h-24 bg-white/5 rounded-2xl"></div>
+      <div class="w-full h-24 bg-white/5 rounded-2xl"></div>
     </div>
 
-    <!-- ERROR STATE -->
-    <div id="lynk-error" class="hidden w-full py-20 text-center space-y-3">
-      <div class="w-16 h-16 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto mb-2">
+    <!-- NOT FOUND STATE -->
+    <div id="error-state" class="hidden w-full py-20 text-center space-y-4">
+      <div class="w-16 h-16 rounded-3xl bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto border border-rose-500/20">
         <i data-lucide="alert-circle" class="w-8 h-8"></i>
       </div>
-      <h2 class="text-lg font-extrabold text-white">Profil Tidak Ditemukan</h2>
-      <p class="text-xs text-slate-400 max-w-xs mx-auto">Link profil atau ID mitra yang Anda buka tidak terdaftar di sistem.</p>
-      <div class="pt-2">
-        <a href="/" class="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-white/10 text-xs font-bold text-white hover:bg-white/20 transition">
-          <i data-lucide="home" class="w-3.5 h-3.5"></i>
-          <span>Kembali ke Beranda</span>
-        </a>
+      <div>
+        <h2 class="text-lg font-extrabold text-white">Profil Belum Tersedia</h2>
+        <p class="text-xs text-slate-400 max-w-xs mx-auto mt-1">Halaman atau akun yang dituju belum terdaftar di patchwork.</p>
       </div>
+      <a href="/" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/15 text-xs font-bold text-white transition border border-white/15">
+        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+        <span>Kembali ke Beranda</span>
+      </a>
     </div>
 
-    <!-- PROFILE CONTENT -->
-    <div id="lynk-content" class="hidden w-full flex flex-col items-center space-y-6">
-      
-      <!-- PROFILE HEADER -->
-      <div class="text-center flex flex-col items-center pt-2 space-y-3">
-        <!-- Avatar -->
-        <div class="relative">
-          <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden border-2 border-white/20 shadow-2xl bg-white/10 flex items-center justify-center" id="profile-avatar-box">
-            <span class="text-2xl font-black tracking-wider text-white" id="profile-avatar-initials">--</span>
-          </div>
-          <span class="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-slate-950 shadow-md" id="profile-badge">
-            VERIFIED
-          </span>
-        </div>
+    <!-- PROFILE VIEW -->
+    <div id="profile-container" class="hidden w-full flex flex-col items-center space-y-5">
 
-        <!-- Name & Bio -->
-        <div class="space-y-1 max-w-md">
-          <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center justify-center gap-1.5" id="profile-name">
-            <span>--</span>
-          </h1>
-          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal" id="profile-bio">
-            --
-          </p>
-          <div class="pt-1">
-            <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-white/10 text-slate-300 border border-white/15" id="profile-slug-pill">
-              <i data-lucide="link" class="w-3 h-3 text-emerald-400"></i>
-              <span id="profile-slug-text">kheireditz.my.id</span>
+      <!-- PROFILE CARD / HEADER WITH BANNER DIRECTLY BEHIND PP -->
+      <div class="text-center flex flex-col items-center pt-2 space-y-3 w-full relative">
+        
+        <!-- HERO PP ZONE: Banner di belakang, Avatar (PP) tepat setengah di dalam & setengah di luar garis bawah banner -->
+        <div class="relative w-full max-w-sm mb-12 sm:mb-14">
+          <!-- The Banner backdrop -->
+          <div id="profile-banner-wrapper" class="w-full h-32 sm:h-36 rounded-3xl overflow-hidden shadow-xl border border-white/10 bg-slate-900 transition-all duration-300 relative">
+            <div id="profile-banner-img" class="w-full h-full bg-cover bg-center transition-all duration-300"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/75 pointer-events-none"></div>
+          </div>
+
+          <!-- Avatar (PP) diposisikan presisi tepat di tengah garis (50% di dalam & 50% di luar) -->
+          <div class="absolute left-1/2 top-full -translate-x-1/2 -translate-y-1/2 z-10 group anim-blur-up avatar-float transition-all duration-300">
+            <div id="profile-avatar" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-emerald-400 shadow-2xl bg-gradient-to-tr from-slate-900 to-slate-800 flex items-center justify-center ring-4 ring-emerald-500/40 transition-all">
+              <span id="profile-initials" class="text-2xl font-black tracking-wider text-white">PW</span>
+            </div>
+            <span id="profile-verified-badge" class="absolute bottom-1 right-1 p-1 rounded-full bg-emerald-500 text-slate-950 shadow-md border-2 border-[#0b0f17] flex items-center justify-center" title="Akun Terverifikasi">
+              <i data-lucide="check" class="w-3 h-3 stroke-[3.5]"></i>
             </span>
           </div>
         </div>
 
-        <!-- Social Media Buttons -->
-        <div class="flex flex-wrap items-center justify-center gap-2 pt-2" id="profile-socials">
-          <!-- Injected via JS -->
-        </div>
-      </div>
+        <!-- Name & Bio -->
+        <div class="space-y-1.5 max-w-sm px-2">
+          <h1 id="profile-name" class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center justify-center gap-1.5">
+            --
+          </h1>
+          <p id="profile-bio" class="text-xs sm:text-[13px] text-slate-300 leading-relaxed font-normal">
+            --
+          </p>
 
-      <!-- SEARCH & FILTER BAR -->
-      <div class="w-full space-y-3 pt-2">
-        <div class="relative w-full">
-          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-          <input type="text" id="lynk-search" oninput="filterProducts(this.value)" placeholder="Cari produk di etalase ini..." class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white/10 border border-white/15 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-white/40 focus:bg-white/15 transition">
-        </div>
-
-        <!-- Categories horizontal pills -->
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-1" id="lynk-categories-bar" style="scrollbar-width:none;">
-          <button onclick="filterCategory('')" class="cat-pill px-3 py-1 rounded-xl text-xs font-bold bg-white text-slate-950 shrink-0 transition" data-cat="">
-            Semua
-          </button>
-        </div>
-      </div>
-
-      <!-- PRODUCTS SECTION -->
-      <div class="w-full space-y-3.5">
-        <div class="flex items-center justify-between text-xs text-slate-400 font-semibold px-1">
-          <span>Katalog Produk (<span id="count-products">0</span>)</span>
-          <span class="text-[11px]">Tautan Belanja Resmi</span>
-        </div>
-
-        <div class="grid grid-cols-1 gap-3" id="lynk-products-list">
-          <!-- Injected via JS -->
-        </div>
-
-        <div id="lynk-no-products" class="hidden py-12 text-center space-y-2">
-          <div class="w-12 h-12 rounded-xl bg-white/5 text-slate-400 flex items-center justify-center mx-auto">
-            <i data-lucide="package-search" class="w-6 h-6"></i>
+          <!-- Verified Slug / URL Tag with Copy button -->
+          <div class="pt-1 flex items-center justify-center gap-2">
+            <button onclick="copyLynkUrl()" class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-mono bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition press-bounce shadow-inner group" title="Salin Link">
+              <i data-lucide="link-2" class="w-3 h-3 text-emerald-400"></i>
+              <span id="profile-slug-display">patchwork.link</span>
+              <i data-lucide="copy" class="w-3 h-3 opacity-60 group-hover:opacity-100 transition"></i>
+            </button>
           </div>
-          <p class="text-xs text-slate-400">Tidak ada produk yang cocok dengan pencarian.</p>
         </div>
-        <!-- SPONSORED PROMO LINK -->
-        <div class="pt-2">
-          <a href="https://www.profitableratecpmnetwork.com/cgtpgfq1xi?key=5132c67297ebe9de5caef9ac99e3bd71" target="_blank" rel="noopener noreferrer sponsored" class="group block relative rounded-2xl overflow-hidden bg-gradient-to-r from-indigo-900/60 to-purple-950/60 p-3.5 border border-indigo-500/30 hover:border-indigo-400/60 shadow-lg transition-all duration-300">
-            <div class="flex items-center justify-between gap-3">
-              <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center shrink-0 border border-indigo-500/30">
-                  <i data-lucide="sparkles" class="w-4 h-4 text-amber-300"></i>
-                </div>
-                <div class="text-left">
-                  <span class="text-[9px] uppercase font-extrabold tracking-wider px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-200">Sponsor</span>
-                  <div class="text-xs font-bold text-white group-hover:text-indigo-200 transition-colors mt-0.5">Klaim Voucher Belanja & Promo Diskon</div>
-                </div>
+
+        <!-- DASHBOARD STATISTIK LYNK ID (KUNJUNGAN, SHOPEE, TIKTOK, TOTAL KLIK) -->
+        <div class="w-full pt-2">
+          <div class="grid grid-cols-4 gap-2 w-full">
+            
+            <!-- Kunjungan -->
+            <div class="p-2.5 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-white/20 transition text-center flex flex-col items-center justify-center space-y-0.5 shadow-sm">
+              <div class="flex items-center space-x-1 text-[10px] text-slate-400">
+                <i data-lucide="eye" class="w-3 h-3 text-sky-400"></i>
+                <span class="font-medium">Kunjungan</span>
               </div>
-              <div class="shrink-0">
-                <span class="px-2.5 py-1 rounded-lg bg-indigo-600 group-hover:bg-indigo-500 text-white text-[11px] font-bold inline-flex items-center space-x-1 transition-colors">
-                  <span>Buka</span>
-                  <i data-lucide="external-link" class="w-3 h-3"></i>
+              <div id="stat-visitors-count" class="text-sm sm:text-base font-extrabold text-white font-mono tracking-tight">0</div>
+            </div>
+
+            <!-- Klik Shopee -->
+            <div class="p-2.5 rounded-2xl bg-[#ee4d2d]/10 border border-[#ee4d2d]/25 hover:border-[#ee4d2d]/45 transition text-center flex flex-col items-center justify-center space-y-0.5 shadow-sm">
+              <div class="flex items-center space-x-1 text-[10px] text-[#ee4d2d]">
+                <span class="w-3 h-3 inline-flex items-center justify-center shrink-0 fill-current">
+                  <svg role="img" viewBox="0 0 24 24" class="w-full h-full fill-current" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.9414 17.9633c.229-1.879-.981-3.077-4.1758-4.0969-1.548-.528-2.277-1.22-2.26-2.1719.065-1.056 1.048-1.825 2.352-1.85a5.2898 5.2898 0 0 1 2.8838.89c.116.072.197.06.263-.039.09-.145.315-.494.39-.62.051-.081.061-.187-.068-.281-.185-.1369-.704-.4149-.983-.5319a6.4697 6.4697 0 0 0-2.5118-.514c-1.909.008-3.4129 1.215-3.5389 2.826-.082 1.1629.494 2.1078 1.73 2.8278.262.152 1.6799.716 2.2438.892 1.774.552 2.695 1.5419 2.478 2.6969-.197 1.047-1.299 1.7239-2.818 1.7439-1.2039-.046-2.2878-.537-3.1278-1.19l-.141-.11c-.104-.08-.218-.075-.287.03-.05.077-.376.547-.458.67-.077.108-.035.168.045.234.35.293.817.613 1.134.775a6.7097 6.7097 0 0 0 2.8289.727 4.9048 4.9048 0 0 0 2.0759-.354c1.095-.465 1.8029-1.394 1.9449-2.554zM11.9986 1.4009c-2.068 0-3.7539 1.95-3.8329 4.3899h7.6657c-.08-2.44-1.765-4.3899-3.8328-4.3899zm7.8516 22.5981-.08.001-15.7843-.002c-1.074-.04-1.863-.91-1.971-1.991l-.01-.195L1.298 6.2858a.459.459 0 0 1 .45-.494h4.9748C6.8448 2.568 9.1607 0 11.9996 0c2.8388 0 5.1537 2.5689 5.2757 5.7898h4.9678a.459.459 0 0 1 .458.483l-.773 15.5883-.007.131c-.094 1.094-.979 1.9769-2.0709 2.0059z"/></svg>
                 </span>
+                <span class="font-bold">Shopee</span>
               </div>
+              <div id="stat-shopee-count" class="text-sm sm:text-base font-extrabold text-[#ee4d2d] font-mono tracking-tight">0</div>
             </div>
-          </a>
+
+            <!-- Klik TikTok -->
+            <div class="p-2.5 rounded-2xl bg-white/[0.06] border border-white/15 hover:border-white/30 transition text-center flex flex-col items-center justify-center space-y-0.5 shadow-sm">
+              <div class="flex items-center space-x-1 text-[10px] text-slate-200">
+                <span class="w-3 h-3 inline-flex items-center justify-center shrink-0 fill-current">
+                  <svg role="img" viewBox="0 0 24 24" class="w-full h-full fill-current" xmlns="http://www.w3.org/2000/svg"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+                </span>
+                <span class="font-bold">TikTok</span>
+              </div>
+              <div id="stat-tiktok-count" class="text-sm sm:text-base font-extrabold text-white font-mono tracking-tight">0</div>
+            </div>
+
+            <!-- Total Produk & Klik -->
+            <div class="p-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 hover:border-emerald-500/40 transition text-center flex flex-col items-center justify-center space-y-0.5 shadow-sm">
+              <div class="flex items-center space-x-1 text-[10px] text-emerald-400">
+                <i data-lucide="mouse-pointer-click" class="w-3 h-3 text-emerald-400"></i>
+                <span class="font-bold">Total Klik</span>
+              </div>
+              <div id="stat-clicks-count" class="text-sm sm:text-base font-extrabold text-emerald-400 font-mono tracking-tight">0</div>
+            </div>
+
+          </div>
+
+          <div class="flex items-center justify-center gap-3 pt-2 text-[11px] text-slate-400">
+            <div class="flex items-center space-x-1">
+              <span id="stat-products-count" class="font-extrabold text-white font-mono">0</span>
+              <span>Produk Pilihan</span>
+            </div>
+            <span class="text-white/20">•</span>
+            <div class="flex items-center space-x-1 text-emerald-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block"></span>
+              <span class="font-semibold text-emerald-400">Statistik Realtime</span>
+            </div>
+          </div>
         </div>
 
-        <!-- SPONSORED BANNER 160x300 (HIGH REVENUE FORMAT) -->
-        <div class="pt-4 flex flex-col items-center">
-          <div class="w-full max-w-sm p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center text-center">
-            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">Iklan Sponsor Resmi</span>
-            <div class="w-[160px] h-[300px] bg-white rounded-xl overflow-hidden shadow flex items-center justify-center">
-              <script type="text/javascript">
-                atOptions = {
-                  'key' : 'a7a21952f7026cf44368c73b41fa36fb',
-                  'format' : 'iframe',
-                  'height' : 300,
-                  'width' : 160,
-                  'params' : {}
-                };
-              </script>
-              <script type="text/javascript" src="https://www.highrevenueformat.com/a7a21952f7026cf44368c73b41fa36fb/invoke.js"></script>
-            </div>
-            <p class="text-[10px] text-slate-400 mt-2">Dukung etalase mitra dengan melihat promo pilihan sponsor</p>
+        <!-- AUTHENTIC SOCIAL / MARKETPLACE BUTTONS (TIKTOK, SHOPEE, WHATSAPP, INSTAGRAM, YOUTUBE, TOKOPEDIA) -->
+        <div id="social-channels" class="flex flex-wrap items-center justify-center gap-2 pt-1 w-full">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+      <!-- SEARCH BAR & VIEW TOGGLE (LIST / GRID) -->
+      <div id="search-section" class="w-full space-y-2 pt-1">
+        <div class="flex items-center gap-2">
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="product-search" oninput="handleSearch(this.value)" placeholder="Cari nama barang atau kategori..." class="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white/5 border border-white/10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30 focus:bg-white/10 transition shadow-inner">
+            <button id="clear-search-btn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition">
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
           </div>
+
+          <!-- View Switcher (Compact List vs 2-Col Grid) -->
+          <div class="flex items-center rounded-2xl bg-white/5 border border-white/10 p-1 shrink-0">
+            <button id="view-list-btn" onclick="setViewMode('list')" class="w-8 h-8 rounded-xl flex items-center justify-center transition text-slate-400 hover:text-white" title="Tampilan Daftar">
+              <i data-lucide="list" class="w-4 h-4"></i>
+            </button>
+            <button id="view-grid-btn" onclick="setViewMode('grid')" class="w-8 h-8 rounded-xl flex items-center justify-center transition bg-white/20 text-white" title="Tampilan Grid">
+              <i data-lucide="grid-2x2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- CATEGORIES PILLS (HORIZONTAL SCROLL) -->
+        <div id="category-pills" class="flex items-center gap-1.5 overflow-x-auto py-1 hide-scrollbar">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+      <!-- PRODUCT / RECOMMENDATION ITEMS LIST -->
+      <div class="w-full space-y-3 pt-1">
+        <div class="flex items-center justify-between text-xs text-slate-400 font-semibold px-1">
+          <span class="flex items-center space-x-1.5">
+            <span class="text-white font-bold">Daftar Produk</span>
+            <span id="products-count-badge" class="px-1.5 py-0.5 text-[10px] rounded-md bg-white/10 text-slate-300 font-mono">0</span>
+          </span>
+          <span id="filter-status-label" class="text-[11px] text-slate-400">Semua Kategori</span>
+        </div>
+
+        <!-- CONTAINER FOR PRODUCTS (LIST / GRID) -->
+        <div id="products-container" class="grid grid-cols-2 gap-2.5 w-full">
+          <!-- Injected via JS -->
+        </div>
+
+        <!-- EMPTY SEARCH STATE -->
+        <div id="no-products-found" class="hidden py-12 text-center space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-white/5 text-slate-400 flex items-center justify-center mx-auto border border-white/10">
+            <i data-lucide="search-x" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-white">Produk Tidak Ditemukan</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Coba kata kunci lain atau pilih kategori Semua.</p>
+          </div>
+          <button onclick="resetFilters()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-white transition press-bounce border border-white/10">
+            Reset Pencarian
+          </button>
         </div>
       </div>
 
@@ -204,59 +327,128 @@
 
   </main>
 
-  <!-- FOOTER BRANDING -->
-  <footer class="w-full text-center pt-10 text-[11px] text-slate-400 space-y-1">
-    <div>Powered by <a href="/" class="font-extrabold text-white hover:underline">PATCHWORK Affiliate</a></div>
-    <div class="text-[10px] text-slate-400">Temukan promo Shopee & TikTok Shop terpercaya</div>
+  <!-- CLEAN PROFESSIONAL FOOTER -->
+  <footer class="w-full max-w-md mx-auto text-center py-6 px-4 text-xs text-slate-500 space-y-1.5 border-t border-white/5 relative z-10">
+    <div class="flex items-center justify-center space-x-1.5">
+      <span>Ditenagai oleh</span>
+      <a href="/" class="font-extrabold tracking-wider text-slate-300 hover:text-white transition" title="PATCHWORK">PATCHWORK</a>
+    </div>
+    <div class="text-[11px] text-slate-500">Platform Link Bio &amp; Etalase Belanja Resmi</div>
   </footer>
 
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-3 toast-anim">
+    <div class="px-4 py-2 rounded-2xl bg-white text-slate-950 text-xs font-bold shadow-2xl flex items-center space-x-2 border border-slate-200">
+      <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+      <span id="toast-message">Tautan disalin!</span>
+    </div>
+  </div>
+
   <!-- SHARE & QR MODAL -->
-  <div id="share-modal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl relative">
-      <button onclick="closeShareModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition">
+  <div id="share-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[#111622] border border-white/15 rounded-3xl max-w-xs sm:max-w-sm w-full p-5 text-center space-y-4 shadow-2xl relative">
+      <button onclick="closeShareModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition press-bounce" title="Tutup">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
 
-      <div class="space-y-1 pt-2">
-        <h3 class="text-base font-black text-white">Bagikan Etalase</h3>
-        <p class="text-xs text-slate-400" id="share-modal-subtitle">Scan QR Code atau salin tautan berikut</p>
+      <div class="space-y-1 pt-1">
+        <h3 class="text-base font-black text-white">Bagikan Profil & Etalase</h3>
+        <p class="text-xs text-slate-400">Scan QR Code atau gunakan tautan resmi berikut</p>
       </div>
 
-      <div class="p-4 bg-white rounded-2xl flex items-center justify-center shadow-inner mx-auto w-fit">
-        <div id="qrcode-box"></div>
+      <!-- QR Code Container -->
+      <div class="p-3.5 bg-white rounded-2xl flex flex-col items-center justify-center shadow-lg mx-auto w-fit">
+        <div id="qrcode-wrapper" class="min-w-[180px] min-h-[180px] flex items-center justify-center overflow-hidden"></div>
       </div>
 
-      <div class="space-y-2 pt-2">
-        <button onclick="copyCurrentLynkUrl()" class="w-full py-2.5 px-4 rounded-xl bg-white text-slate-950 text-xs font-bold hover:bg-slate-100 flex items-center justify-center space-x-2 transition btn-action">
-          <i data-lucide="copy" class="w-4 h-4"></i>
-          <span id="copy-btn-text">Salin Tautan Etalase</span>
-        </button>
-        <button onclick="shareViaWhatsApp()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 flex items-center justify-center space-x-2 transition btn-action">
-          <i data-lucide="message-circle" class="w-4 h-4"></i>
-          <span>Bagikan ke WhatsApp</span>
+      <!-- Valid URL Preview & Copy Bar -->
+      <div class="space-y-2">
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-white/5 border border-white/10 text-left">
+          <input type="text" id="share-url-input" readonly class="w-full bg-transparent px-2.5 py-1 text-xs text-slate-200 font-mono focus:outline-none select-all truncate" placeholder="https://...">
+          <button onclick="copyLynkUrl()" class="px-3 py-1.5 rounded-lg bg-white text-slate-950 text-xs font-bold shrink-0 hover:bg-slate-100 transition press-bounce shadow flex items-center space-x-1">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            <span id="copy-btn-label">Salin</span>
+          </button>
+        </div>
+
+        <!-- Quick Share Action Buttons -->
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="shareToWhatsApp()" class="w-full py-2.5 px-3 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 text-xs font-bold flex items-center justify-center space-x-1.5 transition press-bounce shadow">
+            <svg viewBox="0 0 24 24" class="w-4 h-4 fill-current shrink-0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            <span>WhatsApp</span>
+          </button>
+          <button onclick="nativeShare()" class="w-full py-2.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex items-center justify-center space-x-1.5 transition press-bounce shadow">
+            <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+            <span>Bagikan</span>
+          </button>
+        </div>
+
+        <button onclick="downloadQrCode()" class="w-full py-2 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-semibold flex items-center justify-center space-x-1.5 transition press-bounce border border-white/10">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>Unduh Gambar QR Code</span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- SCRIPT LOGIC -->
+  <!-- AUTHENTIC SVG BRAND DEFINITIONS (FROM SIMPLE-ICONS / BRANDS) -->
   <script>
+    const ICONS = {
+      tiktok: `<svg role="img" viewBox="0 0 24 24" class="w-full h-full fill-current" xmlns="http://www.w3.org/2000/svg"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>`,
+      whatsapp: `<svg role="img" viewBox="0 0 24 24" class="w-full h-full fill-current" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>`,
+      shopee: `<svg role="img" viewBox="0 0 24 24" class="w-full h-full fill-current" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.9414 17.9633c.229-1.879-.981-3.077-4.1758-4.0969-1.548-.528-2.277-1.22-2.26-2.1719.065-1.056 1.048-1.825 2.352-1.85a5.2898 5.2898 0 0 1 2.8838.89c.116.072.197.06.263-.039.09-.145.315-.494.39-.62.051-.081.061-.187-.068-.281-.185-.1369-.704-.4149-.983-.5319a6.4697 6.4697 0 0 0-2.5118-.514c-1.909.008-3.4129 1.215-3.5389 2.826-.082 1.1629.494 2.1078 1.73 2.8278.262.152 1.6799.716 2.2438.892 1.774.552 2.695 1.5419 2.478 2.6969-.197 1.047-1.299 1.7239-2.818 1.7439-1.2039-.046-2.2878-.537-3.1278-1.19l-.141-.11c-.104-.08-.218-.075-.287.03-.05.077-.376.547-.458.67-.077.108-.035.168.045.234.35.293.817.613 1.134.775a6.7097 6.7097 0 0 0 2.8289.727 4.9048 4.9048 0 0 0 2.0759-.354c1.095-.465 1.8029-1.394 1.9449-2.554zM11.9986 1.4009c-2.068 0-3.7539 1.95-3.8329 4.3899h7.6657c-.08-2.44-1.765-4.3899-3.8328-4.3899zm7.8516 22.5981-.08.001-15.7843-.002c-1.074-.04-1.863-.91-1.971-1.991l-.01-.195L1.298 6.2858a.459.459 0 0 1 .45-.494h4.9748C6.8448 2.568 9.1607 0 11.9996 0c2.8388 0 5.1537 2.5689 5.2757 5.7898h4.9678a.459.459 0 0 1 .458.483l-.773 15.5883-.007.131c-.094 1.094-.979 1.9769-2.0709 2.0059z"/></svg>`,
+      instagram: `<svg role="img" viewBox="0 0 24 24" class="w-full h-full fill-current" xmlns="http://www.w3.org/2000/svg"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>`,
+      youtube: `<svg role="img" viewBox="0 0 24 24" class="w-full h-full fill-current" xmlns="http://www.w3.org/2000/svg"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`,
+      tokopedia: `<svg role="img" viewBox="0 0 24 24" class="w-full h-full fill-current" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.372 0 0 5.372 0 12c0 5.302 3.438 9.8 8.207 11.387.6.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.628-5.372-12-12-12z"/></svg>`
+    };
+
+    // MODERN CLEAN DESIGN THEMES
+    const THEMES = {
+      modern: {
+        body: 'bg-[#0b0f17] text-slate-100 selection:bg-emerald-400 selection:text-slate-950',
+        card: 'bg-white/[0.04] border-white/10 hover:border-white/20 hover:bg-white/[0.07] text-white',
+        cardHighlight: 'bg-gradient-to-r from-emerald-950/40 to-slate-900/60 border-emerald-500/30',
+        pillActive: 'bg-white text-slate-950 font-bold shadow',
+        pillInactive: 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
+      },
+      emerald: {
+        body: 'bg-[#04130d] text-emerald-50 selection:bg-emerald-400 selection:text-slate-950',
+        card: 'bg-emerald-950/30 border-emerald-500/20 hover:border-emerald-500/40 hover:bg-emerald-950/50 text-emerald-100',
+        cardHighlight: 'bg-emerald-900/40 border-emerald-400/40',
+        pillActive: 'bg-emerald-400 text-slate-950 font-bold shadow',
+        pillInactive: 'bg-white/5 hover:bg-white/10 text-emerald-200 border border-emerald-500/20'
+      },
+      sunset: {
+        body: 'bg-[#150a1b] text-pink-50 selection:bg-pink-500 selection:text-slate-950',
+        card: 'bg-purple-950/20 border-purple-500/20 hover:border-pink-500/40 hover:bg-purple-950/40 text-white',
+        cardHighlight: 'bg-purple-900/40 border-pink-500/40',
+        pillActive: 'bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold shadow',
+        pillInactive: 'bg-white/5 hover:bg-white/10 text-pink-200 border border-purple-500/20'
+      },
+      minimal: {
+        body: 'bg-[#f8fafc] text-slate-900 selection:bg-slate-900 selection:text-white',
+        card: 'bg-white border-slate-200/80 hover:border-slate-300 shadow-sm hover:shadow-md text-slate-900',
+        cardHighlight: 'bg-slate-50 border-slate-400',
+        pillActive: 'bg-slate-900 text-white font-bold shadow',
+        pillInactive: 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+      }
+    };
+
+    // PARSE IDENTIFIER (Path /lynk/:id, /@:id, /:id, or query)
     const pathParts = window.location.pathname.split('/').filter(Boolean);
     const urlParams = new URLSearchParams(window.location.search);
-    let identifier = urlParams.get('id') || urlParams.get('slug') || '';
+    let identifier = urlParams.get('id') || urlParams.get('user') || '';
 
-    // Check pathname patterns: /lynk/:id, /@:id, or /:id
     if (!identifier && pathParts.length > 0) {
       if (pathParts[0] === 'lynk' || pathParts[0] === 'link') {
         identifier = pathParts[1] || '';
       } else if (pathParts[0].startsWith('@')) {
         identifier = pathParts[0].substring(1);
-      } else if (pathParts.length === 1 && !['admin', 'partner', 'product', 'api', 'uploads'].includes(pathParts[0].toLowerCase())) {
+      } else if (!['admin', 'partner', 'product', 'api', 'uploads', 'dashboard'].includes(pathParts[0].toLowerCase())) {
         identifier = pathParts[0];
       }
     }
 
-    // Check host for subdomain like mitra1.kheireditz.my.id (exclude patchwork, www, app, localhost)
     const host = (window.location.hostname || '').toLowerCase();
     if (!identifier && host.includes('.kheireditz.my.id')) {
       const sub = host.split('.kheireditz.my.id')[0];
@@ -266,299 +458,661 @@
     }
 
     let profileData = null;
-    let allProducts = [];
-    let activeCategory = '';
+    let productsList = [];
+    let categoriesList = [];
+    let activeCategoryId = '';
     let searchQuery = '';
+    let viewMode = localStorage.getItem('pw_lynk_view') || 'grid'; // Default 'grid' (2-kolom)
 
-    const themeStyles = {
-      modern: {
-        bodyBg: 'bg-slate-950 text-white selection:bg-indigo-500',
-        cardBg: 'bg-slate-900/90 border-slate-800 hover:border-slate-700',
-        badge: 'bg-indigo-600 text-white',
-        button: 'bg-indigo-600 hover:bg-indigo-700 text-white',
-        pillActive: 'bg-white text-slate-950',
-        pillInactive: 'bg-white/10 text-slate-300 hover:bg-white/20'
-      },
-      emerald: {
-        bodyBg: 'bg-[#031b14] text-white selection:bg-emerald-500',
-        cardBg: 'bg-emerald-950/40 border-emerald-900/60 hover:border-emerald-700',
-        badge: 'bg-emerald-500 text-slate-950',
-        button: 'bg-emerald-600 hover:bg-emerald-700 text-white',
-        pillActive: 'bg-emerald-400 text-slate-950',
-        pillInactive: 'bg-white/10 text-emerald-100 hover:bg-white/20'
-      },
-      sunset: {
-        bodyBg: 'bg-[#18051e] text-white selection:bg-rose-500',
-        cardBg: 'bg-rose-950/30 border-rose-900/50 hover:border-rose-700',
-        badge: 'bg-rose-500 text-white',
-        button: 'bg-rose-600 hover:bg-rose-700 text-white',
-        pillActive: 'bg-rose-400 text-slate-950',
-        pillInactive: 'bg-white/10 text-rose-100 hover:bg-white/20'
-      },
-      minimal: {
-        bodyBg: 'bg-slate-100 text-slate-900 selection:bg-slate-900 selection:text-white',
-        cardBg: 'bg-white border-slate-200 hover:border-slate-300 shadow-sm',
-        badge: 'bg-slate-900 text-white',
-        button: 'bg-slate-900 hover:bg-slate-800 text-white',
-        pillActive: 'bg-slate-900 text-white',
-        pillInactive: 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-      }
-    };
+    async function initPage() {
+      // Track page visitor for this Lynk ID
+      try {
+        fetch('/api/visitors/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ page: window.location.pathname })
+        }).catch(() => {});
+      } catch (e) {}
 
-    async function loadLynkData() {
-      if (!identifier) {
-        showError();
-        return;
-      }
+      const fetchUrl = identifier 
+        ? `/api/profile/${encodeURIComponent(identifier)}`
+        : `/api/profile/default`;
 
       try {
-        const res = await fetch(`/api/profile/${encodeURIComponent(identifier)}`);
+        const res = await fetch(fetchUrl);
         if (!res.ok) {
-          showError();
+          loadFallbackShowcase();
           return;
         }
-
         const data = await res.json();
-        profileData = data.user;
-        allProducts = data.products || [];
-
+        profileData = data.user || {};
+        productsList = data.products || [];
+        categoriesList = data.categories || [];
         renderProfile(data);
+      } catch (e) {
+        loadFallbackShowcase();
+      }
+    }
+
+    async function loadFallbackShowcase() {
+      try {
+        const [resP, resC] = await Promise.all([
+          fetch('/api/products?limit=50&status=Published'),
+          fetch('/api/categories')
+        ]);
+        const jsonP = await resP.json();
+        const jsonC = await resC.json();
+        const prods = jsonP.data || [];
+        const cats = jsonC.data || [];
+
+        profileData = {
+          name: 'patchwork',
+          bio: 'Koleksi tautan resmi, sosial media, dan etalase rekomendasi belanja terbaik.',
+          custom_slug: 'patchwork',
+          template: 'modern'
+        };
+        productsList = prods;
+        categoriesList = cats;
+        renderProfile({ user: profileData, products: prods, categories: cats });
       } catch (err) {
         showError();
       }
     }
 
     function renderProfile(data) {
-      document.getElementById('lynk-loading').classList.add('hidden');
-      document.getElementById('lynk-content').classList.remove('hidden');
+      document.getElementById('loading-state').classList.add('hidden');
+      document.getElementById('profile-container').classList.remove('hidden');
 
-      const u = data.user;
-      const tmplKey = u.template || 'modern';
-      const tmpl = themeStyles[tmplKey] || themeStyles.modern;
+      const u = data.user || {};
+      const tmpl = THEMES[u.template] || THEMES.modern;
 
-      // Apply theme to body
-      const bodyEl = document.getElementById('lynk-body');
-      bodyEl.className = `${tmpl.bodyBg} min-h-screen flex flex-col antialiased pb-16`;
+      // Apply body theme
+      document.getElementById('page-body').className = `${tmpl.body} min-h-screen flex flex-col antialiased`;
 
-      // Set Page titles
-      document.title = `${u.name || 'Etalase'} - Rekomendasi Resmi PATCHWORK`;
-      document.getElementById('page-title').innerText = `${u.name || 'Etalase'} - LYNK ID`;
-      document.getElementById('page-desc').content = u.bio || `Koleksi produk resmi dari ${u.name}`;
+      // Page Title & Meta
+      const name = u.name || 'patchwork';
+      document.title = `${name} | patchwork`;
+      document.getElementById('page-title').innerText = `${name} - Rekomendasi Belanja`;
+      document.getElementById('profile-name').innerText = name;
+      document.getElementById('profile-bio').innerText = u.bio || 'Etalase rekomendasi produk terverifikasi & tautan resmi.';
 
-      // Name & Bio
-      document.getElementById('profile-name').innerText = u.name || 'Mitra Penjual';
-      document.getElementById('profile-bio').innerText = u.bio || 'Selamat datang di etalase rekomendasi produk pilihan saya!';
-
-      // Slug pill
-      const displaySlug = u.custom_slug ? `${u.custom_slug}.kheireditz.my.id` : `kheireditz.my.id/lynk/${u.id}`;
-      document.getElementById('profile-slug-text').innerText = displaySlug;
-
-      // Avatar
-      const avBox = document.getElementById('profile-avatar-box');
+      // Avatar & Border Styling
+      const avBox = document.getElementById('profile-avatar');
       if (u.avatar) {
-        avBox.innerHTML = `<img src="${u.avatar}" alt="${u.name}" class="w-full h-full object-cover">`;
+        avBox.innerHTML = `<img src="${u.avatar}" alt="${name}" class="w-full h-full object-cover">`;
       } else {
-        const initials = (u.name || 'M P').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-        avBox.innerHTML = `<span class="text-2xl font-black tracking-wider">${initials}</span>`;
+        const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase() || 'PW';
+        avBox.innerHTML = `<span id="profile-initials" class="text-2xl font-black tracking-wider text-white">${initials}</span>`;
       }
 
-      // Social Links
-      const socialsContainer = document.getElementById('profile-socials');
-      socialsContainer.innerHTML = '';
+      // Apply Avatar Shape (Circle vs Squircle)
+      const shape = u.avatar_shape || 'circle';
+      avBox.classList.remove('rounded-full', 'rounded-2xl', 'rounded-3xl');
+      if (shape === 'circle') {
+        avBox.classList.add('rounded-full');
+      } else {
+        avBox.classList.add('rounded-2xl');
+      }
 
-      const socialConfigs = [
-        { key: 'shopee', label: 'Shopee', icon: 'shopping-bag', color: 'bg-orange-500/20 text-orange-400 border-orange-500/30' },
-        { key: 'tiktok', label: 'TikTok', icon: 'video', color: 'bg-pink-500/20 text-pink-400 border-pink-500/30' },
-        { key: 'instagram', label: 'Instagram', icon: 'camera', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
-        { key: 'youtube', label: 'YouTube', icon: 'play-circle', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
-        { key: 'website', label: 'Website', icon: 'globe', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
-        { key: 'phone', label: 'WhatsApp', icon: 'message-circle', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' }
-      ];
+      // Apply Avatar Border Color & Ring
+      const borderCol = u.avatar_border || 'emerald';
+      avBox.classList.remove(
+        'ring-4', 'ring-emerald-500/40', 'border-emerald-400',
+        'ring-amber-400/40', 'border-amber-300',
+        'ring-purple-500/40', 'border-purple-400',
+        'ring-cyan-400/40', 'border-cyan-300',
+        'ring-white/40', 'border-white',
+        'border-2'
+      );
+      const borderClassMap = {
+        emerald: ['ring-4', 'ring-emerald-500/40', 'border-2', 'border-emerald-400'],
+        amber: ['ring-4', 'ring-amber-400/40', 'border-2', 'border-amber-300'],
+        purple: ['ring-4', 'ring-purple-500/40', 'border-2', 'border-purple-400'],
+        cyan: ['ring-4', 'ring-cyan-400/40', 'border-2', 'border-cyan-300'],
+        white: ['ring-4', 'ring-white/40', 'border-2', 'border-white']
+      };
+      const classes = borderClassMap[borderCol] || borderClassMap.emerald;
+      avBox.classList.add(...classes);
 
-      socialConfigs.forEach(s => {
-        let link = u[s.key];
-        if (s.key === 'phone' && link) {
-          const cleanPhone = link.replace(/[^0-9]/g, '');
-          link = `https://wa.me/${cleanPhone.startsWith('0') ? '62' + cleanPhone.substring(1) : cleanPhone}`;
+      // Header Banner Behind PP
+      const bannerImg = document.getElementById('profile-banner-img');
+      const bannerWrapper = document.getElementById('profile-banner-wrapper');
+      if (bannerImg) {
+        if (u.banner && u.banner.trim()) {
+          bannerImg.style.backgroundImage = `url('${u.banner.trim()}')`;
+          bannerWrapper.classList.remove('hidden');
+        } else {
+          // Default stylish gradient if no banner image provided
+          bannerImg.style.backgroundImage = 'linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%)';
+          bannerWrapper.classList.remove('hidden');
         }
-        if (link) {
-          const a = document.createElement('a');
-          a.href = link;
-          a.target = '_blank';
-          a.rel = 'noopener noreferrer';
-          a.className = `inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition hover:scale-105 active:scale-95 ${s.color}`;
-          a.innerHTML = `<i data-lucide="${s.icon}" class="w-3.5 h-3.5"></i><span>${s.label}</span>`;
-          socialsContainer.appendChild(a);
+      }
+
+      // Page Custom Background
+      const customBg = document.getElementById('page-custom-bg');
+      const bgOverlay = document.getElementById('page-custom-bg-overlay');
+      if (customBg && bgOverlay) {
+        if (u.background && u.background.trim()) {
+          customBg.style.backgroundImage = `url('${u.background.trim()}')`;
+          customBg.classList.remove('opacity-0');
+          customBg.classList.add('opacity-100');
+          bgOverlay.classList.remove('opacity-0');
+          bgOverlay.classList.add('opacity-100');
+        } else {
+          customBg.style.backgroundImage = 'none';
+          customBg.classList.remove('opacity-100');
+          customBg.classList.add('opacity-0');
+          bgOverlay.classList.remove('opacity-100');
+          bgOverlay.classList.add('opacity-0');
         }
-      });
+      }
 
-      // Categories Bar
-      const catBar = document.getElementById('lynk-categories-bar');
-      const cats = data.categories || [];
-      catBar.innerHTML = `
-        <button onclick="filterCategory('')" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${activeCategory === '' ? tmpl.pillActive : tmpl.pillInactive}" data-cat="">
-          Semua (${allProducts.length})
-        </button>
-      `;
-      cats.forEach(c => {
-        catBar.innerHTML += `
-          <button onclick="filterCategory('${c.id}')" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${activeCategory === c.id ? tmpl.pillActive : tmpl.pillInactive}" data-cat="${c.id}">
-            ${c.name}
-          </button>
-        `;
-      });
+      // Display Slug
+      const slugPill = document.getElementById('profile-slug-display');
+      const cleanSlug = u.custom_slug || (u.email && u.email.includes('@') ? u.email.split('@')[0] : '') || identifier || 'kheireditz';
+      slugPill.innerText = `@${cleanSlug}`;
 
-      renderProductsList();
+      // Live Stats Dashboard (Kunjungan, Shopee, TikTok, Total Klik)
+      const stats = data.stats || {};
+      let totalShopee = stats.totalShopee !== undefined ? stats.totalShopee : 0;
+      let totalTiktok = stats.totalTiktok !== undefined ? stats.totalTiktok : 0;
+      let totalClicks = stats.totalClicks !== undefined ? stats.totalClicks : (totalShopee + totalTiktok);
+      let totalVisitors = stats.totalVisitors !== undefined ? stats.totalVisitors : 1;
+
+      // Fallback calculation if backend stats are empty
+      if (!data.stats && productsList.length > 0) {
+        productsList.forEach(p => {
+          totalShopee += (p.shopee_clicks || 0);
+          totalTiktok += (p.tiktok_clicks || 0);
+          totalClicks += (p.total_clicks || (p.shopee_clicks || 0) + (p.tiktok_clicks || 0));
+        });
+      }
+
+      const elVis = document.getElementById('stat-visitors-count');
+      const elShp = document.getElementById('stat-shopee-count');
+      const elTik = document.getElementById('stat-tiktok-count');
+      const elClk = document.getElementById('stat-clicks-count');
+      const elPrd = document.getElementById('stat-products-count');
+
+      if (elVis) elVis.innerText = Number(totalVisitors).toLocaleString('id-ID');
+      if (elShp) elShp.innerText = Number(totalShopee).toLocaleString('id-ID');
+      if (elTik) elTik.innerText = Number(totalTiktok).toLocaleString('id-ID');
+      if (elClk) elClk.innerText = Number(totalClicks).toLocaleString('id-ID');
+      if (elPrd) elPrd.innerText = productsList.length;
+
+      // Social Media Buttons
+      renderSocials(u);
+
+      // Categories Pills
+      renderCategories(data.categories || categoriesList);
+
+      // View Mode Sync
+      syncViewButtons();
+
+      // Products List
+      renderProducts();
+
       lucide.createIcons();
     }
 
-    function renderProductsList() {
-      const container = document.getElementById('lynk-products-list');
-      const countEl = document.getElementById('count-products');
-      const noProd = document.getElementById('lynk-no-products');
+    function renderSocials(u) {
+      const container = document.getElementById('social-channels');
+      container.innerHTML = '';
 
-      let filtered = allProducts;
-      if (activeCategory) {
-        filtered = filtered.filter(p => p.category_id === activeCategory);
+      const channels = [
+        {
+          key: 'instagram',
+          label: 'Instagram',
+          iconHtml: ICONS.instagram,
+          getUrl: (v) => v.startsWith('http') ? v : `https://instagram.com/${v.replace('@', '')}`,
+          classes: 'bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] text-white border-white/20 hover:opacity-90'
+        },
+        {
+          key: 'tiktok',
+          label: 'TikTok',
+          iconHtml: ICONS.tiktok,
+          getUrl: (v) => v.startsWith('http') ? v : `https://tiktok.com/@${v.replace('@', '')}`,
+          classes: 'bg-black hover:bg-neutral-900 text-white border-white/25'
+        },
+        {
+          key: 'shopee',
+          label: 'Shopee',
+          iconHtml: ICONS.shopee,
+          getUrl: (v) => v.startsWith('http') ? v : `https://shopee.co.id/${v}`,
+          classes: 'bg-[#ee4d2d] hover:bg-[#d73f21] text-white border-[#ee4d2d]/40'
+        },
+        {
+          key: 'phone',
+          label: 'WhatsApp',
+          iconHtml: ICONS.whatsapp,
+          getUrl: (v) => {
+            const clean = v.replace(/[^0-9]/g, '');
+            return `https://wa.me/${clean.startsWith('0') ? '62' + clean.substring(1) : clean}`;
+          },
+          classes: 'bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-bold border-[#25D366]/40'
+        },
+        {
+          key: 'youtube',
+          label: 'YouTube',
+          iconHtml: ICONS.youtube,
+          getUrl: (v) => v.startsWith('http') ? v : `https://youtube.com/${v.startsWith('@') ? v : '@' + v}`,
+          classes: 'bg-[#FF0000] hover:bg-[#d90000] text-white border-[#FF0000]/40'
+        },
+        {
+          key: 'website',
+          label: 'Website',
+          iconHtml: `<i data-lucide="globe" class="w-4 h-4"></i>`,
+          getUrl: (v) => v.startsWith('http') ? v : `https://${v}`,
+          classes: 'bg-white/10 hover:bg-white/15 text-white border-white/20'
+        }
+      ];
+
+      channels.forEach(ch => {
+        const val = u[ch.key];
+        if (val && String(val).trim()) {
+          const a = document.createElement('a');
+          a.href = ch.getUrl(val.trim());
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.className = `inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold press-bounce transition shadow-sm ${ch.classes}`;
+          a.title = ch.label;
+          a.innerHTML = `<span class="w-3.5 h-3.5 flex items-center justify-center shrink-0">${ch.iconHtml}</span><span>${ch.label}</span>`;
+          container.appendChild(a);
+        }
+      });
+    }
+
+    function renderCategories(cats) {
+      const bar = document.getElementById('category-pills');
+      if (!cats || cats.length === 0) {
+        const catMap = {};
+        productsList.forEach(p => {
+          if (p.category_id && p.category_name) {
+            catMap[p.category_id] = { id: p.category_id, name: p.category_name };
+          }
+        });
+        cats = Object.values(catMap);
       }
+
+      if (cats.length === 0) {
+        bar.classList.add('hidden');
+        return;
+      }
+
+      bar.classList.remove('hidden');
+      const tmpl = THEMES[profileData?.template] || THEMES.modern;
+
+      bar.innerHTML = `
+        <button onclick="setCategory('')" class="cat-pill px-3 py-1 rounded-xl text-xs shrink-0 transition press-bounce ${activeCategoryId === '' ? tmpl.pillActive : tmpl.pillInactive}" data-id="">
+          Semua (${productsList.length})
+        </button>
+      `;
+
+      cats.forEach(c => {
+        const count = productsList.filter(p => p.category_id === c.id).length;
+        bar.innerHTML += `
+          <button onclick="setCategory('${c.id}')" class="cat-pill px-3 py-1 rounded-xl text-xs shrink-0 transition press-bounce ${activeCategoryId === c.id ? tmpl.pillActive : tmpl.pillInactive}" data-id="${c.id}">
+            ${c.name} ${count > 0 ? `(${count})` : ''}
+          </button>
+        `;
+      });
+    }
+
+    function setViewMode(mode) {
+      viewMode = mode;
+      localStorage.setItem('pw_lynk_view', mode);
+      syncViewButtons();
+      renderProducts();
+    }
+
+    function syncViewButtons() {
+      const listBtn = document.getElementById('view-list-btn');
+      const gridBtn = document.getElementById('view-grid-btn');
+      if (viewMode === 'grid') {
+        gridBtn.className = 'w-8 h-8 rounded-xl flex items-center justify-center transition bg-white/20 text-white shadow-inner';
+        listBtn.className = 'w-8 h-8 rounded-xl flex items-center justify-center transition text-slate-400 hover:text-white';
+      } else {
+        listBtn.className = 'w-8 h-8 rounded-xl flex items-center justify-center transition bg-white/20 text-white shadow-inner';
+        gridBtn.className = 'w-8 h-8 rounded-xl flex items-center justify-center transition text-slate-400 hover:text-white';
+      }
+    }
+
+    function renderProducts() {
+      const container = document.getElementById('products-container');
+      const countEl = document.getElementById('products-count-badge');
+      const emptyEl = document.getElementById('no-products-found');
+      const filterLabel = document.getElementById('filter-status-label');
+
+      let filtered = productsList;
+      if (activeCategoryId) {
+        filtered = filtered.filter(p => p.category_id === activeCategoryId);
+        const cat = categoriesList.find(c => c.id === activeCategoryId);
+        filterLabel.innerText = cat ? cat.name : 'Filter Kategori';
+      } else {
+        filterLabel.innerText = 'Semua Kategori';
+      }
+
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
-        filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(q) || (p.description || '').toLowerCase().includes(q));
+        filtered = filtered.filter(p => 
+          (p.name || '').toLowerCase().includes(q) || 
+          (p.description || '').toLowerCase().includes(q) ||
+          (p.category_name || '').toLowerCase().includes(q)
+        );
+        filterLabel.innerText = `Pencarian: "${searchQuery}"`;
       }
 
       countEl.innerText = filtered.length;
 
       if (filtered.length === 0) {
         container.innerHTML = '';
-        noProd.classList.remove('hidden');
+        emptyEl.classList.remove('hidden');
         return;
       }
-      noProd.classList.add('hidden');
+      emptyEl.classList.add('hidden');
 
-      const u = profileData || {};
-      const tmplKey = u.template || 'modern';
-      const tmpl = themeStyles[tmplKey] || themeStyles.modern;
+      const tmpl = THEMES[profileData?.template] || THEMES.modern;
 
-      container.innerHTML = filtered.map(p => {
-        const shopeeLink = p.url_shopee || '';
-        const tiktokLink = p.url_tiktok || '';
-        const hasShopee = Boolean(shopeeLink);
-        const hasTiktok = Boolean(tiktokLink);
-
-        return `
-          <div class="product-card rounded-2xl border p-3 sm:p-3.5 ${tmpl.cardBg} flex items-center space-x-3 sm:space-x-3.5 group">
-            <a href="/product/${p.slug}" class="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border border-white/10 bg-black/20 block">
-              <img src="${p.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80'}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80'">
-            </a>
-
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center space-x-1.5 mb-1">
-                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${p.marketplace === 'Shopee' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' : 'bg-pink-500/20 text-pink-400 border border-pink-500/30'}">
-                  ${p.marketplace || 'Marketplace'}
-                </span>
-                ${p.commission_rate ? `<span class="text-[10px] font-bold text-emerald-400 hidden sm:inline">Komisi ${p.commission_rate}</span>` : ''}
-              </div>
-
-              <a href="/product/${p.slug}" class="block font-bold text-xs sm:text-sm truncate hover:underline" title="${p.name}">
-                ${p.name}
-              </a>
-
-              <div class="flex items-center justify-between mt-1.5 gap-2">
-                <div class="font-black text-xs sm:text-sm text-emerald-400">
-                  Rp ${Number(p.price || 0).toLocaleString('id-ID')}
-                </div>
-
-                <!-- DIRECT ACTION BUTTONS -->
-                <div class="flex items-center space-x-1.5 shrink-0">
-                  ${hasShopee ? `
-                    <a href="${shopeeLink}" target="_blank" onclick="trackClick('${p.id}', 'Shopee')" class="px-3 py-1.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-[11px] flex items-center space-x-1 shadow-sm transition btn-action" title="Beli di Shopee">
-                      <span>Shopee</span>
-                      <i data-lucide="external-link" class="w-3 h-3"></i>
-                    </a>
-                  ` : ''}
-                  ${hasTiktok ? `
-                    <a href="${tiktokLink}" target="_blank" onclick="trackClick('${p.id}', 'TikTok Shop')" class="px-3 py-1.5 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-[11px] flex items-center space-x-1 shadow-sm transition btn-action" title="Beli di TikTok Shop">
-                      <span>TikTok</span>
-                      <i data-lucide="external-link" class="w-3 h-3"></i>
-                    </a>
-                  ` : ''}
-                  ${!hasShopee && !hasTiktok ? `
-                    <a href="/product/${p.slug}" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] flex items-center space-x-1 transition btn-action">
-                      <span>Detail</span>
-                      <i data-lucide="arrow-right" class="w-3 h-3"></i>
-                    </a>
-                  ` : ''}
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
+      if (viewMode === 'grid') {
+        container.className = 'grid grid-cols-2 gap-2.5 w-full';
+        container.innerHTML = filtered.map(p => renderGridCard(p, tmpl)).join('');
+      } else {
+        container.className = 'space-y-2.5 w-full';
+        container.innerHTML = filtered.map(p => renderListCard(p, tmpl)).join('');
+      }
 
       lucide.createIcons();
     }
 
-    function filterCategory(catId) {
-      activeCategory = catId;
-      const u = profileData || {};
-      const tmplKey = u.template || 'modern';
-      const tmpl = themeStyles[tmplKey] || themeStyles.modern;
-
-      document.querySelectorAll('.cat-pill').forEach(btn => {
-        if (btn.getAttribute('data-cat') === catId) {
-          btn.className = `cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${tmpl.pillActive}`;
-        } else {
-          btn.className = `cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${tmpl.pillInactive}`;
-        }
-      });
-      renderProductsList();
-    }
-
-    function filterProducts(query) {
-      searchQuery = query;
-      renderProductsList();
+    function formatValidUrl(url, fallbackTerm = '') {
+      if (!url || typeof url !== 'string') {
+        return fallbackTerm ? `https://shopee.co.id/search?keyword=${encodeURIComponent(fallbackTerm)}` : '#';
+      }
+      url = url.trim();
+      if (!url || url === '#' || url === 'javascript:void(0)') {
+        return fallbackTerm ? `https://shopee.co.id/search?keyword=${encodeURIComponent(fallbackTerm)}` : '#';
+      }
+      if (/^https?:\/\//i.test(url)) return url;
+      if (url.startsWith('//')) return 'https:' + url;
+      return 'https://' + url;
     }
 
     function trackClick(productId, marketplace) {
-      fetch('/api/clicks/track', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product_id: productId, marketplace })
-      }).catch(() => {});
+      if (!productId) return;
+
+      // Optimistic UI counter update for instantaneous feedback
+      const mp = (marketplace || '').toLowerCase();
+      const elShp = document.getElementById('stat-shopee-count');
+      const elTik = document.getElementById('stat-tiktok-count');
+      const elClk = document.getElementById('stat-clicks-count');
+
+      if (elClk) {
+        const cur = parseInt((elClk.innerText || '0').replace(/[^0-9]/g, '')) || 0;
+        elClk.innerText = Number(cur + 1).toLocaleString('id-ID');
+      }
+
+      if (mp.includes('shopee') && elShp) {
+        const cur = parseInt((elShp.innerText || '0').replace(/[^0-9]/g, '')) || 0;
+        elShp.innerText = Number(cur + 1).toLocaleString('id-ID');
+      } else if (mp.includes('tiktok') && elTik) {
+        const cur = parseInt((elTik.innerText || '0').replace(/[^0-9]/g, '')) || 0;
+        elTik.innerText = Number(cur + 1).toLocaleString('id-ID');
+      }
+
+      try {
+        fetch('/api/clicks/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product_id: productId, marketplace: marketplace || 'General' })
+        }).catch(() => {});
+      } catch (e) {}
+    }
+
+    function renderListCard(p, tmpl) {
+      const hasShopee = Boolean(p.url_shopee && p.url_shopee.trim());
+      const hasTiktok = Boolean(p.url_tiktok && p.url_tiktok.trim());
+      const shopeeUrl = hasShopee ? formatValidUrl(p.url_shopee, p.name) : '';
+      const tiktokUrl = hasTiktok ? formatValidUrl(p.url_tiktok, p.name) : '';
+      const targetUrl = shopeeUrl || tiktokUrl || formatValidUrl(p.url_tokopedia, p.name);
+      const isExternal = targetUrl.startsWith('http');
+      const isSpecial = Boolean(p.is_featured);
+
+      return `
+        <div class="card-item rounded-2xl border p-2.5 sm:p-3 ${isSpecial ? tmpl.cardHighlight : tmpl.card} flex items-center space-x-3 group relative overflow-hidden">
+          
+          <!-- Thumbnail with Hover Zoom -->
+          <a href="${targetUrl}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} onclick="trackClick('${p.id}', 'Thumbnail')" class="w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-xl overflow-hidden bg-black/20 shrink-0 border border-white/10 block relative">
+            <img src="${p.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&q=80'}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&q=80'">
+            ${isSpecial ? `
+              <span class="absolute top-1 left-1 px-1 py-0.2 rounded bg-amber-500 text-slate-950 font-black text-[9px] uppercase tracking-wider shadow">Pilihan</span>
+            ` : ''}
+          </a>
+
+          <!-- Details -->
+          <div class="flex-1 min-w-0 pr-1">
+            <div class="flex items-center space-x-1.5 mb-1">
+              ${hasShopee ? `
+                <span class="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#ee4d2d]/20 text-[#ee4d2d] border border-[#ee4d2d]/30">
+                  <span class="w-3 h-3 inline-flex items-center justify-center shrink-0">${ICONS.shopee}</span>
+                  <span>Shopee</span>
+                </span>
+              ` : ''}
+              ${hasTiktok ? `
+                <span class="inline-flex items-center justify-center w-5 h-5 rounded-md bg-white/10 text-white border border-white/20" title="TikTok">
+                  <span class="w-3 h-3 inline-flex items-center justify-center">${ICONS.tiktok}</span>
+                </span>
+              ` : ''}
+              ${p.category_name ? `<span class="text-[10px] text-slate-400 truncate">${p.category_name}</span>` : ''}
+            </div>
+
+            <a href="${targetUrl}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} onclick="trackClick('${p.id}', 'Title')" class="block font-bold text-xs sm:text-[13px] leading-snug line-clamp-1 group-hover:text-emerald-400 transition" title="${p.name}">
+              ${p.name}
+            </a>
+
+            <div class="flex items-center justify-between mt-1.5">
+              <span class="font-extrabold text-xs sm:text-sm text-emerald-400 font-mono">
+                Rp ${Number(p.price || 0).toLocaleString('id-ID')}
+              </span>
+
+              <!-- Direct Buy Action Buttons -->
+              <div class="flex items-center space-x-1.5 shrink-0">
+                ${hasShopee ? `
+                  <a href="${shopeeUrl}" target="_blank" rel="noopener noreferrer" onclick="trackClick('${p.id}', 'Shopee')" class="px-2.5 py-1 rounded-lg bg-[#ee4d2d] hover:bg-[#d73f21] text-white text-[11px] font-bold inline-flex items-center space-x-1.5 press-bounce shadow-sm leading-none" title="Beli di Shopee">
+                    <span class="w-3.5 h-3.5 inline-flex items-center justify-center shrink-0">${ICONS.shopee}</span>
+                    <span>Shopee</span>
+                  </a>
+                ` : ''}
+                ${hasTiktok ? `
+                  <a href="${tiktokUrl}" target="_blank" rel="noopener noreferrer" onclick="trackClick('${p.id}', 'TikTok')" class="w-7 h-7 rounded-lg bg-black hover:bg-neutral-900 border border-white/20 text-white inline-flex items-center justify-center press-bounce shadow-sm" title="TikTok">
+                    <span class="w-3.5 h-3.5 inline-flex items-center justify-center">${ICONS.tiktok}</span>
+                  </a>
+                ` : ''}
+                ${!hasShopee && !hasTiktok ? `
+                  <a href="${targetUrl}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} onclick="trackClick('${p.id}', 'Direct')" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold flex items-center space-x-1 press-bounce">
+                    <span>Buka</span>
+                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                  </a>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    function renderGridCard(p, tmpl) {
+      const hasShopee = Boolean(p.url_shopee && p.url_shopee.trim());
+      const hasTiktok = Boolean(p.url_tiktok && p.url_tiktok.trim());
+      const shopeeUrl = hasShopee ? formatValidUrl(p.url_shopee, p.name) : '';
+      const tiktokUrl = hasTiktok ? formatValidUrl(p.url_tiktok, p.name) : '';
+      const targetUrl = shopeeUrl || tiktokUrl || formatValidUrl(p.url_tokopedia, p.name);
+      const isExternal = targetUrl.startsWith('http');
+      const isSpecial = Boolean(p.is_featured);
+
+      return `
+        <div class="grid-view-card rounded-2xl border ${isSpecial ? tmpl.cardHighlight : tmpl.card} p-2.5 flex flex-col justify-between group overflow-hidden">
+          
+          <!-- Image -->
+          <a href="${targetUrl}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} onclick="trackClick('${p.id}', 'Thumbnail')" class="w-full aspect-square rounded-xl overflow-hidden bg-black/20 mb-2 block relative border border-white/10">
+            <img src="${p.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&q=80'}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&q=80'">
+            ${isSpecial ? `
+              <span class="absolute top-1.5 left-1.5 px-1.5 py-0.2 rounded bg-amber-500 text-slate-950 font-black text-[9px] uppercase tracking-wider shadow">Pilihan</span>
+            ` : ''}
+          </a>
+
+          <!-- Meta -->
+          <div class="space-y-1.5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center space-x-1 mb-1">
+                ${hasShopee ? `
+                  <span class="w-3.5 h-3.5 inline-flex items-center justify-center text-[#ee4d2d]" title="Shopee">${ICONS.shopee}</span>
+                ` : ''}
+                ${hasTiktok ? `
+                  <span class="w-3.5 h-3.5 inline-flex items-center justify-center text-white" title="TikTok">${ICONS.tiktok}</span>
+                ` : ''}
+                <span class="text-[10px] text-slate-400 truncate">${p.category_name || 'Rekomendasi'}</span>
+              </div>
+              <a href="${targetUrl}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} onclick="trackClick('${p.id}', 'Title')" class="font-bold text-xs leading-snug line-clamp-2 group-hover:text-emerald-400 transition" title="${p.name}">
+                ${p.name}
+              </a>
+            </div>
+
+            <div class="pt-2">
+              <div class="font-extrabold text-xs text-emerald-400 font-mono mb-2">
+                Rp ${Number(p.price || 0).toLocaleString('id-ID')}
+              </div>
+
+              <!-- Action button in grid -->
+              ${hasShopee && hasTiktok ? `
+                <div class="flex items-center space-x-1.5">
+                  <a href="${shopeeUrl}" target="_blank" rel="noopener noreferrer" onclick="trackClick('${p.id}', 'Shopee')" class="flex-1 py-1.5 rounded-xl bg-[#ee4d2d] hover:bg-[#d73f21] text-white text-[11px] font-bold flex items-center justify-center space-x-1.5 press-bounce shadow-sm leading-none" title="Beli di Shopee">
+                    <span class="w-3.5 h-3.5 inline-flex items-center justify-center shrink-0">${ICONS.shopee}</span>
+                    <span>Shopee</span>
+                  </a>
+                  <a href="${tiktokUrl}" target="_blank" rel="noopener noreferrer" onclick="trackClick('${p.id}', 'TikTok')" class="w-8 h-8 rounded-xl bg-black hover:bg-neutral-900 border border-white/20 text-white inline-flex items-center justify-center press-bounce shadow-sm shrink-0" title="TikTok">
+                    <span class="w-4 h-4 inline-flex items-center justify-center">${ICONS.tiktok}</span>
+                  </a>
+                </div>
+              ` : hasShopee ? `
+                <a href="${shopeeUrl}" target="_blank" rel="noopener noreferrer" onclick="trackClick('${p.id}', 'Shopee')" class="w-full py-1.5 rounded-xl bg-[#ee4d2d] hover:bg-[#d73f21] text-white text-[11px] font-bold flex items-center justify-center space-x-1.5 press-bounce shadow-sm leading-none" title="Beli di Shopee">
+                  <span class="w-3.5 h-3.5 inline-flex items-center justify-center shrink-0">${ICONS.shopee}</span>
+                  <span>Shopee</span>
+                </a>
+              ` : hasTiktok ? `
+                <a href="${tiktokUrl}" target="_blank" rel="noopener noreferrer" onclick="trackClick('${p.id}', 'TikTok')" class="w-full py-2 rounded-xl bg-black hover:bg-neutral-900 border border-white/20 text-white inline-flex items-center justify-center press-bounce shadow-sm" title="TikTok">
+                  <span class="w-4 h-4 inline-flex items-center justify-center">${ICONS.tiktok}</span>
+                </a>
+              ` : `
+                <a href="${targetUrl}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} onclick="trackClick('${p.id}', 'Direct')" class="w-full py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold flex items-center justify-center space-x-1 press-bounce">
+                  <span>Lihat Produk</span>
+                  <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                </a>
+              `}
+            </div>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+    function setCategory(id) {
+      activeCategoryId = id;
+      const tmpl = THEMES[profileData?.template] || THEMES.modern;
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        if (btn.getAttribute('data-id') === id) {
+          btn.className = `cat-pill px-3 py-1 rounded-xl text-xs shrink-0 transition press-bounce ${tmpl.pillActive}`;
+        } else {
+          btn.className = `cat-pill px-3 py-1 rounded-xl text-xs shrink-0 transition press-bounce ${tmpl.pillInactive}`;
+        }
+      });
+      renderProducts();
+    }
+
+    function handleSearch(val) {
+      searchQuery = val.trim();
+      const clearBtn = document.getElementById('clear-search-btn');
+      if (searchQuery) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+      renderProducts();
+    }
+
+    function clearSearch() {
+      document.getElementById('product-search').value = '';
+      searchQuery = '';
+      document.getElementById('clear-search-btn').classList.add('hidden');
+      renderProducts();
+    }
+
+    function resetFilters() {
+      clearSearch();
+      setCategory('');
     }
 
     function showError() {
-      document.getElementById('lynk-loading').classList.add('hidden');
-      document.getElementById('lynk-error').classList.remove('hidden');
+      document.getElementById('loading-state').classList.add('hidden');
+      document.getElementById('error-state').classList.remove('hidden');
       lucide.createIcons();
     }
 
-    function getShareableUrl() {
+    function getShareUrl() {
       const u = profileData || {};
-      if (u.custom_slug) {
-        return `https://${u.custom_slug}.kheireditz.my.id`;
+      const origin = window.location.origin;
+      let slug = u.custom_slug || (u.email && u.email.includes('@') ? u.email.split('@')[0] : '') || identifier || 'kheireditz';
+      
+      // If slug matches a raw UUID pattern, replace with clean handle
+      if (!slug || /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)) {
+        slug = (u.email && u.email.includes('@') ? u.email.split('@')[0] : '') || 'kheireditz';
       }
-      return `${window.location.origin}/lynk/${u.id || identifier}`;
+      
+      return `${origin}/@${encodeURIComponent(slug)}`;
     }
 
     function openShareModal() {
       const modal = document.getElementById('share-modal');
-      const shareUrl = getShareableUrl();
+      const shareUrl = getShareUrl();
       modal.classList.remove('hidden');
       document.body.classList.add('overflow-hidden');
 
-      const qrContainer = document.getElementById('qrcode-box');
-      qrContainer.innerHTML = '';
-      if (typeof QRCode !== 'undefined') {
-        new QRCode(qrContainer, {
-          text: shareUrl,
-          width: 160,
-          height: 160,
-          colorDark: "#0f172a",
-          colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.M
-        });
+      const urlInput = document.getElementById('share-url-input');
+      if (urlInput) {
+        urlInput.value = shareUrl;
       }
+
+      const wrapper = document.getElementById('qrcode-wrapper');
+      wrapper.innerHTML = '';
+
+      // Direct synchronous render with offline pure-JS QRCode engine
+      try {
+        if (typeof QRCode !== 'undefined') {
+          new QRCode(wrapper, {
+            text: shareUrl,
+            width: 180,
+            height: 180,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel ? QRCode.CorrectLevel.M : 0
+          });
+        }
+      } catch (err) {
+        console.warn('QRCode render notice:', err);
+      }
+
+      // Check if rendered successfully (canvas present), otherwise fallback to high-res online image
+      const hasCanvas = wrapper.querySelector('canvas');
+      if (!hasCanvas || wrapper.children.length === 0) {
+        const qrImg = new Image();
+        qrImg.className = 'w-[160px] h-[160px] object-contain rounded-xl shadow-sm block mx-auto';
+        qrImg.alt = 'QR Code';
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=8&data=${encodeURIComponent(shareUrl)}`;
+        wrapper.innerHTML = '';
+        wrapper.appendChild(qrImg);
+      }
+
       lucide.createIcons();
     }
 
@@ -567,26 +1121,142 @@
       document.body.classList.remove('overflow-hidden');
     }
 
-    function copyCurrentLynkUrl() {
-      const shareUrl = getShareableUrl();
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        const txt = document.getElementById('copy-btn-text');
-        txt.innerText = 'Tautan Tersalin ke Clipboard!';
-        setTimeout(() => { txt.innerText = 'Salin Tautan Etalase'; }, 2000);
-      }).catch(() => {
-        prompt('Salin tautan profil ini:', shareUrl);
-      });
+    function copyLynkUrl() {
+      const url = getShareUrl();
+      const doSuccess = () => {
+        showToast('Tautan etalase berhasil disalin!');
+        const lbl = document.getElementById('copy-btn-label');
+        if (lbl) {
+          lbl.innerText = 'Tersalin!';
+          setTimeout(() => { lbl.innerText = 'Salin'; }, 2000);
+        }
+      };
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(doSuccess).catch(() => fallbackCopy(url, doSuccess));
+      } else {
+        fallbackCopy(url, doSuccess);
+      }
     }
 
-    function shareViaWhatsApp() {
-      const u = profileData || {};
-      const shareUrl = getShareableUrl();
-      const text = `Halo! Yuk cek etalase rekomendasi belanja resmi ${u.name || ''} di sini: ${shareUrl}`;
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    function fallbackCopy(text, cb) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand('copy');
+        if (cb) cb();
+      } catch (e) {
+        prompt('Salin link berikut:', text);
+      }
+      document.body.removeChild(ta);
     }
 
-    // Initialize
-    loadLynkData();
+    function nativeShare() {
+      const shareUrl = getShareUrl();
+      const name = profileData?.name || 'patchwork';
+      if (navigator.share) {
+        navigator.share({
+          title: `${name} - Rekomendasi Belanja & Etalase`,
+          text: `Cek koleksi produk rekomendasi & etalase resmi pilihan ${name}:`,
+          url: shareUrl
+        }).catch(() => {});
+      } else {
+        copyLynkUrl();
+      }
+    }
+
+    function downloadQrCode() {
+      const wrapper = document.getElementById('qrcode-wrapper');
+      const canvas = wrapper.querySelector('canvas');
+      const img = wrapper.querySelector('img');
+      const svg = wrapper.querySelector('svg');
+      const name = (profileData?.custom_slug || profileData?.name || 'patchwork').toLowerCase().replace(/[^a-z0-9]/g, '-');
+
+      if (canvas) {
+        const a = document.createElement('a');
+        a.download = `qrcode-${name}.png`;
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+        showToast('QR Code berhasil diunduh!');
+      } else if (svg) {
+        // Convert SVG to Canvas and download as PNG
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        const URL = window.URL || window.webkitURL || window;
+        const blobURL = URL.createObjectURL(svgBlob);
+        const tempImg = new Image();
+        tempImg.onload = function() {
+          const cvs = document.createElement('canvas');
+          cvs.width = 400;
+          cvs.height = 400;
+          const ctx = cvs.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, 400, 400);
+          ctx.drawImage(tempImg, 0, 0, 400, 400);
+          URL.revokeObjectURL(blobURL);
+          const a = document.createElement('a');
+          a.download = `qrcode-${name}.png`;
+          a.href = cvs.toDataURL('image/png');
+          a.click();
+          showToast('QR Code berhasil diunduh!');
+        };
+        tempImg.src = blobURL;
+      } else if (img && img.src) {
+        // Create canvas to download image without cross-origin issues
+        const tempImg = new Image();
+        tempImg.crossOrigin = 'anonymous';
+        tempImg.onload = function() {
+          const cvs = document.createElement('canvas');
+          cvs.width = tempImg.naturalWidth || 300;
+          cvs.height = tempImg.naturalHeight || 300;
+          const ctx = cvs.getContext('2d');
+          ctx.drawImage(tempImg, 0, 0);
+          const a = document.createElement('a');
+          a.download = `qrcode-${name}.png`;
+          a.href = cvs.toDataURL('image/png');
+          a.click();
+          showToast('QR Code berhasil diunduh!');
+        };
+        tempImg.onerror = function() {
+          const a = document.createElement('a');
+          a.download = `qrcode-${name}.png`;
+          a.href = img.src;
+          a.target = '_blank';
+          a.click();
+          showToast('QR Code siap diunduh!');
+        };
+        tempImg.src = img.src;
+      } else {
+        showToast('QR Code belum siap, coba sesaat lagi.');
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const txt = document.getElementById('toast-message');
+      txt.innerText = msg;
+      toast.classList.remove('opacity-0', 'translate-y-3');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-3');
+      }, 2500);
+    }
+
+    function shareToWhatsApp() {
+      const url = getShareUrl();
+      const name = profileData?.name || 'patchwork';
+      const text = `Halo! Kunjungi koleksi produk & tautan resmi pilihan ${name}: ${url}`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    // Auto-init on page load
+    initPage();
   </script>
 </body>
 </html>

@@ -17,9 +17,9 @@ export function authenticateToken(req, res, next) {
     }
     
     // Fetch user details from DB to ensure fresh status, role, and profile fields
-    let user = sqlite.prepare('SELECT id, name, email, phone, role, status, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug FROM users WHERE id = ?').get(decoded.id);
+    let user = sqlite.prepare('SELECT id, name, email, phone, role, status, bio, avatar, banner, background, avatar_border, avatar_shape, tiktok, instagram, shopee, youtube, website, template, custom_slug FROM users WHERE id = ?').get(decoded.id);
     if (!user && decoded.email) {
-      user = sqlite.prepare('SELECT id, name, email, phone, role, status, bio, avatar, tiktok, instagram, shopee, youtube, website, template, custom_slug FROM users WHERE email = ?').get(decoded.email);
+      user = sqlite.prepare('SELECT id, name, email, phone, role, status, bio, avatar, banner, background, avatar_border, avatar_shape, tiktok, instagram, shopee, youtube, website, template, custom_slug FROM users WHERE email = ?').get(decoded.email);
     }
     if (!user && decoded.role) {
       // If user was created in previous container instance, allow valid decoded token payload
